@@ -9,6 +9,7 @@ package Streamy
 		public var udpport:uint;
 		public var tcpsocket:Socket;
 		public var id:String;
+		public var identifier:uint;
 		
 		public function ServerPeer(Ip:String, Port:uint, TCPSocket:Socket) 
 		{

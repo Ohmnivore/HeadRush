@@ -2,6 +2,7 @@ package Streamy
 {
 	import flash.utils.ByteArray;
 	import flash.errors.IOError;
+	import org.flixel.FlxG;
 	
 	/**
 	 * @author Ohmnivore
@@ -54,6 +55,11 @@ package Streamy
 		public var isClient:Boolean;
 		
 		/**
+		 * DO NOT USE. NOT IMPLEMENTED.
+		 */
+		public var compress:Boolean;
+		
+		/**
 		 * A buffer used when sending.
 		 * @private
 		 */
@@ -70,14 +76,16 @@ package Streamy
 		 * 
 		 * @param id		The message ID. Should be the same on both server and client. Must be 10 or larger. 0-9 are reserved for internal messages.
 		 * @param Network	The parent network. You should pass an instance of a client or that of a server.
+		 * @param Compress 	Whether to use zlib compression. Only compresses when message is sent through TCP (reliable).
 		 */
-		public function Message(id:uint, Network) 
+		public function Message(id:uint, Network, Compress:Boolean = false) 
 		{
 			fields = new Array();
 			msg = new Array();
 			_tosend = new Array();
 			bytedata = new ByteArray();
 			ID = id;
+			compress = Compress;
 			
 			network = Network;
 			network.add(this);
@@ -108,6 +116,7 @@ package Streamy
 				{
 					_tosend.splice(0);
 					_tosend.push(ID);
+					bytedata.clear();
 					
 					for (var x:uint; x < fields.length; x++)
 					{
@@ -118,18 +127,20 @@ package Streamy
 					{
 						if (y == 0)
 						{
-							network.tcpsocket.writeInt(_tosend[y]);
+							bytedata.writeInt(_tosend[y]);
 						}
 						
 						else
 						{
-							if (types[y-1] == "String") network.tcpsocket.writeUTF(_tosend[y]);
-							if (types[y-1] == "Int") network.tcpsocket.writeInt(_tosend[y]);
-							if (types[y-1] == "Float") network.tcpsocket.writeFloat(_tosend[y]);
-							if (types[y-1] == "Boolean") network.tcpsocket.writeBoolean(_tosend[y]);
+							if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
+							if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
+							if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
+							if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
 						}
 					}
 					
+					if (compress) bytedata.compress();
+					network.tcpsocket.writeBytes(bytedata);
 					network.tcpsocket.flush();
 				}
 				
@@ -137,6 +148,7 @@ package Streamy
 				{
 					_tosend.splice(0);
 					_tosend.push(ID);
+					bytedata.clear();
 					
 					for (var x:uint; x < fields.length; x++)
 					{
@@ -147,18 +159,21 @@ package Streamy
 					{
 						if (y == 0)
 						{
-							peer.tcpsocket.writeInt(_tosend[y]);
+							bytedata.writeInt(_tosend[y]);
 						}
 						
 						else
 						{
-							if (types[y-1] == "String") peer.tcpsocket.writeUTF(_tosend[y]);
-							if (types[y-1] == "Int") peer.tcpsocket.writeInt(_tosend[y]);
-							if (types[y-1] == "Float") peer.tcpsocket.writeFloat(_tosend[y]);
-							if (types[y-1] == "Boolean") peer.tcpsocket.writeBoolean(_tosend[y]);
+							if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
+							if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
+							if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
+							if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
 						}
 					}
 					
+					//trace(peer.tcpsocket.remotePort);
+					if (compress) bytedata.compress();
+					peer.tcpsocket.writeBytes(bytedata);
 					peer.tcpsocket.flush();
 				}
 			}

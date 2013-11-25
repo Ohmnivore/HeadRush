@@ -124,7 +124,7 @@ package Streamy
 		private function ProcessTCP(buffer:ByteArray, peersocket:Socket):Array
 		{
 			var inputarray:Array = new Array();
-			
+			//tcpsocket.
 			var x:uint = 0;
 			var y:uint = 100;
 			while (buffer.bytesAvailable && x <= y)
@@ -280,9 +280,13 @@ package Streamy
 			}
 		}
 		
-		private function onClientClose( event:Event ):void 
+		public function onClientClose( event:Event ):void 
         { 
             trace( "Server:", "TCPConnection to client closed." ); 
+			var sock:Socket = event.target as Socket;
+			var id:String = sock.remoteAddress.concat(sock.remotePort);
+			
+			delete peers[id];
             //Should also remove from clientSockets array... 
         } 
  

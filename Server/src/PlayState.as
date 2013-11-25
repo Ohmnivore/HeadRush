@@ -1,5 +1,6 @@
 package  
 {
+	import flash.utils.ByteArray;
 	import org.flixel.*;
 	
 	public class PlayState extends FlxState
@@ -9,16 +10,31 @@ package
 		public var spawns:Array = new Array();
 		public var players:FlxGroup = new FlxGroup();
 		
+		internal var elapsed:Number;
+		internal var messagespersecond:uint;
+		internal var rate:Number;
+		
 		override public function create():void 
 		{
 			super.create();
 			
+			elapsed = 0;
+			rate = 1.0 / messagespersecond;
+			
 			Registry.playstate = this;
+			Registry.server = new RushServer();
+			
+			Msg.init();
 			
 			FlxG.bgColor = 0xff7A7A7A;
 			
 			map = new FlxTilemap();
 			string = convertMatrixToStr(Registry.mapray);
+			var temp:String = new String();
+			temp = LZW.compress(string);
+			trace(string.length);
+			//temp.compress();
+			trace(temp.length);
 			map.loadMap(string, FlxTilemap.ImgAuto, 8, 8, FlxTilemap.AUTO);
 			add(map);
 			
@@ -27,14 +43,38 @@ package
 			var spect:Spectator = new Spectator(0, 0);
 			add(spect);
 			
+			generatespawns();
+			
 			FlxG.camera.setBounds(0, 0, map.width, map.height);
 			FlxG.camera.follow(spect);
+			
+			Msg.mapstring.msg["compressed"] = temp;
 		}
 		
 		override public function update():void
 		{
 			super.update();
 			FlxG.collide(players, map);
+			
+			elapsed += FlxG.elapsed;
+			if (elapsed >= messagespersecond)
+			{
+				elapsed = 0;
+				
+				var peerstates:Array = new Array;
+				for each (var peer:Player in players.members)
+				{
+					//FlxG.log(peer.ID);
+					var peerstate:Array = new Array();
+					peerstate.push(peer.ID);
+					peerstate.push(peer.x);
+					peerstate.push(peer.y);
+					peerstates.push(peerstate);
+				}
+				
+				Msg.clientpositions.msg["json"] = JSON.stringify(peerstates);
+				Msg.clientpositions.SendUnreliableToAll();
+			}
 		}
 		
 		public function convertMatrixToStr( mat:Array ):String
@@ -54,6 +94,21 @@ package
 			return mapString;
 		}
 		
+		public static function encode(ba:ByteArray):String 
+		{
+			var origPos:uint = ba.position;
+			var result:Array = new Array();
+
+			for (ba.position = 0; ba.position < ba.length - 1; )
+				result.push(ba.readShort());
+
+			if (ba.position != ba.length)
+				result.push(ba.readByte() << 8);
+
+			ba.position = origPos;
+			return String.fromCharCode.apply(null, result);
+		}
+		
 		private function getspawn():FlxPoint
 		{
 			var ok:Boolean = false;
@@ -66,7 +121,7 @@ package
 				x = xb / 8;
 				y = yb / 8;
 				
-				if (Registry.mapray[y][x] == 1)
+				if (Registry.mapray[y][x] == 1 || xb == 300 || yb == 300)
 				{
 					xb = Math.floor(Math.random() * 300);
 					yb = Math.floor(Math.random() * 200);

@@ -1,11 +1,8 @@
 package  
 {
 	import org.flixel.*;
+	import RushServer;
 
-	/**
-	 * ...
-	 * @author Grey
-	 */
 	public class Registry 
 	{
 			public static var totdiggers:int = 0;		
@@ -13,8 +10,9 @@ package
 			public static var ddig:int = 0;
 			
 			public static var playstate:PlayState;
+			public static var server:RushServer;
 			
-			public static function getRandomElementOf(array:Array):Object 
+			public static function getRandomElementOf(array:Array):* 
 			{
 				var idx:int=Math.floor(Math.random() * array.length);
 				return array[idx];
