@@ -28,7 +28,7 @@ package org.flixel.system
 		/**
 		 * A reference to the tilemap this tile object belongs to.
 		 */
-		public var tilemap;
+		public var tilemap:FlxTilemap;
 		/**
 		 * The index of this tile type in the core map data.
 		 * For example, if your map only has 16 kinds of tiles in it,
@@ -52,7 +52,7 @@ package org.flixel.system
 		 * @param Visible			Whether the tile is visible or not.
 		 * @param AllowCollisions	The collision flags for the object.  By default this value is ANY or NONE depending on the parameters sent to loadMap().
 		 */
-		public function FlxTile(Tilemap, Index:uint, Width:Number, Height:Number, Visible:Boolean, AllowCollisions:uint)
+		public function FlxTile(Tilemap:FlxTilemap, Index:uint, Width:Number, Height:Number, Visible:Boolean, AllowCollisions:uint)
 		{
 			super(0, 0, Width, Height);
 			immovable = true;

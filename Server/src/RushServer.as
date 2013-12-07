@@ -19,7 +19,7 @@ package
 		
 		public function RushServer() 
 		{
-			super("127.0.0.1", 5605, 5605);
+			super("192.168.1.5", 5613, 5613);
 			id = 0;
 		}
 		
@@ -42,6 +42,7 @@ package
 		
 		override public function NewClient(event:ServerSocketConnectEvent):void
 		{
+			FlxG.log("newplayer");
 			Msg.newclient.msg["id"] = id;
 			Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
 			Msg.newclient.SendReliableToAll();
@@ -50,7 +51,6 @@ package
 			
 			var spawn:FlxPoint = Registry.getRandomElementOf(Registry.playstate.spawns);
 			var newplayer:Player = new Player(spawn.x, spawn.y);
-			Registry.playstate.players.add(newplayer);
 			
 			trace(newplayer.x, newplayer.y);
 			
@@ -65,7 +65,7 @@ package
 			
 			Msg.fellowclients.msg["yourid"] = id;
 			var peerarray:Array = new Array();
-			for each (var client:Player in Registry.playstate.players)
+			for each (var client:Player in Registry.playstate.players.members)
 			{
 				var infoarray:Array = new Array();
 				infoarray.push(client.ID);
@@ -75,6 +75,7 @@ package
 			Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
 			Msg.fellowclients.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			id++;
+			Registry.playstate.players.add(newplayer);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void

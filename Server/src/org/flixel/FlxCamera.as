@@ -302,6 +302,12 @@ package org.flixel
 					var targetX:Number = target.x + ((target.x > 0)?0.0000001:-0.0000001);
 					var targetY:Number = target.y + ((target.y > 0)?0.0000001:-0.0000001);
 					
+					if ((target is FlxSprite) && (FlxSprite(target).isSimpleRender()))
+					{
+						targetX = FlxU.floor(targetX);
+						targetY = FlxU.floor(targetY);
+					}
+					
 					edge = targetX - deadzone.x;
 					if(scroll.x > edge)
 						scroll.x = edge;
@@ -380,24 +386,34 @@ package org.flixel
 		public function follow(Target:FlxObject, Style:uint=STYLE_LOCKON):void
 		{
 			target = Target;
-			var helper:Number;
+			
+			if (target == null)
+			{
+				deadzone = null;
+				return;
+			}
+			
 			switch(Style)
 			{
 				case STYLE_PLATFORMER:
-					var w:Number = width/8;
-					var h:Number = height/3;
-					deadzone = new FlxRect((width-w)/2,(height-h)/2 - h*0.25,w,h);
+					var cameraPaddingX:Number = width/8;
+					var cameraPaddingY:Number = height/3;
+					deadzone = new FlxRect((width-cameraPaddingX)/2,(height-cameraPaddingY)/2 - cameraPaddingY*0.25,cameraPaddingX,cameraPaddingY);
 					break;
 				case STYLE_TOPDOWN:
-					helper = FlxU.max(width,height)/4;
-					deadzone = new FlxRect((width-helper)/2,(height-helper)/2,helper,helper);
-					break;
 				case STYLE_TOPDOWN_TIGHT:
-					helper = FlxU.max(width,height)/8;
-					deadzone = new FlxRect((width-helper)/2,(height-helper)/2,helper,helper);
+					var tdTightness:Number = (Style == STYLE_TOPDOWN_TIGHT) ? 8 : 4;
+					var tdHelper:Number = FlxU.max(width,height)/tdTightness;
+					deadzone = new FlxRect((width-tdHelper)/2,(height-tdHelper)/2,tdHelper,tdHelper);
 					break;
 				case STYLE_LOCKON:
+					var targetWidth:Number = target.width;
+					var targetHeight:Number = target.height;
+					deadzone = new FlxRect((width-targetWidth)/2,(height-targetHeight)/2,targetWidth,targetHeight);
+					break;
 				default:
+					FlxG.log("[FlxCamera#follow()] WARNING: Invalid follow style of value: " + String(Style) + "'. Defaulting to centering on the target.");
+					target = null;
 					deadzone = null;
 					break;
 			}
@@ -406,13 +422,13 @@ package org.flixel
 		/**
 		 * Move the camera focus to this location instantly.
 		 * 
-		 * @param	Point		Where you want the camera to focus.
+		 * @param	TargetPoint		Where you want the camera to focus.
 		 */
-		public function focusOn(Point:FlxPoint):void
+		public function focusOn(TargetPoint:FlxPoint):void
 		{
-			Point.x += (Point.x > 0)?0.0000001:-0.0000001;
-			Point.y += (Point.y > 0)?0.0000001:-0.0000001;
-			scroll.make(Point.x - width*0.5,Point.y - height*0.5);
+			TargetPoint.x += (TargetPoint.x > 0)?0.0000001:-0.0000001;
+			TargetPoint.y += (TargetPoint.y > 0)?0.0000001:-0.0000001;
+			scroll.make(TargetPoint.x - width*0.5,TargetPoint.y - height*0.5);
 		}
 		
 		/**
@@ -673,8 +689,16 @@ package org.flixel
 		 */
 		public function fill(Color:uint,BlendAlpha:Boolean=true):void
 		{
-			_fill.fillRect(_flashRect,Color);
-			buffer.copyPixels(_fill,_flashRect,_flashPoint,null,null,BlendAlpha);
+			var alpha:uint = Color >>> 24;
+			if(alpha == 255 || !BlendAlpha)
+			{
+				buffer.fillRect(_flashRect,Color);
+			}
+			else
+			{
+				_fill.fillRect(_flashRect,Color);
+				buffer.copyPixels(_fill,_flashRect,_flashPoint,null,null,BlendAlpha);
+			}
 		}
 		
 		/**

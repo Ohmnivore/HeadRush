@@ -11,23 +11,26 @@ package
 		
 		public function RushClient(address:String = null, addresstoconnect:String = null) 
 		{
-			super(address, 5600, 5600);
-			if (addresstoconnect == null) Connect(boundaddress, 5605, 5605);
-			else Connect(addresstoconnect, 5605, 5605);
+			super("192.168.1.5", 5600, 5600);
+			if (addresstoconnect == null) Connect("192.168.1.5", 5613, 5613);
+			else Connect("192.168.1.5", 5613, 5613);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void
 		{
-			FlxG.log("received");
+			//FlxG.log("received");
 			if (event.id == Msg.mapstring.ID)
 			{
 				FlxG.log("gotmap");
-				var map:FlxTilemap = Registry.playstate.map;
 				var buffer:String = new String();
-				//buffer.writeUTFBytes(Msg.mapstring.msg["compressed"]);
 				buffer = LZW.decompress(Msg.mapstring.msg["compressed"]);
-				map.loadMap(buffer, FlxTilemap.ImgAuto, 0, 0, FlxTilemap.AUTO);
-				Registry.playstate.add(map);
+				
+				Registry.playstate.loadmap(buffer);
+				
+				//var map:FlxTilemap = Registry.playstate.map;
+				//map.loadMap(buffer, FlxTilemap.ImgAuto, 0, 0, FlxTilemap.AUTO);
+				//Registry.playstate.add(map);
+				
 				Registry.loadedmap = true;
 			}
 			

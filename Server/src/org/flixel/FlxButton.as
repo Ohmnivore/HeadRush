@@ -90,8 +90,6 @@ package org.flixel
 		 */
 		protected var _initialized:Boolean;
 		
-		public var parameters;
-		
 		/**
 		 * Creates a new <code>FlxButton</code> object with a gray background
 		 * and a callback function on the UI thread.
@@ -101,10 +99,9 @@ package org.flixel
 		 * @param	Label		The text that you want to appear on the button.
 		 * @param	OnClick		The function to call whenever the button is clicked.
 		 */
-		public function FlxButton(X:Number=0,Y:Number=0,Label:String=null,OnClick:Function=null,Param=null)
+		public function FlxButton(X:Number=0,Y:Number=0,Label:String=null,OnClick:Function=null)
 		{
-			super(X, Y);
-			parameters = Param;
+			super(X,Y);
 			if(Label != null)
 			{
 				label = new FlxText(0,0,80,Label);
@@ -349,11 +346,8 @@ package org.flixel
 		{
 			if(!exists || !visible || !active || (status != PRESSED))
 				return;
-			if (onUp != null)
-			{
-				if (parameters != null) onUp(parameters);
-				else onUp();
-			}
+			if(onUp != null)
+				onUp();
 			if(soundUp != null)
 				soundUp.play(true);
 		}

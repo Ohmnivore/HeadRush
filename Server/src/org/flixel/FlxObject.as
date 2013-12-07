@@ -1,9 +1,6 @@
 package org.flixel
 {
 	import flash.display.Graphics;
-	import flash.display.Sprite;
-	import flash.geom.Point;
-	
 	import org.flixel.FlxBasic;
 	
 	/**
@@ -15,7 +12,6 @@ package org.flixel
 	 */
 	public class FlxObject extends FlxBasic
 	{
-		static public var SEPARATE:Boolean = true;
 		/**
 		 * Generic value for "left" Used by <code>facing</code>, <code>allowCollisions</code>, and <code>touching</code>.
 		 */
@@ -196,8 +192,8 @@ package org.flixel
 		protected var _rect:FlxRect;
 		/**
 		 * Set this to false if you want to skip the automatic motion/movement stuff (see <code>updateMotion()</code>).
-		 * FlxObject and FlxSprite default to true.
-		 * FlxText, FlxTileblock, and FlxTilemap default to false.
+		 * FlxObject, FlxSprite and FlxText default to true.
+		 * FlxTileblock and FlxTilemap default to false.
 		 */
 		public var moves:Boolean;
 		/**
@@ -690,11 +686,16 @@ package org.flixel
 			{
 				var results:Boolean = false;
 				var i:uint = 0;
-				var members:Array = (ObjectOrGroup as FlxGroup).members;
+				var group:FlxGroup = ObjectOrGroup as FlxGroup; 
+				var members:Array = group.members;
+				var length:uint = group.length;
 				while(i < length)
 				{
-					if(overlaps(members[i++],InScreenSpace,Camera))
+					var basic:FlxBasic = members[i++] as FlxBasic;
+					if (basic != null && basic.exists && overlaps(basic,InScreenSpace,Camera))
+					{
 						results = true;
+					}
 				}
 				return results;
 			}
@@ -739,13 +740,17 @@ package org.flixel
 			if(ObjectOrGroup is FlxGroup)
 			{
 				var results:Boolean = false;
-				var basic:FlxBasic;
 				var i:uint = 0;
-				var members:Array = (ObjectOrGroup as FlxGroup).members;
+				var group:FlxGroup = ObjectOrGroup as FlxGroup; 
+				var members:Array = group.members;
+				var length:uint = group.length;
 				while(i < length)
 				{
-					if(overlapsAt(X,Y,members[i++],InScreenSpace,Camera))
+					var basic:FlxBasic = members[i++] as FlxBasic;
+					if(basic != null && basic.exists && overlapsAt(X,Y,basic,InScreenSpace,Camera))
+					{
 						results = true;
+					}
 				}
 				return results;
 			}
@@ -1036,35 +1041,32 @@ package org.flixel
 			//Then adjust their positions and velocities accordingly (if there was any overlap)
 			if(overlap != 0)
 			{
-				if (SEPARATE)
+				var obj1v:Number = Object1.velocity.x;
+				var obj2v:Number = Object2.velocity.x;
+				
+				if(!obj1immovable && !obj2immovable)
 				{
-					var obj1v:Number = Object1.velocity.x;
-					var obj2v:Number = Object2.velocity.x;
-					
-					if(!obj1immovable && !obj2immovable)
-					{
-						overlap *= 0.5;
-						Object1.x = Object1.x - overlap;
-						Object2.x += overlap;
+					overlap *= 0.5;
+					Object1.x = Object1.x - overlap;
+					Object2.x += overlap;
 
-						var obj1velocity:Number = Math.sqrt((obj2v * obj2v * Object2.mass)/Object1.mass) * ((obj2v > 0)?1:-1);
-						var obj2velocity:Number = Math.sqrt((obj1v * obj1v * Object1.mass)/Object2.mass) * ((obj1v > 0)?1:-1);
-						var average:Number = (obj1velocity + obj2velocity)*0.5;
-						obj1velocity -= average;
-						obj2velocity -= average;
-						Object1.velocity.x = average + obj1velocity * Object1.elasticity;
-						Object2.velocity.x = average + obj2velocity * Object2.elasticity;
-					}
-					else if(!obj1immovable)
-					{
-						Object1.x = Object1.x - overlap;
-						Object1.velocity.x = obj2v - obj1v*Object1.elasticity;
-					}
-					else if(!obj2immovable)
-					{
-						Object2.x += overlap;
-						Object2.velocity.x = obj1v - obj2v*Object2.elasticity;
-					}
+					var obj1velocity:Number = Math.sqrt((obj2v * obj2v * Object2.mass)/Object1.mass) * ((obj2v > 0)?1:-1);
+					var obj2velocity:Number = Math.sqrt((obj1v * obj1v * Object1.mass)/Object2.mass) * ((obj1v > 0)?1:-1);
+					var average:Number = (obj1velocity + obj2velocity)*0.5;
+					obj1velocity -= average;
+					obj2velocity -= average;
+					Object1.velocity.x = average + obj1velocity * Object1.elasticity;
+					Object2.velocity.x = average + obj2velocity * Object2.elasticity;
+				}
+				else if(!obj1immovable)
+				{
+					Object1.x = Object1.x - overlap;
+					Object1.velocity.x = obj2v - obj1v*Object1.elasticity;
+				}
+				else if(!obj2immovable)
+				{
+					Object2.x += overlap;
+					Object2.velocity.x = obj1v - obj2v*Object2.elasticity;
 				}
 				return true;
 			}
@@ -1138,41 +1140,38 @@ package org.flixel
 			//Then adjust their positions and velocities accordingly (if there was any overlap)
 			if(overlap != 0)
 			{
-				if (SEPARATE)
+				var obj1v:Number = Object1.velocity.y;
+				var obj2v:Number = Object2.velocity.y;
+				
+				if(!obj1immovable && !obj2immovable)
 				{
-					var obj1v:Number = Object1.velocity.y;
-					var obj2v:Number = Object2.velocity.y;
-					
-					if(!obj1immovable && !obj2immovable)
-					{
-						overlap *= 0.5;
-						Object1.y = Object1.y - overlap;
-						Object2.y += overlap;
+					overlap *= 0.5;
+					Object1.y = Object1.y - overlap;
+					Object2.y += overlap;
 
-						var obj1velocity:Number = Math.sqrt((obj2v * obj2v * Object2.mass)/Object1.mass) * ((obj2v > 0)?1:-1);
-						var obj2velocity:Number = Math.sqrt((obj1v * obj1v * Object1.mass)/Object2.mass) * ((obj1v > 0)?1:-1);
-						var average:Number = (obj1velocity + obj2velocity)*0.5;
-						obj1velocity -= average;
-						obj2velocity -= average;
-						Object1.velocity.y = average + obj1velocity * Object1.elasticity;
-						Object2.velocity.y = average + obj2velocity * Object2.elasticity;
-					}
-					else if(!obj1immovable)
-					{
-						Object1.y = Object1.y - overlap;
-						Object1.velocity.y = obj2v - obj1v*Object1.elasticity;
-						//This is special case code that handles cases like horizontal moving platforms you can ride
-						if(Object2.active && Object2.moves && (obj1delta > obj2delta))
-							Object1.x += Object2.x - Object2.last.x;
-					}
-					else if(!obj2immovable)
-					{
-						Object2.y += overlap;
-						Object2.velocity.y = obj1v - obj2v*Object2.elasticity;
-						//This is special case code that handles cases like horizontal moving platforms you can ride
-						if(Object1.active && Object1.moves && (obj1delta < obj2delta))
-							Object2.x += Object1.x - Object1.last.x;
-					}
+					var obj1velocity:Number = Math.sqrt((obj2v * obj2v * Object2.mass)/Object1.mass) * ((obj2v > 0)?1:-1);
+					var obj2velocity:Number = Math.sqrt((obj1v * obj1v * Object1.mass)/Object2.mass) * ((obj1v > 0)?1:-1);
+					var average:Number = (obj1velocity + obj2velocity)*0.5;
+					obj1velocity -= average;
+					obj2velocity -= average;
+					Object1.velocity.y = average + obj1velocity * Object1.elasticity;
+					Object2.velocity.y = average + obj2velocity * Object2.elasticity;
+				}
+				else if(!obj1immovable)
+				{
+					Object1.y = Object1.y - overlap;
+					Object1.velocity.y = obj2v - obj1v*Object1.elasticity;
+					//This is special case code that handles cases like horizontal moving platforms you can ride
+					if(Object2.active && Object2.moves && (obj1delta > obj2delta))
+						Object1.x += Object2.x - Object2.last.x;
+				}
+				else if(!obj2immovable)
+				{
+					Object2.y += overlap;
+					Object2.velocity.y = obj1v - obj2v*Object2.elasticity;
+					//This is special case code that handles cases like horizontal moving platforms you can ride
+					if(Object1.active && Object1.moves && (obj1delta < obj2delta))
+						Object2.x += Object1.x - Object1.last.x;
 				}
 				return true;
 			}

@@ -6,12 +6,10 @@ package org.flixel
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.geom.Matrix;
-	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
 	import org.flixel.plugin.DebugPathDisplay;
 	import org.flixel.plugin.TimerManager;
-	import org.flixel.system.FlxDebugger;
 	import org.flixel.system.FlxQuadTree;
 	import org.flixel.system.input.*;
 	
@@ -29,7 +27,6 @@ package org.flixel
 		 * If you build and maintain your own version of flixel,
 		 * you can give it your own name here.
 		 */
-		static public var SEPARATE:Boolean = true;
 		static public var LIBRARY_NAME:String = "flixel";
 		/**
 		 * Assign a major version to your library.
@@ -40,7 +37,7 @@ package org.flixel
 		 * Assign a minor version to your library.
 		 * Appears after the decimal in the console.
 		 */
-		static public var LIBRARY_MINOR_VERSION:uint = 55;
+		static public var LIBRARY_MINOR_VERSION:uint = 56;
 		
 		/**
 		 * Debugger overlay layout preset: Wide but low windows at the bottom of the screen.
@@ -881,7 +878,7 @@ package org.flixel
 			FlxG.cameras.length = 0;
 			
 			if(NewCamera == null)
-				NewCamera = new FlxCamera(0,0,FlxG.width,FlxG.height)
+				NewCamera = new FlxCamera(0,0,FlxG.width,FlxG.height);
 			FlxG.camera = FlxG.addCamera(NewCamera);
 		}
 		
@@ -1003,16 +1000,7 @@ package org.flixel
 		 */
 		static public function collide(ObjectOrGroup1:FlxBasic=null, ObjectOrGroup2:FlxBasic=null, NotifyCallback:Function=null):Boolean
 		{
-			if (SEPARATE) 
-			{
-				FlxObject.SEPARATE = true;
-				return overlap(ObjectOrGroup1, ObjectOrGroup2, NotifyCallback, FlxObject.separate);
-			}
-			else 
-			{
-				FlxObject.SEPARATE = false;
-				return overlap(ObjectOrGroup1, ObjectOrGroup2, NotifyCallback, FlxObject.separate);
-			}
+			return overlap(ObjectOrGroup1,ObjectOrGroup2,NotifyCallback,FlxObject.separate);
 		}
 		
 		/**
