@@ -48,7 +48,7 @@ package org.flixel.plugin.photonstorm.FX
 		private var stars:Array;
 		private var starfieldType:int;
 		
-		private var backgroundColor:uint = 0x2269D2FF;
+		private var backgroundColor:uint = 0xff000000;
 		
 		private var updateSpeed:int;
 		private var tick:int;
@@ -73,10 +73,8 @@ package org.flixel.plugin.photonstorm.FX
 		 * @param	type			Type of starfield. Either STARFIELD_TYPE_2D (default, stars move horizontally) or STARFIELD_TYPE_3D (stars flow out from the center)
 		 * @param	updateInterval	How many ms should pass before the next starfield update (default 20)
 		 */
-		public function create(x:int, y:int, width:uint, height:uint, quantity:uint = 200, type:int = 1, updateInterval:int = 20, background:uint=0x00000000):FlxSprite
+		public function create(x:int, y:int, width:uint, height:uint, quantity:uint = 200, type:int = 1, updateInterval:int = 20):FlxSprite
 		{
-			backgroundColor = background;
-			
 			sprite = new FlxSprite(x, y).makeGraphic(width, height, backgroundColor);
 			
 			canvas = new BitmapData(sprite.width, sprite.height, true, backgroundColor);

@@ -12,6 +12,7 @@ package
 		public static var clientpositions:Message;
 		public static var keystatus:Message;
 		public static var clientdisco:Message;
+		public static var announce:Message;
 		
 		public static function init():void
 		{
@@ -30,8 +31,8 @@ package
 			clientpositions.SetTypes("String");
 			
 			keystatus = new Message(13, client);
-			keystatus.SetFields("right", "left", "up");
-			keystatus.SetTypes("Boolean", "Boolean", "Boolean");
+			keystatus.SetFields("right", "left", "up", "a", "lookright", "shooting");
+			keystatus.SetTypes("Boolean", "Boolean", "Boolean", "Float", "Boolean", "Boolean");
 			
 			newclient = new Message(14, client);
 			newclient.SetFields("id", "json");
@@ -40,6 +41,10 @@ package
 			clientdisco = new Message(15, client);
 			clientdisco.SetFields("id");
 			clientdisco.SetTypes("Int");
+			
+			announce = new Message(16, client);
+			announce.SetFields("msg");
+			announce.SetTypes("String");
 		}
 	}
 

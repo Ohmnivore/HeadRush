@@ -11,9 +11,9 @@ package
 		
 		public function RushClient(address:String = null, addresstoconnect:String = null) 
 		{
-			super("192.168.1.5", 5600, 5600);
-			if (addresstoconnect == null) Connect("192.168.1.5", 5613, 5613);
-			else Connect("192.168.1.5", 5613, 5613);
+			super("127.0.0.1", 5600, 5600);
+			if (addresstoconnect == null) Connect("127.0.0.1", 5613, 5613);
+			else Connect("127.0.0.1", 5613, 5613);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void
@@ -90,6 +90,12 @@ package
 					Registry.peers[peerstate[0]].x = peerstate[1];
 					Registry.peers[peerstate[0]].y = peerstate[2];
 				}
+			}
+			
+			if (event.id == Msg.announce.ID)
+			{
+				Registry.playstate.announcer.add(Msg.announce.msg["msg"]);
+				FlxG.log(Msg.announce.msg["msg"]);
 			}
 		}
 		

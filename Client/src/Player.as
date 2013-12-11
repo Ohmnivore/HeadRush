@@ -5,11 +5,12 @@ package
 	public class Player extends FlxSprite
 	{
 		public var name:String;
+		public var a:Number;
 
 		public function Player(_x:int, _y:int):void 
 		{		
 			super(_x, _y);
-			makeGraphic(10,12,0xffaa1111);
+			makeGraphic(24,24,0xffaa1111);
 			maxVelocity.x = 80;
 			maxVelocity.y = 200;
 			acceleration.y = 200;
@@ -21,6 +22,7 @@ package
 		public override function update():void
 		{
 			super.update();
+			
 		}
 	}
 }

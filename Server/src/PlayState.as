@@ -17,8 +17,13 @@ package
 		public var lasers:FlxGroup = new FlxGroup();
 		public var platforms:FlxGroup = new FlxGroup();
 		public var charunderlay:FlxGroup = new FlxGroup();
+		public var charoverlay:FlxGroup = new FlxGroup();
+		public var heademitters:FlxGroup = new FlxGroup();
+		public var bullets:FlxGroup = new FlxGroup();
+		public var hud:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
+		public static var announcer:Announcer = new Announcer();
 		
 		internal var elapsed:Number;
 		internal var messagespersecond:uint;
@@ -33,16 +38,18 @@ package
 			
 			Registry.playstate = this;
 			Registry.server = new RushServer();
+			Registry.spawntimer = 3000;
 			
 			Msg.init();
 			
 			FlxG.bgColor = 0xff7A7A7A;
+			FlxG.mouse.show();
 			
 			if (random) RandomMap();
 			
 			else 
 			{
-				spawns.push(new FlxPoint(30, 0));
+				spawns.push(new Spawn(30, 0, 0));
 				map = new BTNTilemap();
 				
 				LoadMap();
@@ -57,15 +64,23 @@ package
 			}
 			
 			add(map);
-			add(players);
-			
 			add(charunderlay);
+			add(players);
+			add(charoverlay);
+			add(bullets);
+			add(heademitters);
 			
 			var spect:Spectator = new Spectator(0, 0);
 			add(spect);
 			
 			FlxG.camera.setBounds(0, 0, map.width, map.height);
 			FlxG.camera.follow(spect);
+			
+			var chatbox:FlxInputText = new FlxInputText(0, 200*2, 320*2, 120*2, "->");
+			//add(chatbox);
+			chatbox.size = 20;
+			chatbox.scrollFactor = new FlxPoint(0, 0);
+			//chatbox.
 		}
 		
 		public function LoadMap():void
@@ -113,6 +128,7 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(hud);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < Assets.LVLS[levelindex][4].length; platf++)
@@ -177,14 +193,31 @@ package
 		{
 			super.update();
 			FlxG.collide(players, map);
+			FlxG.collide(bullets, map, explobullet);
+			FlxG.collide(bullets, platforms, explobullet);
+			FlxG.collide(bullets, players, explobullet);
+			FlxG.collide(players, platforms);
+			//FlxG.collide(heademitters, platforms);
+			FlxG.overlap(players, heademitters, collectedhead);
+			FlxG.collide(players, players, jumpkill);
+			
+			for each (var player:Player in players.members)
+			{
+				if (player.y > map.height + map.y + 100 && !player.dead) 
+				{
+					player.respawn(Registry.spawntimer);
+					announcer.add((player.name.concat(" fell off the map.")));
+				}
+			}
 			
 			for each (var laser:Laser in lasers.members)
 			{
-				for each (var player in players.members)
+				for each (var player:Player in players.members)
 				{
 					if (FlxCollision.pixelPerfectCheck(laser, player, 255))
 					{
-						//player hit laser
+						if (!player.dead)
+							player.health -= 100;
 					}
 				}
 			}
@@ -206,8 +239,66 @@ package
 				}
 				
 				Msg.clientpositions.msg["json"] = JSON.stringify(peerstates);
-				Msg.clientpositions.SendReliableToAll();
+				Msg.clientpositions.SendUnreliableToAll();
 			}
+		}
+		
+		private function explobullet(bullet, placeholder):void
+		{
+			for each (var player:Player in players.members)
+			{
+				var ppos:FlxPoint = new FlxPoint(player.x + player.width / 2, player.y + player.height / 2);
+				var bpos:FlxPoint = new FlxPoint(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
+				
+				var dist:Vector2D = new Vector2D(bpos.x - ppos.x, bpos.y - ppos.y);
+				var length:Number = dist.length;
+				VMath.normalize(dist);
+				player.velocity.x = 300;
+				player.velocity.y = -300;
+				
+				if (length <= 36)
+				{
+					player.health -= (90 - 2.5 * length);
+				}
+				
+				bullet.kill();
+			}
+		}
+		
+		private function collectedhead(player:Player, head:Head):void
+		{
+			if (!player.dead)
+			{
+				head.kill();
+				player.heads++;
+			}
+		}
+		
+		private function jumpkill(player:Player, player2:Player):void
+		{
+			var winner:Player;
+			var loser:Player;
+			
+			if (player.touching & FlxObject.DOWN)
+			{
+				if (player.y <= player2.y + 1)
+				{
+					winner = player;
+					loser = player2;
+				}
+			}
+			
+			if (player2.touching & FlxObject.DOWN)
+			{
+				if (player2.y <= player.y + 1)
+				{
+					winner = player2;
+					loser = player;
+				}
+			}
+			
+			winner.kills++;
+			loser.respawn(Registry.spawntimer);
 		}
 		
 		public function convertMatrixToStr( mat:Array ):String

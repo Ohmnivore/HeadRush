@@ -80,8 +80,6 @@ package org.flixel.plugin.photonstorm
 		public var rndFactorSpeed:uint = 0;
 		public var rndFactorPosition:FlxPoint = new FlxPoint;
 		
-		public var type:uint;
-		
 		/**
 		 * A reference to the Bullet that was fired
 		 */
@@ -138,11 +136,9 @@ package org.flixel.plugin.photonstorm
 		 * @param	xVariable	The x axis variable of the parent to use when firing. Typically "x", but could be "screenX" or any public getter that exposes the x coordinate.
 		 * @param	yVariable	The y axis variable of the parent to use when firing. Typically "y", but could be "screenY" or any public getter that exposes the y coordinate.
 		 */
-		public function FlxWeapon(name:String, parentRef:* = null, xVariable:String = "x", yVariable:String = "y", Type:uint = 0)
+		public function FlxWeapon(name:String, parentRef:* = null, xVariable:String = "x", yVariable:String = "y")
 		{
 			this.name = name;
-			
-			type = Type;
 			
 			bounds = new FlxRect(0, 0, FlxG.width, FlxG.height);
 			
@@ -172,10 +168,7 @@ package org.flixel.plugin.photonstorm
 			
 			for (var b:uint = 0; b < quantity; b++)
 			{
-				if (type == Player.GEL)
-				{
-					var tempBullet:GelBullet = new GelBullet(this, b);
-				}
+				var tempBullet:Bullet = new Bullet(this, b);
 				
 				tempBullet.makeGraphic(width, height, color);
 				
@@ -274,7 +267,6 @@ package org.flixel.plugin.photonstorm
 			}
 			
 			currentBullet = getFreeBullet();
-			//currentBullet. = FlxObject.FLOOR;
 			
 			if (currentBullet == null)
 			{

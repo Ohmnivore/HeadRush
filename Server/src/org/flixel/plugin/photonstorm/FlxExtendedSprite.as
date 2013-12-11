@@ -42,7 +42,7 @@ package org.flixel.plugin.photonstorm
 		private var clickOnRelease:Boolean = false;
 		private var clickPixelPerfect:Boolean = false;
 		private var clickPixelPerfectAlpha:uint;
-		public var clickCounter:uint;
+		private var clickCounter:uint;
 		
 		/**
 		 * Function called when the mouse is pressed down on this sprite. Function is passed these parameters: obj:FlxExtendedSprite, x:int, y:int
@@ -577,18 +577,18 @@ package org.flixel.plugin.photonstorm
 		/**
 		 * Updates the Mouse Drag on this Sprite.
 		 */
-		public function updateDrag():void
+		private function updateDrag():void
 		{
 			//FlxG.mouse.getWorldPosition(null, tempPoint);
 			
 			if (allowHorizontalDrag)
 			{
-				x = int(FlxG.mouse.screenX) - 16;
+				x = int(FlxG.mouse.x) - dragOffsetX;
 			}
 			
 			if (allowVerticalDrag)
 			{
-				y = int(FlxG.mouse.screenY) - 16;
+				y = int(FlxG.mouse.y) - dragOffsetY;
 			}
 			
 			if (boundsRect)
@@ -622,13 +622,13 @@ package org.flixel.plugin.photonstorm
 					return;
 				}
 				
-				if (clickPixelPerfect && FlxCollision.pixelPerfectPointCheck(FlxG.mouse.screenX, FlxG.mouse.screenY, this, clickPixelPerfectAlpha))
+				if (clickPixelPerfect && FlxCollision.pixelPerfectPointCheck(FlxG.mouse.x, FlxG.mouse.y, this, clickPixelPerfectAlpha))
 				{
 					FlxMouseControl.addToStack(this);
 					return;
 				}
 				
-				if (dragPixelPerfect && FlxCollision.pixelPerfectPointCheck(FlxG.mouse.screenX, FlxG.mouse.screenY, this, dragPixelPerfectAlpha))
+				if (dragPixelPerfect && FlxCollision.pixelPerfectPointCheck(FlxG.mouse.x, FlxG.mouse.y, this, dragPixelPerfectAlpha))
 				{
 					FlxMouseControl.addToStack(this);
 					return;
@@ -692,8 +692,8 @@ package org.flixel.plugin.photonstorm
 			
 			if (dragFromPoint == false)
 			{
-				dragOffsetX = 16;
-				dragOffsetY = 16;
+				dragOffsetX = int(FlxG.mouse.x) - x;
+				dragOffsetY = int(FlxG.mouse.y) - y;
 			}
 			else
 			{
@@ -836,7 +836,7 @@ package org.flixel.plugin.photonstorm
 		 */
 		public function get mouseOver():Boolean
 		{
-			return FlxMath.pointInCoordinates(FlxG.mouse.screenX, FlxG.mouse.screenY, x, y, width, height);
+			return FlxMath.pointInCoordinates(FlxG.mouse.x, FlxG.mouse.y, x, y, width, height);
 		}
 		
 		/**
@@ -846,7 +846,7 @@ package org.flixel.plugin.photonstorm
 		{
 			if (mouseOver)
 			{
-				return FlxG.mouse.screenX - x;
+				return FlxG.mouse.x - x;
 			}
 			
 			return -1;
@@ -859,7 +859,7 @@ package org.flixel.plugin.photonstorm
 		{
 			if (mouseOver)
 			{
-				return FlxG.mouse.screenY - y;
+				return FlxG.mouse.y - y;
 			}
 			
 			return -1;

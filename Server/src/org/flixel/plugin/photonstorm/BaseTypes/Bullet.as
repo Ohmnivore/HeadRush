@@ -38,8 +38,6 @@ package org.flixel.plugin.photonstorm.BaseTypes
 		public var launchTime:uint;
 		public var expiresTime:uint;
 		
-		public var type:uint;
-		
 		protected var animated:Boolean;
 		
 		public function Bullet(weapon:FlxWeapon, id:uint)
@@ -48,8 +46,6 @@ package org.flixel.plugin.photonstorm.BaseTypes
 			
 			this.weapon = weapon;
 			this.ID = id;
-			
-			type = weapon.type;
 			
 			//	Safe defaults
 			accelerates = false;

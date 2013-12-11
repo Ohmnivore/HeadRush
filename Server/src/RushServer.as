@@ -19,7 +19,7 @@ package
 		
 		public function RushServer() 
 		{
-			super("192.168.1.5", 5613, 5613);
+			super("127.0.0.1", 5613, 5613);
 			id = 0;
 		}
 		
@@ -49,10 +49,7 @@ package
 			
 			super.NewClient(event);
 			
-			var spawn:FlxPoint = Registry.getRandomElementOf(Registry.playstate.spawns);
-			var newplayer:Player = new Player(spawn.x, spawn.y);
-			
-			trace(newplayer.x, newplayer.y);
+			var newplayer:Player = new Player(0, 0);
 			
 			//Equivalent to clients[peer.id], but we don't have a reference
 			//to the peer object.
@@ -109,6 +106,16 @@ package
 				{
 					clients[event.peer.identifier].velocity.y = -clients[event.peer.identifier].maxVelocity.y / 2;
 				}
+				
+				if (Msg.keystatus.msg["shooting"])
+				{
+					clients[event.peer.identifier].shoot();
+					//trace("shot");
+				}
+				
+				clients[event.peer.identifier].right = Msg.keystatus.msg["lookright"];
+				
+				clients[event.peer.identifier].a = Msg.keystatus.msg["a"];
 			}
 		}
 	}

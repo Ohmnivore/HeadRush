@@ -12,8 +12,10 @@ package
 		public var lasers:FlxGroup = new FlxGroup();
 		public var platforms:FlxGroup = new FlxGroup();
 		public var charunderlay:FlxGroup = new FlxGroup();
+		public var hud:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
+		public var announcer:Announcer = new Announcer();
 		
 		internal var elapsed:Number;
 		internal var messagespersecond:uint;
@@ -35,6 +37,7 @@ package
 			players.add(player);
 			
 			FlxG.bgColor = 0xff7A7A7A;
+			FlxG.mouse.show();
 			
 			map = new BTNTilemap();
 			Registry.loadedmap = false;
@@ -97,6 +100,7 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(hud);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < damap[4].length; platf++)
@@ -147,9 +151,25 @@ package
 			super.update();
 			
 			//if (Registry.loadedmap)
-			if (true)
+			if (Registry.loadedmap)
 			{
 				FlxG.collide(players, map);
+				
+				var deltay:Number = (player.y + player.height / 2) - FlxG.mouse.y;
+				var deltax:Number = (player.x + player.width / 2) - FlxG.mouse.x;
+				
+				if (deltax == 0) deltax = 0.1;
+				
+				Msg.keystatus.msg["a"] = deltay / deltax;
+				
+				if (FlxG.mouse.x > (player.x + player.width / 2)) Msg.keystatus.msg["lookright"] = true;
+				else Msg.keystatus.msg["lookright"] = false;
+				//FlxG.log(toString(FlxG.mouse).concat(new String("player: ").concat(toString(player.x + player.width/2))));
+				
+				if (FlxG.mouse.pressed()) Msg.keystatus.msg["shooting"] = true;
+				else Msg.keystatus.msg["shooting"] = false;
+				
+				//FlxG.log(StriFlxG.mouse.pressed);
 				
 				elapsed += FlxG.elapsed;
 				if (elapsed >= messagespersecond)
@@ -162,23 +182,23 @@ package
 					Msg.keystatus.msg["up"] = false;
 					
 					player.acceleration.x = 0;
-					if (FlxG.keys.LEFT)
+					if (FlxG.keys.A)
 					{
 						player.acceleration.x = -player.maxVelocity.x * 4;
 						Msg.keystatus.msg["left"] = true;
 					}
-					if (FlxG.keys.RIGHT)
+					if (FlxG.keys.D)
 					{
 						player.acceleration.x = player.maxVelocity.x * 4;
 						Msg.keystatus.msg["right"] = true;
 					}
-					if ((FlxG.keys.SPACE || FlxG.keys.UP) && player.isTouching(FlxObject.ANY))
+					if ((FlxG.keys.W || FlxG.keys.UP))
 					{
 						player.velocity.y = -player.maxVelocity.y / 2;
 						Msg.keystatus.msg["up"] = true;
 					}
 					
-					Msg.keystatus.SendReliable();
+					Msg.keystatus.SendUnreliable();
 				}
 			}
 		}

@@ -12,6 +12,8 @@ package
 			public static var playstate:PlayState;
 			public static var server:RushServer;
 			
+			public static var spawntimer:uint;
+			
 			public static function getRandomElementOf(array:Array):* 
 			{
 				var idx:int=Math.floor(Math.random() * array.length);
