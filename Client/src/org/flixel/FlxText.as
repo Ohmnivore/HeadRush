@@ -15,6 +15,7 @@ package org.flixel
 	 */
 	public class FlxText extends FlxSprite
 	{
+		public var autowidth:Boolean;
 		/**
 		 * Internal reference to a Flash <code>TextField</code> object.
 		 */
@@ -38,9 +39,12 @@ package org.flixel
 		 * @param	Text			The actual text you would like to display initially.
 		 * @param	EmbeddedFont	Whether this text field uses embedded fonts or nto
 		 */
-		public function FlxText(X:Number, Y:Number, Width:uint, Text:String=null, EmbeddedFont:Boolean=true)
+		public function FlxText(X:Number, Y:Number, Width:uint, Text:String=null, EmbeddedFont:Boolean=true, Autowidth = false)
 		{
-			super(X,Y);
+			super(X, Y);
+			
+			autowidth = Autowidth;
+			
 			makeGraphic(Width,1,0);
 			
 			if(Text == null)
@@ -64,6 +68,14 @@ package org.flixel
 			_regen = true;
 			_shadow = 0;
 			allowCollisions = NONE;
+			calcFrame();
+		}
+		
+		public function Markup(markuparray:Array):void
+		{
+			_textField.setTextFormat(new TextFormat("system", markuparray[0], markuparray[1]), 
+									markuparray[2], markuparray[3]);
+			_regen = true;
 			calcFrame();
 		}
 		
@@ -238,8 +250,10 @@ package org.flixel
 				var i:uint = 0;
 				var nl:uint = _textField.numLines;
 				height = 0;
+				if (autowidth) width = 0;
 				while(i < nl)
-					height += _textField.getLineMetrics(i++).height;
+					height += _textField.getLineMetrics(i++).height;				
+					if (autowidth) width += _textField.textWidth;
 				height += 4; //account for 2px gutter on top and bottom
 				_pixels = new BitmapData(width,height,true,0);
 				frameHeight = height;

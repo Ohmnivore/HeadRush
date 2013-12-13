@@ -9,6 +9,9 @@ package org.flixel.system.input
 	 */
 	public class Keyboard extends Input
 	{
+		public var handling:Boolean = true;
+		//public var Tilde:Boolean;
+		
 		public var ESCAPE:Boolean;
 		public var F1:Boolean;
 		public var F2:Boolean;
@@ -103,6 +106,8 @@ package org.flixel.system.input
 
 		public function Keyboard()
 		{
+			//addKey("F1", 112);
+			
 			var i:uint;
 			
 			//LETTERS
@@ -182,11 +187,14 @@ package org.flixel.system.input
 		 */
 		public function handleKeyDown(FlashEvent:KeyboardEvent):void
 		{
-			var object:Object = _map[FlashEvent.keyCode];
-			if(object == null) return;
-			if(object.current > 0) object.current = 1;
-			else object.current = 2;
-			this[object.name] = true;
+			if (handling)
+			{
+				var object:Object = _map[FlashEvent.keyCode];
+				if(object == null) return;
+				if(object.current > 0) object.current = 1;
+				else object.current = 2;
+				this[object.name] = true;
+			}
 		}
 		
 		/**
@@ -196,11 +204,15 @@ package org.flixel.system.input
 		 */
 		public function handleKeyUp(FlashEvent:KeyboardEvent):void
 		{
-			var object:Object = _map[FlashEvent.keyCode];
-			if(object == null) return;
-			if(object.current > 0) object.current = -1;
-			else object.current = 0;
-			this[object.name] = false;
+			if (handling)
+			{
+				if (FlashEvent.keyCode == 27) FlashEvent.stopImmediatePropagation();
+				var object:Object = _map[FlashEvent.keyCode];
+				if(object == null) return;
+				if(object.current > 0) object.current = -1;
+				else object.current = 0;
+				this[object.name] = false;
+			}
 		}
 	}
 }

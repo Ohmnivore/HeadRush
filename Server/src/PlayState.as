@@ -3,10 +3,13 @@ package
 	import flash.utils.ByteArray;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
+	import org.flixel.system.FlxTile;
 	
 	public class PlayState extends FlxState
 	{
 		public var map:BTNTilemap;
+		public var materialmap:FlxTilemap;
+		public var lavamap:FlxTilemap;
 		public var string:String;
 		public var spawns:Array = new Array();
 		public var players:FlxGroup = new FlxGroup();
@@ -39,6 +42,8 @@ package
 			Registry.playstate = this;
 			Registry.server = new RushServer();
 			Registry.spawntimer = 3000;
+			Registry.devconsole = new DeveloperConsole(FlxG._game, this);
+			FlxG._game.stage.addChild(Registry.devconsole);
 			
 			Msg.init();
 			
@@ -85,7 +90,8 @@ package
 		
 		public function LoadMap():void
 		{
-			var materialmap:FlxTilemap = new FlxTilemap();
+			materialmap = new FlxTilemap();
+			lavamap = new FlxTilemap();
 			
 			for (var layer:int = 0; layer < Assets.LVLS[levelindex][3].length; layer++)
 			{
@@ -105,10 +111,25 @@ package
 					
 					var pattern:RegExp = /1/g;
 					var materialstring:String = Assets.LVLS[levelindex][3][layer][1].replace(pattern, "0");
+					var pattern2:RegExp = /3/g;
+					materialstring = materialstring.replace(pattern2, "0");
 					pattern = /2/g;
 					materialstring = materialstring.replace(pattern, "1");
 					
-					materialmap.loadMap(materialstring, Assets.T_MATERIAL, 8, 8, FlxTilemap.OFF, 0, 1, FlxObject.NONE);
+					materialmap.loadMap(materialstring, Assets.T_MATERIAL, 8, 8);
+					materialmap.setTileProperties(0, FlxObject.NONE);
+					materialmap.setTileProperties(1, FlxObject.ANY, CeilingWalk, Player);
+					
+					pattern = /1/g;
+					var lavastring:String = Assets.LVLS[levelindex][3][layer][1].replace(pattern, "0");
+					pattern2 = /2/g;
+					lavastring = lavastring.replace(pattern2, "0");
+					pattern = /3/g;
+					lavastring = lavastring.replace(pattern, "1");
+					
+					lavamap.loadMap(lavastring, Assets.T_MATERIAL, 8, 8);
+					lavamap.setTileProperties(0, FlxObject.NONE);
+					lavamap.setTileProperties(1, FlxObject.ANY, LavaBurn, Player);
 				}
 				if (Assets.LVLS[levelindex][3][layer][0] == 'Snow') 
 				{
@@ -125,6 +146,7 @@ package
 			
 			add(backmap);
 			add(lasers);
+			add(lavamap);
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
@@ -192,6 +214,8 @@ package
 		override public function update():void
 		{
 			super.update();
+			FlxG.collide(players, materialmap);
+			FlxG.collide(players, lavamap);
 			FlxG.collide(players, map);
 			FlxG.collide(bullets, map, explobullet);
 			FlxG.collide(bullets, platforms, explobullet);
@@ -206,7 +230,13 @@ package
 				if (player.y > map.height + map.y + 100 && !player.dead) 
 				{
 					player.respawn(Registry.spawntimer);
-					announcer.add((player.name.concat(" fell off the map.")));
+					
+					var announce:String = player.name.concat(" fell off the map.");
+					announcer.add(announce,
+								[
+								[11, player.teamcolor, 0, player.name.length]
+								]
+								);
 				}
 			}
 			
@@ -221,6 +251,10 @@ package
 					}
 				}
 			}
+			
+			if (FlxG.keys.justReleased("ESCAPE")) Registry.cli.toggle();
+			if (FlxG.keys.justReleased("Z")) Registry.devconsole.toggle();
+			if (FlxG.keys.justReleased("F1")) Registry.devconsole.toggle();
 			
 			elapsed += FlxG.elapsed;
 			if (elapsed >= messagespersecond)
@@ -299,6 +333,36 @@ package
 			
 			winner.kills++;
 			loser.respawn(Registry.spawntimer);
+		}
+		
+		public function CeilingWalk(tile:FlxTile, player:Player):void
+		{
+			if (player.touching & FlxObject.UP)
+			{
+				if ((tile.y + tile.height) <= player.y + 1)
+				{
+					player.acceleration.y = -420;
+				}
+			}
+			
+			//player.acceleration.y = -420;
+			//trace("walk");
+		}
+		
+		public function LavaBurn(tile:FlxTile, player:Player):void
+		{
+			player.health -= 1;
+			if (player.health <= 0 && !player.dead)
+			{
+				player.respawn(Registry.spawntimer);
+				var announce:String = player.name.concat(" was scorched by lava.");
+				announcer.add(announce,
+							[
+							[11, player.teamcolor, 0, player.name.length],
+							[10, FlxG.RED, announce.length-6, announce.length - 1]
+							]
+							);
+			}
 		}
 		
 		public function convertMatrixToStr( mat:Array ):String

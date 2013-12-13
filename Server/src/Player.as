@@ -2,18 +2,21 @@ package
 {
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
+	import Streamy.ServerPeer;
 	
 	public class Player extends FlxSprite
 	{
-		protected static const RUN_SPEED:int = 130;
+		protected static const RUN_SPEED:int = 145;
 		protected static const GRAVITY:int =420;
-		protected static const JUMP_SPEED:int = 250;
+		protected static const JUMP_SPEED:int = 420;
+		public var peer:ServerPeer;
 		public var healthBar:FlxBar;
 		public var cannon:FlxWeapon;
 		public var gun:FlxSprite;
 		public var gun2:FlxSprite;
 		public var name:String;
 		public var team:uint;
+		public var teamcolor:uint;
 		public var state:PlayState;
 		public var dead:Boolean = false;
 		public var respawntimer:FlxDelay;
@@ -75,6 +78,7 @@ package
 			
 			name = "Ohmnivore";
 			team = 0;
+			teamcolor = 0xff00A8C2;
 			heads = 4;
 			
 			var found = false;
@@ -102,6 +106,11 @@ package
 		public override function update():void
 		{
 			super.update();
+			
+			if (acceleration.y == -420)
+			{
+				if (!(touching & UP)) acceleration.y = 420;
+			}
 			
 			FlxG.collide(coinEmitter, Registry.playstate.map);
 			
@@ -171,6 +180,8 @@ package
 				dead = false;
 				
 				flicker(1);
+				gun.flicker(1);
+				gun2.flicker(1);
 				
 				var found = false;
 			
@@ -226,6 +237,8 @@ package
 		{
 			gun.kill();
 			gun.destroy();
+			gun2.kill();
+			gun2.destroy();
 			healthBar.kill();
 			healthBar.destroy();
 			cannon.group.kill();

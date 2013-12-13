@@ -3,6 +3,7 @@ package
 	import flash.events.ServerSocketConnectEvent;
 	import flash.utils.Dictionary;
 	import org.flixel.FlxPoint;
+	import HUDLabel;
 	import Streamy.MsgHandler;
 	import Streamy.Server;
 	import Player;
@@ -73,6 +74,16 @@ package
 			Msg.fellowclients.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			id++;
 			Registry.playstate.players.add(newplayer);
+			newplayer.peer = peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
+			
+			//var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
+			//testhud.Init(newplayer);
+			//testhud.Set(newplayer);
+			
+			//var testtimer:HUDTimer = new HUDTimer(2, 0, 500);
+			//testtimer.Init(newplayer);
+			//testtimer.Set(newplayer);
+			//testtimer.Start(newplayer);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void
@@ -97,6 +108,11 @@ package
 				if (Msg.keystatus.msg["right"])
 				{
 					clients[event.peer.identifier].acceleration.x = clients[event.peer.identifier].maxVelocity.x * 4;
+				}
+				
+				if (Msg.keystatus.msg["down"])
+				{
+					clients[event.peer.identifier].acceleration.y = 420;
 				}
 				
 				//See how we check if the player is actually touching the floor?

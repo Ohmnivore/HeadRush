@@ -13,6 +13,7 @@ package
 		public static var keystatus:Message;
 		public static var clientdisco:Message;
 		public static var announce:Message;
+		public static var hud:Message;
 		
 		public static function init():void
 		{
@@ -31,8 +32,8 @@ package
 			clientpositions.SetTypes("String");
 			
 			keystatus = new Message(13, client);
-			keystatus.SetFields("right", "left", "up", "a", "lookright", "shooting");
-			keystatus.SetTypes("Boolean", "Boolean", "Boolean", "Float", "Boolean", "Boolean");
+			keystatus.SetFields("right", "left", "up", "a", "lookright", "shooting", "down");
+			keystatus.SetTypes("Boolean", "Boolean", "Boolean", "Float", "Boolean", "Boolean", "Boolean");
 			
 			newclient = new Message(14, client);
 			newclient.SetFields("id", "json");
@@ -43,8 +44,12 @@ package
 			clientdisco.SetTypes("Int");
 			
 			announce = new Message(16, client);
-			announce.SetFields("msg");
-			announce.SetTypes("String");
+			announce.SetFields("text", "markup");
+			announce.SetTypes("String", "String");
+			
+			hud = new Message(17, client);
+			hud.SetFields("json");
+			hud.SetTypes("String");
 		}
 	}
 

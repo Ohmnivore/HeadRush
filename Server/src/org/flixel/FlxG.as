@@ -94,7 +94,7 @@ package org.flixel
 		/**
 		 * Internal tracker for game object.
 		 */
-		static internal var _game:FlxGame;
+		static public var _game:FlxGame;
 		/**
 		 * Handy shared variable for implementing your own pause behavior.
 		 */

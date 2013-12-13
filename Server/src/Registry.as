@@ -14,6 +14,9 @@ package
 			
 			public static var spawntimer:uint;
 			
+			public static var devconsole:DeveloperConsole;
+			public static var cli:CLI = new CLI(FlxG._game);
+			
 			public static function getRandomElementOf(array:Array):* 
 			{
 				var idx:int=Math.floor(Math.random() * array.length);

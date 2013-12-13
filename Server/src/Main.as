@@ -1,5 +1,6 @@
 package 
 {
+	import flash.display.Stage;
     import org.flixel.*;
 	import flash.events.Event;
 	
@@ -8,6 +9,8 @@ package
 
 	public class Main extends org.flixel.FlxGame
 	{
+		//public var stage:Stage = FlxG.stage;
+		
 		
 		public function Main()
 		{
@@ -18,6 +21,7 @@ package
 		override protected function create(FlashEvent:Event):void
         {
             super.create(FlashEvent);
+			//stage = FlxG.stage;
             stage.removeEventListener(Event.DEACTIVATE, onFocusLost);
             stage.removeEventListener(Event.ACTIVATE, onFocus);
         }

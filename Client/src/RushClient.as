@@ -1,6 +1,8 @@
 package  
 {
 	import flash.utils.ByteArray;
+	import org.flixel.FlxPoint;
+	import org.flixel.FlxText;
 	import org.flixel.FlxTilemap;
 	import Streamy.Client;
 	import Streamy.MsgHandler;
@@ -87,6 +89,8 @@ package
 				for each (var peerstate:Array in peerstates)
 				{
 					//FlxG.log(peerstate[0]);
+					Registry.peers[peerstate[0]].velocity.x = Registry.peers[peerstate[0]].x - peerstate[1];
+					Registry.peers[peerstate[0]].velocity.y = Registry.peers[peerstate[0]].y - peerstate[2];
 					Registry.peers[peerstate[0]].x = peerstate[1];
 					Registry.peers[peerstate[0]].y = peerstate[2];
 				}
@@ -94,8 +98,84 @@ package
 			
 			if (event.id == Msg.announce.ID)
 			{
-				Registry.playstate.announcer.add(Msg.announce.msg["msg"]);
-				FlxG.log(Msg.announce.msg["msg"]);
+				//Registry.playstate.announcer.add(Msg.announce.msg["msg"]);
+				//FlxG.log(Msg.announce.msg["msg"]);
+			}
+			
+			if (event.id == Msg.hud.ID)
+			{
+				var msgarray:Array = JSON.parse(Msg.hud.msg["json"]) as Array;
+				
+				if (msgarray[0] == "i")
+				{
+					if (msgarray[1] == "label")
+					{
+						//var arr:Array = ["i", "label", id, scrollfact];
+						var t:FlxText = new FlxText(0, 0, 100, "", true, true);
+						t.scrollFactor = new FlxPoint(msgarray[3], msgarray[3]);
+						Registry.huds[msgarray[2]] = t;
+						Registry.playstate.huds.add(t);
+					}
+					
+					if (msgarray[1] == "timer")
+					{
+						//var arr:Array = ["i", "label", id, scrollfact];
+						var t:FlxText = new HUDTimer(0, 0, 100, "");
+						t.scrollFactor = new FlxPoint(msgarray[3], msgarray[3]);
+						Registry.huds[msgarray[2]] = t;
+						Registry.playstate.huds.add(t);
+					}
+				}
+				
+				if (msgarray[0] == "s")
+				{
+					//var arr:Array = ["s", id, text, color, size];
+					Registry.huds[msgarray[1]].text = msgarray[2];
+					Registry.huds[msgarray[1]].color = msgarray[3];
+					Registry.huds[msgarray[1]].size = msgarray[4];
+				}
+				
+				if (msgarray[0] == "st")
+				{
+					//var arr:Array = ["st", id, seconds, descending, color, size];
+					Registry.huds[msgarray[1]].seconds = msgarray[2];
+					Registry.huds[msgarray[1]].descending = msgarray[3];
+					Registry.huds[msgarray[1]].color = msgarray[4];
+					Registry.huds[msgarray[1]].size = msgarray[5];
+				}
+				
+				if (msgarray[0] == "start")
+				{
+					//var arr:Array = ["start", id, seconds, descending];
+					Registry.huds[msgarray[1]].descending = msgarray[3];
+					Registry.huds[msgarray[1]].seconds = msgarray[2];
+					Registry.huds[msgarray[1]].running = true;
+				}
+				
+				if (msgarray[0] == "stop")
+				{
+					//var arr:Array = ["stop", id, seconds, descending];
+					Registry.huds[msgarray[1]].descending = msgarray[3];
+					Registry.huds[msgarray[1]].seconds = msgarray[2];
+					Registry.huds[msgarray[1]].update();
+					Registry.huds[msgarray[1]].running = false;
+				}
+				
+				if (msgarray[0] == "d")
+				{
+					//var arr:Array = ["d", id];
+					Registry.playstate.huds.remove(Registry.huds[msgarray[1]], true);
+					Registry.huds[msgarray[1]].kill();
+					Registry.huds[msgarray[1]].destroy();
+					delete Registry.huds[msgarray[1]];
+				}
+				
+				if (msgarray[0] == "p")
+				{
+					//var arr:Array = ["p", id, pos.x, pos.y];
+					Registry.huds[msgarray[1]].x = msgarray[2];
+					Registry.huds[msgarray[1]].y = msgarray[3];
+				}
 			}
 		}
 		

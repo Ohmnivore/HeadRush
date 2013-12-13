@@ -121,7 +121,7 @@ package org.flixel
 		/**
 		 * The debugger overlay object.
 		 */
-		internal var _debugger:FlxDebugger;
+		public var _debugger:FlxDebugger;
 		/**
 		 * A handy boolean that keeps track of whether the debugger exists and is currently visible.
 		 */

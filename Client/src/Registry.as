@@ -11,6 +11,7 @@ package
 		public static var loadedmap:Boolean;
 		public static var peers:Dictionary = new Dictionary;
 		public static var loadedpeers:Boolean = false;
+		public static var huds:Dictionary = new Dictionary;
 	}
 
 }

@@ -12,6 +12,7 @@ package
 		public var lasers:FlxGroup = new FlxGroup();
 		public var platforms:FlxGroup = new FlxGroup();
 		public var charunderlay:FlxGroup = new FlxGroup();
+		public var huds:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
@@ -58,6 +59,7 @@ package
 		{
 			var damap = JSON.parse(mapstring);
 			var materialmap:FlxTilemap = new FlxTilemap();
+			var lavamap:FlxTilemap = new FlxTilemap();
 			
 			for (var layer:int = 0; layer < damap[3].length; layer++)
 			{
@@ -77,10 +79,25 @@ package
 					
 					var pattern:RegExp = /1/g;
 					var materialstring:String = damap[3][layer][1].replace(pattern, "0");
+					var pattern2:RegExp = /3/g;
+					materialstring = materialstring.replace(pattern2, "0");
 					pattern = /2/g;
 					materialstring = materialstring.replace(pattern, "1");
 					
-					materialmap.loadMap(materialstring, Assets.T_MATERIAL, 8, 8, FlxTilemap.OFF, 0, 1, FlxObject.NONE);
+					materialmap.loadMap(materialstring, Assets.T_MATERIAL, 8, 8);
+					materialmap.setTileProperties(0, FlxObject.NONE);
+					materialmap.setTileProperties(1, FlxObject.NONE);
+					
+					pattern = /1/g;
+					var lavastring:String = damap[3][layer][1].replace(pattern, "0");
+					pattern2 = /2/g;
+					lavastring = lavastring.replace(pattern2, "0");
+					pattern = /3/g;
+					lavastring = lavastring.replace(pattern, "1");
+					
+					lavamap.loadMap(lavastring, Assets.T_MATERIAL, 8, 8);
+					lavamap.setTileProperties(0, FlxObject.NONE);
+					lavamap.setTileProperties(1, FlxObject.NONE);
 				}
 				if (damap[3][layer][0] == 'Snow') 
 				{
@@ -97,10 +114,12 @@ package
 			
 			add(backmap);
 			add(lasers);
+			add(lavamap);
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
 			add(hud);
+			add(huds);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < damap[4].length; platf++)
@@ -180,6 +199,7 @@ package
 					Msg.keystatus.msg["left"] = false;
 					Msg.keystatus.msg["right"] = false;
 					Msg.keystatus.msg["up"] = false;
+					Msg.keystatus.msg["down"] = false;
 					
 					player.acceleration.x = 0;
 					if (FlxG.keys.A)
@@ -191,6 +211,10 @@ package
 					{
 						player.acceleration.x = player.maxVelocity.x * 4;
 						Msg.keystatus.msg["right"] = true;
+					}
+					if (FlxG.keys.S)
+					{
+						Msg.keystatus.msg["down"] = true;
 					}
 					if ((FlxG.keys.W || FlxG.keys.UP))
 					{
