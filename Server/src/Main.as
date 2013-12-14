@@ -21,10 +21,15 @@ package
 		override protected function create(FlashEvent:Event):void
         {
             super.create(FlashEvent);
-			//stage = FlxG.stage;
+			stage.addEventListener(Event.CLOSING, onShutdown);
             stage.removeEventListener(Event.DEACTIVATE, onFocusLost);
             stage.removeEventListener(Event.ACTIVATE, onFocus);
         }
+		
+		public function onShutdown(e:Event):void
+		{
+			Registry.ms.shutdown();
+		}
 	}
 	
 }

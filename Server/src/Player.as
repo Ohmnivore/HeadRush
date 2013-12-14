@@ -1,5 +1,6 @@
 package  
 {
+	import mx.core.FlexSprite;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import Streamy.ServerPeer;
@@ -23,12 +24,21 @@ package
 		public var shootimer:FlxDelay;
 		public var coinEmitter:FlxEmitter = new FlxEmitter();
 		
+		public var wallshade:FlxSprite;
+		public var wallshade2:FlxSprite;
+		public var wallright:Boolean = false;
+		public var walleft:Boolean = false;
+		
 		public var kills:uint;
 		public var deaths:uint;
 		public var heads:uint;
 		
 		public var a:Number = 1;
 		public var right:Boolean = true;
+		
+		public var wallslide:Boolean = true;
+		public var firstslide:Boolean = true;
+		public var ceilingwalk:Boolean = true;
 
 		public function Player(_x:int, _y:int):void 
 		{		
@@ -48,7 +58,7 @@ package
 			
 			addAnimation("ledgeidle", [12]);
 			
-			drag.x = RUN_SPEED * 8;  // Drag is how quickly you slow down when you're not pushing a button. By using a multiplier, it will always scale to the run speed, even if we change it.
+			drag.x = 80;  // Drag is how quickly you slow down when you're not pushing a button. By using a multiplier, it will always scale to the run speed, even if we change it.
             acceleration.y = GRAVITY; // Always try to push helmutguy in the direction of gravity
             maxVelocity.x = RUN_SPEED;
             maxVelocity.y = JUMP_SPEED;
@@ -58,6 +68,7 @@ package
 			cannon.setBulletSpeed(160);
 			cannon.setFireRate(2000);
 			cannon.setBulletOffset(10, 10);
+			cannon.setBulletBounds(Registry.playstate.map.getBounds());
 			state.bullets.add(cannon.group);
 			
 			gun = new FlxSprite(0, 0, Assets.GUN);
@@ -101,15 +112,81 @@ package
 			shootimer.start();
 			
 			Registry.playstate.heademitters.add(coinEmitter);
+			
+			wallshade = new FlxSprite(x - 2, y + 2);
+			wallshade.width = width/2;
+			wallshade.height = height -4;
+			//wallshade.visible = false;
+			
+			wallshade2 = new FlxSprite(x + width + 2, y + 2);
+			wallshade2.width = width/2;
+			wallshade2.height = height -4;
+			//wallshade2.visible = false;
+			//wallshade.immovable = true;
+			//Registry.playstate.add(wallshade);
+			
+			//Registry.playstate.add(wallshade);
 		}
 
 		public override function update():void
 		{
 			super.update();
+			wallshade.update();
+			wallshade2.update();
 			
-			if (acceleration.y == -420)
+			//FlxG.collide(Registry.playstate.map, wallshade);
+			//FlxG.collide(Registry.playstate.platforms, wallshade);
+			
+			wallshade.x = x - 2;
+			wallshade.y = y + 2;
+			wallshade2.x = x + width / 2 + 2;
+			wallshade2.y = y + 2;
+			
+			wallslide = false;
+			//trace(wallshade.isTouching(FlxObject.RIGHT));
+			//if (wallshade.isTouching(FlxObject.RIGHT) || wallshade.isTouching(FlxObject.LEFT)) trace("slide");
+			//if (FlxG.collide(Registry.playstate.platforms, wallshade)) trace("lol");
+			if (Registry.playstate.map.overlaps(wallshade)) 
 			{
-				if (!(touching & UP)) acceleration.y = 420;
+				wallslide = true;
+				walleft = true;
+				wallright = false;
+			}
+			
+			if (Registry.playstate.map.overlaps(wallshade2)) 
+			{
+				wallslide = true;
+				wallright = true;
+				walleft = false;
+			}
+			//trace(Registry.playstate.map.overlaps(wallshade));
+			
+			if (wallslide)
+			{
+				acceleration.y = 100;
+				if (firstslide) 
+				{
+					firstslide = false;
+					if (velocity.y < 0)
+						velocity.y = 0;
+				}
+			}
+			
+			else 
+			{
+				if (ceilingwalk == false)
+					acceleration.y = 420;
+				wallslide = false;
+				firstslide = true;
+			}
+			
+			if (ceilingwalk)
+			{
+				if (!(touching & UP)) 
+				{
+					acceleration.y = 420;
+					ceilingwalk = false;
+				}
 			}
 			
 			FlxG.collide(coinEmitter, Registry.playstate.map);
@@ -140,11 +217,23 @@ package
 				}
 			}
 			
-			if (facing == RIGHT && velocity.x > 0) { play("walking"); }
-			if (facing == LEFT && velocity.x < 0) { play("walking"); }
-			if (facing == RIGHT && velocity.x < 0) { play("i_walking"); }
-			if (facing == LEFT && velocity.x > 0) {play("i_walking");}
-			else if (!velocity.x) { play("idle"); }
+			if (!ceilingwalk)
+			{
+				if (facing == RIGHT && velocity.x > 0) { play("walking"); }
+				if (facing == LEFT && velocity.x < 0) { play("walking"); }
+				if (facing == RIGHT && velocity.x < 0) { play("i_walking"); }
+				if (facing == LEFT && velocity.x > 0) {play("i_walking");}
+				else if (!velocity.x) { play("idle"); }
+			}
+			
+			else
+			{
+				if (facing == RIGHT && velocity.x > 0) { play("rwalking"); }
+				if (facing == LEFT && velocity.x < 0) { play("rwalking"); }
+				if (facing == RIGHT && velocity.x < 0) { play("ri_walking"); }
+				if (facing == LEFT && velocity.x > 0) {play("ri_walking");}
+				else if (!velocity.x) { play("ridle"); }
+			}
 			
 			if (health <= 0)
 			{

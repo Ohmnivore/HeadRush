@@ -19,7 +19,7 @@ package org.flixel
 		/**
 		 * Internal reference to a Flash <code>TextField</code> object.
 		 */
-		protected var _textField:TextField;
+		public var _textField:TextField;
 		/**
 		 * Whether the actual text field needs to be regenerated and stamped again.
 		 * This is NOT the same thing as <code>FlxSprite.dirty</code>.
@@ -54,8 +54,14 @@ package org.flixel
 			_textField.embedFonts = EmbeddedFont;
 			_textField.selectable = false;
 			_textField.sharpness = 100;
-			_textField.multiline = true;
-			_textField.wordWrap = true;
+			if (!autowidth)
+				_textField.multiline = true;
+			else
+				_textField.multiline = false;
+			if (!autowidth)
+				_textField.wordWrap = true;
+			else
+				_textField.wordWrap = false;
 			_textField.text = Text;
 			var format:TextFormat = new TextFormat("system",8,0xffffff);
 			_textField.defaultTextFormat = format;
@@ -249,14 +255,20 @@ package org.flixel
 				//Need to generate a new buffer to store the text graphic
 				var i:uint = 0;
 				var nl:uint = _textField.numLines;
+				//trace(_textField.numLines);
 				height = 0;
 				if (autowidth) width = 0;
 				while(i < nl)
 					height += _textField.getLineMetrics(i++).height;				
-					if (autowidth) width += _textField.textWidth;
+					if (autowidth) 
+					{
+						width += _textField.textWidth * FlxG.camera.zoom;
+						//trace(_textField.textWidth * FlxG.camera.zoom);
+					}
 				height += 4; //account for 2px gutter on top and bottom
 				_pixels = new BitmapData(width,height,true,0);
 				frameHeight = height;
+				if (autowidth) frameWidth = width;
 				_textField.height = height*1.2;
 				_flashRect.x = 0;
 				_flashRect.y = 0;

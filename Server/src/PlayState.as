@@ -1,8 +1,11 @@
 package  
 {
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 	import flash.utils.ByteArray;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
+	import org.flixel.plugin.photonstorm.BaseTypes.Bullet;
 	import org.flixel.system.FlxTile;
 	
 	public class PlayState extends FlxState
@@ -24,6 +27,7 @@ package
 		public var heademitters:FlxGroup = new FlxGroup();
 		public var bullets:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
+		public var chats:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public static var announcer:Announcer = new Announcer();
@@ -31,6 +35,9 @@ package
 		internal var elapsed:Number;
 		internal var messagespersecond:uint;
 		internal var rate:Number;
+		
+		public var chatbox:ChatBox;
+		public var chathist:ChatHist;
 		
 		override public function create():void 
 		{
@@ -81,11 +88,28 @@ package
 			FlxG.camera.setBounds(0, 0, map.width, map.height);
 			FlxG.camera.follow(spect);
 			
-			var chatbox:FlxInputText = new FlxInputText(0, 200*2, 320*2, 120*2, "->");
-			//add(chatbox);
-			chatbox.size = 20;
-			chatbox.scrollFactor = new FlxPoint(0, 0);
-			//chatbox.
+			var bounds:FlxRect;
+			bounds = new FlxRect(map.x, map.y, map.width, map.height);
+			bounds.x -= 100;
+			bounds.y -= 100;
+			bounds.width += 200;
+			bounds.height += 200;
+			
+			FlxG.worldBounds = bounds;
+			
+			//var chatbox:FlxInputText = new FlxInputText(0, 200*2, 320*2, 120*2, "->");
+			//chatbox.size = 20;
+			//chatbox.scrollFactor = new FlxPoint(0, 0);
+			//chatbox.borderVisible = false;
+			//chatbox.backgroundColor = 0x55949494;
+			chathist = new ChatHist();
+			//chathist.toggle();
+			
+			chatbox = new ChatBox();
+			chatbox.toggle();
+			
+			Registry.ms = new MasterServer(ServerInfo.ms);
+			Registry.ms.announce();
 		}
 		
 		public function LoadMap():void
@@ -150,7 +174,9 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(Registry.chatrect);
 			add(hud);
+			add(chats);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < Assets.LVLS[levelindex][4].length; platf++)
@@ -214,6 +240,9 @@ package
 		override public function update():void
 		{
 			super.update();
+			
+			Registry.ms.update(FlxG.elapsed);
+			
 			FlxG.collide(players, materialmap);
 			FlxG.collide(players, lavamap);
 			FlxG.collide(players, map);
@@ -234,7 +263,8 @@ package
 					var announce:String = player.name.concat(" fell off the map.");
 					announcer.add(announce,
 								[
-								[11, player.teamcolor, 0, player.name.length]
+								[11, player.teamcolor, 0, player.name.length],
+								[11, Registry.ORANGE, announce.length-4, announce.length-1]
 								]
 								);
 				}
@@ -247,7 +277,19 @@ package
 					if (FlxCollision.pixelPerfectCheck(laser, player, 255))
 					{
 						if (!player.dead)
-							player.health -= 100;
+						{
+							player.health -= 10;
+							if (player.health <= 0)
+							{
+								var announce:String = player.name.concat(" was burned by a laser!");
+								announcer.add(announce,
+											[
+											[11, player.teamcolor, 0, player.name.length],
+											[11, Registry.ORANGE, announce.length-6, announce.length-1]
+											]
+											);
+							}
+						}
 					}
 				}
 			}
@@ -255,6 +297,7 @@ package
 			if (FlxG.keys.justReleased("ESCAPE")) Registry.cli.toggle();
 			if (FlxG.keys.justReleased("Z")) Registry.devconsole.toggle();
 			if (FlxG.keys.justReleased("F1")) Registry.devconsole.toggle();
+			if (FlxG.keys.justReleased("T")) chatbox.toggle();
 			
 			elapsed += FlxG.elapsed;
 			if (elapsed >= messagespersecond)
@@ -277,18 +320,25 @@ package
 			}
 		}
 		
-		private function explobullet(bullet, placeholder):void
+		private function explobullet(bullet:Bullet, placeholder):void
 		{
 			for each (var player:Player in players.members)
 			{
 				var ppos:FlxPoint = new FlxPoint(player.x + player.width / 2, player.y + player.height / 2);
 				var bpos:FlxPoint = new FlxPoint(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
 				
-				var dist:Vector2D = new Vector2D(bpos.x - ppos.x, bpos.y - ppos.y);
+				var dist:Vector2D = new Vector2D(ppos.x - bpos.x, ppos.y - bpos.y);
 				var length:Number = dist.length;
+				//VMath.reverse(dist);
+				if (length <= 36)
+				{
+					//player.velocity.x += 36*sign(dist.x) - dist.x;
+					player.velocity.y += 360 * sign(dist.y) - dist.y * 10;
+					//player.velocity.x += dist.x * 15 - 0.4 * Math.pow(dist.x, 2);
+					if (Math.abs(dist.x) > 5)
+						player.velocity.x += 180 * sign(dist.x) - dist.x * 5;
+				}
 				VMath.normalize(dist);
-				player.velocity.x = 300;
-				player.velocity.y = -300;
 				
 				if (length <= 36)
 				{
@@ -298,6 +348,10 @@ package
 				bullet.kill();
 			}
 		}
+		
+		public function sign(num) {
+			  return (num > 0) ? 1 : ((num < 0) ? -1 : 0);
+			}
 		
 		private function collectedhead(player:Player, head:Head):void
 		{
@@ -341,6 +395,7 @@ package
 			{
 				if ((tile.y + tile.height) <= player.y + 1)
 				{
+					player.ceilingwalk = true;
 					player.acceleration.y = -420;
 				}
 			}
@@ -359,7 +414,7 @@ package
 				announcer.add(announce,
 							[
 							[11, player.teamcolor, 0, player.name.length],
-							[10, FlxG.RED, announce.length-6, announce.length - 1]
+							[11, Registry.ORANGE, announce.length-6, announce.length - 1]
 							]
 							);
 			}

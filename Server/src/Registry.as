@@ -17,6 +17,12 @@ package
 			public static var devconsole:DeveloperConsole;
 			public static var cli:CLI = new CLI(FlxG._game);
 			
+			public static const ORANGE:uint = 0xffFF9100;
+			
+			public static var chatrect:FlxSprite = new FlxSprite(0, 0);
+			
+			public static var ms:MasterServer;
+			
 			public static function getRandomElementOf(array:Array):* 
 			{
 				var idx:int=Math.floor(Math.random() * array.length);

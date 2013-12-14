@@ -51,6 +51,7 @@ package org.flixel
 			_textField.selectable = false;
 			_textField.sharpness = 100;
 			_textField.multiline = true;
+			//if ()
 			_textField.wordWrap = true;
 			_textField.text = Text;
 			var format:TextFormat = new TextFormat("system",8,0xffffff);

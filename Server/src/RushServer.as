@@ -43,7 +43,7 @@ package
 		
 		override public function NewClient(event:ServerSocketConnectEvent):void
 		{
-			FlxG.log("newplayer");
+			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
 			Msg.newclient.msg["id"] = id;
 			Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
 			Msg.newclient.SendReliableToAll();
@@ -57,7 +57,7 @@ package
 			peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = id;
 			clients[id] = newplayer;
 			newplayer.ID = id;
-			trace(Msg.mapstring.msg["compressed"].length);
+			//trace(Msg.mapstring.msg["compressed"].length);
 			Msg.mapstring.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			//id++;
 			
@@ -90,37 +90,65 @@ package
 		{
 			super.HandleMsg(event);
 			
+			var p:Player = clients[event.peer.identifier];
+			
 			if (event.id == Msg.keystatus.ID)
 			{
 				//FlxG.log(event.peer.identifier);
 				if (!Msg.keystatus.msg["left"] && !Msg.keystatus.msg["right"])
 				{
-					clients[event.peer.identifier].acceleration.x = 0;
+					//if (!p.isTouching(FlxObject.NONE)) p.acceleration.x = 0;
 				}
 				
 				if (Msg.keystatus.msg["left"])
 				{
-					clients[event.peer.identifier].acceleration.x = -clients[event.peer.identifier].maxVelocity.x * 4;
+					//clients[event.peer.identifier].acceleration.x = -clients[event.peer.identifier].maxVelocity.x * 4;
+					p.velocity.x -= 5;
 				}
 				
 				//event.id is 11, since we checked that earlier.
 				
 				if (Msg.keystatus.msg["right"])
 				{
-					clients[event.peer.identifier].acceleration.x = clients[event.peer.identifier].maxVelocity.x * 4;
+					//clients[event.peer.identifier].acceleration.x = clients[event.peer.identifier].maxVelocity.x * 4;
+					p.velocity.x += 5;
 				}
 				
 				if (Msg.keystatus.msg["down"])
 				{
-					clients[event.peer.identifier].acceleration.y = 420;
+					//clients[event.peer.identifier].acceleration.y = 420;
+					p.acceleration.y = 420;
 				}
 				
 				//See how we check if the player is actually touching the floor?
 				//Although the same check is already used in the update function,
 				//never trust the client.
-				if (Msg.keystatus.msg["up"] && clients[event.peer.identifier].isTouching(FlxObject.ANY))
+				if (Msg.keystatus.msg["up"])
 				{
-					clients[event.peer.identifier].velocity.y = -clients[event.peer.identifier].maxVelocity.y / 2;
+					//trace(
+					//FlxG.collide(Registry.playstate.map, p.wallshade));
+					//FlxObject.separateX(p.wallshade, Registry.playstate.map);
+					//trace(p.wallslide);
+					if (p.wallslide)
+					{
+						if (p.walleft)
+						{
+							p.velocity.y = -p.maxVelocity.y / 2;
+							p.velocity.x = 60;
+						}
+						
+						if (p.wallright)
+						{
+							p.velocity.y = -p.maxVelocity.y / 2;
+							p.velocity.x = -60;
+						}
+					}
+					
+					else
+					{
+						if (p.isTouching(FlxObject.DOWN))
+							p.velocity.y = -p.maxVelocity.y / 2;
+					}
 				}
 				
 				if (Msg.keystatus.msg["shooting"])
