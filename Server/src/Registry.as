@@ -1,5 +1,7 @@
 package  
 {
+	import flash.utils.Dictionary;
+	import gamemode.Base;
 	import org.flixel.*;
 	import RushServer;
 
@@ -11,6 +13,8 @@ package
 			
 			public static var playstate:PlayState;
 			public static var server:RushServer;
+			public static var clients:Dictionary = new Dictionary();
+			public static var gamemode:Base;
 			
 			public static var spawntimer:uint;
 			

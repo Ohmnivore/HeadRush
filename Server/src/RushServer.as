@@ -16,7 +16,7 @@ package
 	public class RushServer extends Server 
 	{
 		public var id:uint;
-		public var clients:Dictionary = new Dictionary();
+		public var clients:Dictionary = Registry.clients;
 		
 		public function RushServer() 
 		{
@@ -25,7 +25,8 @@ package
 		}
 		
 		override public function onClientClose( event:Event ):void 
-        { 
+        {
+			
 			var sock:Socket = event.target as Socket;
 			var id:String = sock.remoteAddress.concat(sock.remotePort);
 			var peer:ServerPeer = peers[id];
@@ -39,6 +40,8 @@ package
 			super.onClientClose(event);
 			
 			Msg.clientdisco.SendReliableToAll();
+			
+			
 		}
 		
 		override public function NewClient(event:ServerSocketConnectEvent):void

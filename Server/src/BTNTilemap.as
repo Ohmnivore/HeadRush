@@ -1,0 +1,243 @@
+package 
+{
+ import org.flixel.FlxPoint;
+ import org.flixel.FlxTilemap;
+ 
+ /**
+  * 
+  * @author greglieberman
+  * 
+  */
+ public class BTNTilemap extends FlxTilemap
+ {
+    
+  public function BTNTilemap()
+  {
+   super();
+  }
+  
+  /**
+   * Casts a ray from the start point until it hits either a filled tile, or the edge of the tilemap
+   * 
+   * If the starting point is outside the bounding box of the tilemap, 
+   * it will not cast the ray, and place the end point at the start point.
+   * 
+   * Warning: If your ray is completely horizontal or vertical, make sure your x or y values are exactly zero. 
+   * Otherwise you may suffer the wrath of floating point rounding error!
+   * 
+   * Algorithm based on
+   * http://www.metanetsoftware.com/technique/tutorialB.html
+   * http://www.cse.yorku.ca/~amana/research/grid.pdf
+   * http://www.flipcode.com/archives/Raytracing_Topics_Techniques-Part_4_Spatial_Subdivisions.shtml
+   * 
+   * @param start    the starting point of the ray
+   * @param direction   the direction to shoot the ray. Does not need to be normalized
+   * @param result   where the resulting point is stored, in (x,y) coordinates
+   * @param resultInTiles  a point containing the tile that was hit, in tile coordinates (optional)
+   * @param maxTilesToCheck The maximum number of tiles you want the ray to pass. -1 means go across the entire tilemap. Only change this if you know what you're doing! 
+   * @return      true if hit a filled tile, false if it hit the end of the tilemap
+   * 
+   */
+  public function rayCast(start:FlxPoint, direction:FlxPoint, result:FlxPoint=null, resultInTiles:FlxPoint=null, maxTilesToCheck:int=-1):Boolean
+  {
+   var cx:Number, cy:Number,    // current x, y, in tiles
+    cbx:Number, cby:Number,    // starting tile cell bounds, in pixels
+    tMaxX:Number, tMaxY:Number,   // maximum time the ray has traveled so far (not distance!)
+    tDeltaX:Number, tDeltaY:Number,  // the time that the ray needs to travel to cross a single tile (not distance!)
+    stepX:Number, stepY:Number,   // step direction, either 1 or -1
+    outX:Number, outY:Number,   // bounds of the tileMap where the ray would exit
+    hitTile:Boolean = false,    
+    tResult:Number = 0;
+    
+   if(start == null)
+    return false;
+   
+   if(result == null)
+    result = new FlxPoint();
+   
+   if(direction == null || (direction.x == 0 && direction.y == 0) )
+   {
+    // no direction, no ray
+    result.x = start.x;
+    result.y = start.y;
+    return false;
+   }
+   
+    
+   // find the tile at the start position of the ray
+   cx = coordsToTileX(start.x);
+   cy = coordsToTileY(start.y);
+   
+   if(!inTileRange(cx, cy))
+   {
+    // outside of the tilemap
+    result.x = start.x;
+    result.y = start.y;
+    return false;    
+   }
+   
+   if(getTile(cx, cy) > 0)
+   {
+    // start point is inside a block
+    result.x = start.x;
+    result.y = start.y;
+    return true;
+   }
+   
+   if(maxTilesToCheck == -1)
+   {
+    // this number is large enough to guarantee that the ray will pass through the entire tile map
+    maxTilesToCheck = int(widthInTiles * heightInTiles);
+   }
+   
+   // determine step direction, and initial starting block
+   if(direction.x > 0)
+   {
+    stepX = 1;
+    outX = widthInTiles;
+    cbx = x + (cx+1) * _tileWidth;
+   }
+   else
+   {
+    stepX = -1;
+    outX = -1;
+    cbx = x + cx * _tileWidth;
+   }
+   if(direction.y > 0)
+   {
+    stepY = 1;
+    outY = heightInTiles;
+    cby = y + (cy+1) * _tileHeight;
+   }
+   else
+   {
+    stepY = -1;
+    outY = -1;
+    cby = y + cy * _tileHeight;
+   }
+      
+   // determine tMaxes and deltas
+   if(direction.x != 0)
+   {
+    tMaxX = (cbx - start.x) / direction.x;
+    tDeltaX = _tileWidth * stepX / direction.x;
+   }
+   else
+    tMaxX = 1000000;
+   if(direction.y != 0)
+   {
+    tMaxY = (cby - start.y) / direction.y;
+    tDeltaY = _tileHeight * stepY / direction.y;
+   }
+   else
+    tMaxY = 1000000;
+   
+   // step through each block   
+   for(var tileCount:int=0; tileCount < maxTilesToCheck; tileCount++)
+   {
+    if(tMaxX < tMaxY) 
+    {
+     cx = cx + stepX;
+     if(getTile(cx, cy) > 0)
+     {
+      hitTile = true;
+      break;
+     }
+     if(cx == outX)
+     {
+      hitTile = false;
+      break;
+     }
+     tMaxX = tMaxX + tDeltaX;
+    } 
+    else 
+    {
+     cy = cy + stepY;
+     if(getTile(cx, cy) > 0)
+     {
+      hitTile = true;
+      break;
+     }
+     if(cy == outY)
+     {
+      hitTile = false;
+      break;
+     }
+     tMaxY = tMaxY + tDeltaY;
+    }
+   }
+   
+   // result time
+   tResult = (tMaxX < tMaxY) ? tMaxX : tMaxY;
+
+   // store the result
+   result.x = start.x + (direction.x * tResult);
+   result.y = start.y + (direction.y * tResult);
+   if(resultInTiles != null)
+   {
+    resultInTiles.x = cx;
+    resultInTiles.y = cy;
+   }
+   
+   return hitTile;
+  }
+  
+  public function inTileRange(tileX:Number, tileY:Number):Boolean
+  {
+   return (tileX >= 0 && tileX < widthInTiles && tileY >= 0 && tileY < heightInTiles);
+  }
+  
+  
+  public function tileAt(coordX:Number, coordY:Number):uint
+  {
+   return getTile(Math.floor((coordX-x)/_tileWidth), Math.floor((coordY-y)/_tileHeight));
+  }
+  
+  public function tileIndexAt(coordX:Number, coordY:Number):uint
+  {
+   var X:uint = Math.floor((coordX-x)/_tileWidth);
+   var Y:uint = Math.floor((coordY-y)/_tileHeight);
+   return Y * widthInTiles + X;
+  }
+  
+  /**
+   * 
+   * @param X in tiles
+   * @param Y in tiles
+   * @return 
+   * 
+   */
+  public function getTileIndex(X:uint, Y:uint):uint
+  {
+   return Y * widthInTiles + X;
+   
+  }
+  
+  
+  public function coordsToTileX(coordX:Number):Number
+  {
+   return Math.floor((coordX-x)/_tileWidth);
+  }
+  public function coordsToTileY(coordY:Number):Number
+  {
+   return Math.floor((coordY-y)/_tileHeight);
+  }
+  
+  
+  public function indexToCoordX(index:uint):Number
+  {
+   return (index % widthInTiles) * _tileWidth + _tileWidth/2;
+  }
+  public function indexToCoordY(index:uint):Number
+  {
+   return Math.floor(index / widthInTiles) * _tileHeight + _tileHeight/2;
+  }
+  
+  //override public function update():void
+  //{
+	  //super.update();
+	  //_tileHeight = 16;
+	  //_tileWidth = 16;
+  //}
+ }
+}

@@ -1,0 +1,17 @@
+application: headrushms
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+automatic_scaling:
+  max_idle_instances: 1
+  min_pending_latency: 1.0s
+
+handlers:
+- url: .*
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
