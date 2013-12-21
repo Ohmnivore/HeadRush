@@ -11,6 +11,8 @@ package
 		public static var password:String = "";
 		public static var pub:Boolean = true;
 		public static var ms:String = "http://headrushms.appspot.com/server";
+		public static var dlurl:String = "https://dl.dropboxusercontent.com/u/229424261/hr/";
+		public static var dlmanifests = ["splash.json"];
 		
 		public function ServerInfo() 
 		{

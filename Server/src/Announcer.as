@@ -22,7 +22,8 @@ package
 			text.scrollFactor.x = text.scrollFactor.y = 0;
 			//text.font = "Kongtext";
 			//text.width = message.length * text.size * 1.4;
-			text.x = 320 - text.width - 2;
+			text.x = 320 - text._textField.textWidth - 2;
+			trace(text._textField.textWidth);
 			
 			for (var i:uint = 0; i < msg.length; i++)
 			{

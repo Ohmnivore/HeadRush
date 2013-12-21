@@ -14,6 +14,7 @@ package
 		public static var clientdisco:Message;
 		public static var announce:Message;
 		public static var hud:Message;
+		public static var dl:Message;
 		
 		public static function init():void
 		{
@@ -48,8 +49,14 @@ package
 			announce.SetTypes("String", "String");
 			
 			hud = new Message(17, network);
-			hud.SetFields("msg");
+			hud.SetFields("json");
 			hud.SetTypes("String");
+			
+			dl = new Message(18, network);
+			dl.SetFields("dlurl", "jsonmanifests");
+			dl.SetTypes("String", "String");
+			
+			
 		}
 	}
 

@@ -53,6 +53,10 @@ package
 			
 			super.NewClient(event);
 			
+			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
+			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
+			Msg.dl.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			
 			var newplayer:Player = new Player(0, 0);
 			
 			//Equivalent to clients[peer.id], but we don't have a reference
@@ -79,14 +83,16 @@ package
 			Registry.playstate.players.add(newplayer);
 			newplayer.peer = peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
 			
-			//var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
-			//testhud.Init(newplayer);
-			//testhud.Set(newplayer);
+			var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
+			testhud.pos = new FlxPoint(100, 0);
+			testhud.Init(newplayer);
+			testhud.Set(newplayer);
+			testhud.Pos(newplayer);
 			
-			//var testtimer:HUDTimer = new HUDTimer(2, 0, 500);
-			//testtimer.Init(newplayer);
-			//testtimer.Set(newplayer);
-			//testtimer.Start(newplayer);
+			var testtimer:HUDTimer = new HUDTimer(2, 0, 500);
+			testtimer.Init(newplayer);
+			testtimer.Set(newplayer);
+			testtimer.Start(newplayer);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void

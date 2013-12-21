@@ -14,6 +14,7 @@ package
 		public static var clientdisco:Message;
 		public static var announce:Message;
 		public static var hud:Message;
+		public static var dl:Message;
 		
 		public static function init():void
 		{
@@ -50,6 +51,10 @@ package
 			hud = new Message(17, client);
 			hud.SetFields("json");
 			hud.SetTypes("String");
+			
+			dl = new Message(18, client);
+			dl.SetFields("dlurl", "jsonmanifests");
+			dl.SetTypes("String", "String");
 		}
 	}
 

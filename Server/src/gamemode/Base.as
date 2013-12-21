@@ -14,11 +14,6 @@ package gamemode
 			
 		}
 		
-		public function shutdown():void
-		{
-			
-		}
-		
 	}
 
 }

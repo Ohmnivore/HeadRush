@@ -111,7 +111,7 @@ package
 					if (msgarray[1] == "label")
 					{
 						//var arr:Array = ["i", "label", id, scrollfact];
-						var t:FlxText = new FlxText(0, 0, 100, "", true, true);
+						var t:FlxText = new FlxText(0, 0, 100, "", true, false);
 						t.scrollFactor = new FlxPoint(msgarray[3], msgarray[3]);
 						Registry.huds[msgarray[2]] = t;
 						Registry.playstate.huds.add(t);
@@ -176,6 +176,14 @@ package
 					Registry.huds[msgarray[1]].x = msgarray[2];
 					Registry.huds[msgarray[1]].y = msgarray[3];
 				}
+			}
+			
+			if (event.id == Msg.dl.ID)
+			{
+				Downloader.dlurl = Msg.dl.msg["dlurl"];
+				Downloader.dlmanifests = JSON.parse(Msg.dl.msg["jsonmanifests"]) as Array;
+				//FlxG.log("");
+				Downloader.Go();
 			}
 		}
 		
