@@ -16,13 +16,10 @@ http://headrushms.appspot.com/
 
 TODO
 -Networked scoreboard
--Rework map loading
--Add asset downloading from remote server
+-Rework map exporting from DAME editor
 -Rework architecture for custom mods and plugins
 -Server config GUI
--Finish client-side implementations of things
+-Finish client-side implementations of things (announcer, chat, anims)
 
 TOFIX
 -Better knock back
--Networked HUD elements
--Finish chat
