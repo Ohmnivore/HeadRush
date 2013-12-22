@@ -1,6 +1,7 @@
 package  
 {
 	import org.flixel.*;
+	import flash.utils.getDefinitionByName;
 	
 	public class PlayState extends FlxState
 	{
@@ -61,13 +62,19 @@ package
 			var materialmap:FlxTilemap = new FlxTilemap();
 			var lavamap:FlxTilemap = new FlxTilemap();
 			
-			for (var layer:int = 0; layer < damap[3].length; layer++)
+			const PROPERTIES = 0;
+			const LASERS = 1;
+			const PLATFORMS = 2;
+			const ENTITIES = 3;
+			const MAPS = 4;
+			
+			for (var layer:int = 0; layer < damap[MAPS].length; layer++)
 			{
 				maps[layer] = new FlxTilemap;
 				mapz[layer] = new BTNTilemap;
-				if (damap[3][layer][0] == 'Collide') 
+				if (damap[MAPS][layer][0] == 'Collide') 
 				{
-					map = mapz[layer].loadMap(damap[3][layer][1], Assets.T_COLLIDE, 8, 8);
+					map = mapz[layer].loadMap(damap[MAPS][layer][1], Assets.T_COLLIDE, 8, 8);
 					map.setTileProperties(0, FlxObject.NONE);
 					map.setTileProperties(1, FlxObject.ANY);
 					FlxG.worldBounds = new FlxRect(0, 0, map.width, map.height);
@@ -78,7 +85,7 @@ package
 					//GenerateEdges();
 					
 					var pattern:RegExp = /1/g;
-					var materialstring:String = damap[3][layer][1].replace(pattern, "0");
+					var materialstring:String = damap[MAPS][layer][1].replace(pattern, "0");
 					var pattern2:RegExp = /3/g;
 					materialstring = materialstring.replace(pattern2, "0");
 					pattern = /2/g;
@@ -89,7 +96,7 @@ package
 					materialmap.setTileProperties(1, FlxObject.NONE);
 					
 					pattern = /1/g;
-					var lavastring:String = damap[3][layer][1].replace(pattern, "0");
+					var lavastring:String = damap[MAPS][layer][1].replace(pattern, "0");
 					pattern2 = /2/g;
 					lavastring = lavastring.replace(pattern2, "0");
 					pattern = /3/g;
@@ -99,15 +106,15 @@ package
 					lavamap.setTileProperties(0, FlxObject.NONE);
 					lavamap.setTileProperties(1, FlxObject.NONE);
 				}
-				if (damap[3][layer][0] == 'Snow') 
+				if (damap[MAPS][layer][0] == 'Snow') 
 				{
 					var frontmap:FlxTilemap;
-					frontmap = maps[layer].loadMap(damap[3][layer][1], Assets.T_SNOW, 16, 16);
+					frontmap = maps[layer].loadMap(damap[MAPS][layer][1], Assets.T_SNOW, 16, 16);
 				}
-				if (damap[3][layer][0] == 'SnowBack') 
+				if (damap[MAPS][layer][0] == 'SnowBack') 
 				{
 					var backmap:FlxTilemap;
-					backmap = maps[layer].loadMap(damap[3][layer][1], Assets.T_SNOW, 16, 16);
+					backmap = maps[layer].loadMap(damap[MAPS][layer][1], Assets.T_SNOW, 16, 16);
 					backmap.scrollFactor.x = backmap.scrollFactor.y = 0.8;
 				}
 			}
@@ -122,45 +129,59 @@ package
 			add(huds);
 			
 			//Load platforms
-			for (var platf:int = 0; platf < damap[4].length; platf++)
+			for (var platf:int = 0; platf < damap[PLATFORMS].length; platf++)
 			{
 				var pathlength:int;
 				var direc:String;
 				
-				trace(damap[4][platf].w, ":", damap[4][platf].h);
+				trace(damap[PLATFORMS][platf].w, ":", damap[PLATFORMS][platf].h);
 				
-				if (int(damap[4][platf].w) > int(damap[4][platf].h)) 
+				if (int(damap[PLATFORMS][platf].w) > int(damap[PLATFORMS][platf].h)) 
 				{
 					direc = "x";
-					pathlength = int(damap[4][platf].w) - 48;
+					pathlength = int(damap[PLATFORMS][platf].w) - 48;
 				}
 				else 
 				{
 					direc = "y";
-					pathlength = int(damap[4][platf].h) - 16;
+					pathlength = int(damap[PLATFORMS][platf].h) - 16;
 				}
 				
 				var reverse:Boolean = false;
-				if (damap[4][platf].t == "R" || damap[4][platf].t == "B") reverse = true;
-				var platform:OutPlatform = new OutPlatform(int(damap[4][platf].x), int(damap[4][platf].y), pathlength, 0, direc, reverse);
+				if (damap[PLATFORMS][platf].t == "R" || damap[PLATFORMS][platf].t == "B") reverse = true;
+				var platform:OutPlatform = new OutPlatform(int(damap[PLATFORMS][platf].x), int(damap[PLATFORMS][platf].y), pathlength, 0, direc, reverse);
 				platforms.add(platform);
 			}
 			
 			//Load game entities
-			for (var enem:int = 0; enem < damap[1].length; enem++)
+			for (var enem:int = 0; enem < damap[ENTITIES].length; enem++)
 			{
-				switch (damap[1][enem][2])
+				try
 				{
-					case "Spawn":
-						break;
-				}		
+					var entity:Class = getDefinitionByName("entity.".concat(damap[ENTITIES][enem][2])) as Class;
+					
+					if (damap[ENTITIES][enem].hasOwnProperty(3))
+					{
+						new entity(damap[ENTITIES][enem][0], damap[ENTITIES][enem][1], damap[ENTITIES][enem][3]);
+					}
+					
+					else
+					{
+						new entity(damap[ENTITIES][enem][0], damap[ENTITIES][enem][1]);
+					}	
+				}
+				
+				catch(error:Error)
+				{
+					
+				}
 			}
 			
 			//Load lasers
-			for (var laser:int = 0; laser < damap[0].length; laser++)
+			for (var laser:int = 0; laser < damap[LASERS].length; laser++)
 			{
-				var laz:Laser = new Laser(new FlxPoint(int(damap[0][laser][0]), int(damap[0][laser][1])), 
-				new FlxPoint(int(damap[0][laser][2]), int(damap[0][laser][3])), this);
+				var laz:Laser = new Laser(new FlxPoint(int(damap[LASERS][laser][0]), int(damap[LASERS][laser][1])), 
+				new FlxPoint(int(damap[LASERS][laser][2]), int(damap[LASERS][laser][3])), this);
 				lasers.add(laz);
 			}
 		}

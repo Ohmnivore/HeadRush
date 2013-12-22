@@ -20,6 +20,7 @@ TODO
 -Custom networked objects protocol
 -Server config GUI
 -Finish client-side implementations of things (announcer, chat, anims)
+-Client-side GUI (mostly server browser)
 
 TOFIX
 -Better knock back

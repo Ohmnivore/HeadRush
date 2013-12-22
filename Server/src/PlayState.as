@@ -7,6 +7,9 @@ package
 	import org.flixel.plugin.photonstorm.*;
 	import org.flixel.plugin.photonstorm.BaseTypes.Bullet;
 	import org.flixel.system.FlxTile;
+	import flash.utils.getDefinitionByName;
+	import entity.*;
+	import Spawn;
 	
 	public class PlayState extends FlxState
 	{
@@ -117,13 +120,20 @@ package
 			materialmap = new FlxTilemap();
 			lavamap = new FlxTilemap();
 			
-			for (var layer:int = 0; layer < Assets.LVLS[levelindex][4].length; layer++)
+			var lvl = Assets.LVLS[levelindex];
+			const PROPERTIES = 0;
+			const LASERS = 1;
+			const PLATFORMS = 2;
+			const ENTITIES = 3;
+			const MAPS = 4;
+			
+			for (var layer:int = 0; layer < lvl[MAPS].length; layer++)
 			{
 				maps[layer] = new FlxTilemap;
 				mapz[layer] = new BTNTilemap;
-				if (Assets.LVLS[levelindex][4][layer][0] == 'Collide') 
+				if (lvl[MAPS][layer][0] == 'Collide') 
 				{
-					map = mapz[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_COLLIDE, 8, 8);
+					map = mapz[layer].loadMap(lvl[MAPS][layer][1], Assets.T_COLLIDE, 8, 8);
 					map.setTileProperties(0, FlxObject.NONE);
 					map.setTileProperties(1, FlxObject.ANY);
 					FlxG.worldBounds = new FlxRect(0, 0, map.width, map.height);
@@ -134,7 +144,7 @@ package
 					//GenerateEdges();
 					
 					var pattern:RegExp = /1/g;
-					var materialstring:String = Assets.LVLS[levelindex][4][layer][1].replace(pattern, "0");
+					var materialstring:String = lvl[4][layer][1].replace(pattern, "0");
 					var pattern2:RegExp = /3/g;
 					materialstring = materialstring.replace(pattern2, "0");
 					pattern = /2/g;
@@ -145,7 +155,7 @@ package
 					materialmap.setTileProperties(1, FlxObject.ANY, CeilingWalk, Player);
 					
 					pattern = /1/g;
-					var lavastring:String = Assets.LVLS[levelindex][4][layer][1].replace(pattern, "0");
+					var lavastring:String = lvl[MAPS][layer][1].replace(pattern, "0");
 					pattern2 = /2/g;
 					lavastring = lavastring.replace(pattern2, "0");
 					pattern = /3/g;
@@ -155,19 +165,20 @@ package
 					lavamap.setTileProperties(0, FlxObject.NONE);
 					lavamap.setTileProperties(1, FlxObject.ANY, LavaBurn, Player);
 				}
-				if (Assets.LVLS[levelindex][4][layer][0] == 'Snow') 
+				if (lvl[MAPS][layer][0] == 'Snow') 
 				{
 					var frontmap:FlxTilemap;
-					frontmap = maps[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_SNOW, 16, 16);
+					frontmap = maps[layer].loadMap(lvl[4][layer][1], Assets.T_SNOW, 16, 16);
 				}
-				if (Assets.LVLS[levelindex][4][layer][0] == 'SnowBack') 
+				if (lvl[MAPS][layer][0] == 'SnowBack') 
 				{
 					var backmap:FlxTilemap;
-					backmap = maps[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_SNOW, 16, 16);
+					backmap = maps[layer].loadMap(lvl[4][layer][1], Assets.T_SNOW, 16, 16);
 					backmap.scrollFactor.x = backmap.scrollFactor.y = 0.8;
 				}
 			}
 			
+			//Add all layers to playstate
 			add(backmap);
 			add(lasers);
 			add(lavamap);
@@ -179,45 +190,51 @@ package
 			add(chats);
 			
 			//Load platforms
-			for (var platf:int = 0; platf < Assets.LVLS[levelindex][2].length; platf++)
+			for (var platf:int = 0; platf < lvl[PLATFORMS].length; platf++)
 			{
 				var pathlength:int;
 				var direc:String;
 				
-				trace(Assets.LVLS[levelindex][2][platf].w, ":", Assets.LVLS[levelindex][2][platf].h);
+				trace(lvl[PLATFORMS][platf].w, ":", lvl[PLATFORMS][platf].h);
 				
-				if (int(Assets.LVLS[levelindex][2][platf].w) > int(Assets.LVLS[levelindex][2][platf].h)) 
+				if (int(lvl[PLATFORMS][platf].w) > int(lvl[PLATFORMS][platf].h)) 
 				{
 					direc = "x";
-					pathlength = int(Assets.LVLS[levelindex][2][platf].w) - 48;
+					pathlength = int(lvl[PLATFORMS][platf].w) - 48;
 				}
 				else 
 				{
 					direc = "y";
-					pathlength = int(Assets.LVLS[levelindex][2][platf].h) - 16;
+					pathlength = int(lvl[PLATFORMS][platf].h) - 16;
 				}
 				
 				var reverse:Boolean = false;
-				if (Assets.LVLS[levelindex][2][platf].t == "R" || Assets.LVLS[levelindex][2][platf].t == "B") reverse = true;
-				var platform:OutPlatform = new OutPlatform(int(Assets.LVLS[levelindex][2][platf].x), int(Assets.LVLS[levelindex][2][platf].y), pathlength, 0, direc, reverse);
+				if (lvl[PLATFORMS][platf].t == "R" || lvl[2][platf].t == "B") reverse = true;
+				var platform:OutPlatform = new OutPlatform(int(lvl[PLATFORMS][platf].x), int(lvl[PLATFORMS][platf].y), pathlength, 0, direc, reverse);
 				platforms.add(platform);
 			}
 			
 			//Load game entities
-			for (var enem:int = 0; enem < Assets.LVLS[levelindex][3].length; enem++)
+			for (var enem:int = 0; enem < lvl[ENTITIES].length; enem++)
 			{
-				switch (Assets.LVLS[levelindex][3][enem][2])
+				var entity:Class = getDefinitionByName("entity.".concat(lvl[ENTITIES][enem][2])) as Class;
+				
+				if (lvl[ENTITIES][enem].hasOwnProperty(3))
 				{
-					case "Spawn":
-						break;
-				}		
+					new entity(lvl[ENTITIES][enem][0], lvl[ENTITIES][enem][1], lvl[ENTITIES][enem][3]);
+				}
+				
+				else
+				{
+					new entity(lvl[ENTITIES][enem][0], lvl[ENTITIES][enem][1]);
+				}
 			}
 			
 			//Load lasers
-			for (var laser:int = 0; laser < Assets.LVLS[levelindex][1].length; laser++)
+			for (var laser:int = 0; laser < lvl[LASERS].length; laser++)
 			{
-				var laz:Laser = new Laser(new FlxPoint(int(Assets.LVLS[levelindex][1][laser][0]), int(Assets.LVLS[levelindex][1][laser][1])), 
-				new FlxPoint(int(Assets.LVLS[levelindex][1][laser][2]), int(Assets.LVLS[levelindex][1][laser][3])), this);
+				var laz:Laser = new Laser(new FlxPoint(int(lvl[LASERS][laser][0]), int(lvl[LASERS][laser][1])), 
+				new FlxPoint(int(lvl[LASERS][laser][2]), int(lvl[LASERS][laser][3])), this);
 				lasers.add(laz);
 			}
 		}
