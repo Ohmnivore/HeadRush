@@ -21,8 +21,8 @@ package
 			drag.x = PLAYER_RUN_SPEED * 3;
 			drag.y = PLAYER_RUN_SPEED * 3;
 			
-			maxVelocity.x = PLAYER_RUN_SPEED;
-			maxVelocity.y = PLAYER_RUN_SPEED;
+			maxVelocity.x = PLAYER_RUN_SPEED*30;
+			maxVelocity.y = PLAYER_RUN_SPEED*30;
 			
 			solid = false;
 			
@@ -40,32 +40,64 @@ package
 			
 			if (FlxG.keys.LEFT)
 			{
-				acceleration.x = -drag.x;
+				acceleration.x = -drag.x*10;
 				//x--;
 			}
 			
 			if (FlxG.keys.RIGHT)
 			{
-				acceleration.x = drag.x;	
+				acceleration.x = drag.x*10;	
 				//x++;
 			}
 			
 			if (FlxG.keys.UP)
 			{
-				acceleration.y = -drag.y;
+				acceleration.y = -drag.y*10;
 				//y--;
 			}
 			
 			if (FlxG.keys.DOWN)
 			{
-				acceleration.y = drag.y;
+				acceleration.y = drag.y*10;
 				//y++;
 			}
 			
-			if (x < zone.x) x = zone.x;
-			if (y < zone.y) y = zone.y;
-			if (x > zone.x + zone.width) x = zone.x + zone.width;
-			if (y > zone.y + zone.height) y = zone.y + zone.height;
+			if (!FlxG.keys.RIGHT && !FlxG.keys.LEFT)
+			{
+				acceleration.x = 0;
+				velocity.x /= 1.2;
+			}
+			
+			if (!FlxG.keys.UP && !FlxG.keys.DOWN)
+			{
+				acceleration.y = 0;
+				velocity.y /= 1.2;
+			}
+			
+			if (x < zone.x) 
+			{
+				x = zone.x;
+				acceleration.x = 0;
+				velocity.x /= 1.2;
+			}
+			if (y < zone.y) 
+			{
+				y = zone.y;
+				acceleration.y = 0;
+				velocity.y /= 1.2;
+			}
+			if (x > zone.x + zone.width) 
+			{
+				x = zone.x + zone.width;
+				acceleration.x = 0;
+				velocity.x /= 1.2;
+			}
+			if (y > zone.y + zone.height) 
+			{
+				y = zone.y + zone.height;
+				acceleration.y = 0;
+				velocity.y /= 1.2;
+			}
 			
 			super.update();
 			//super.update();

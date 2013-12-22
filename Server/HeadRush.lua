@@ -6,6 +6,7 @@ groupCount = as3.tolua(groups.length) -1
 FileExt = as3.tolua(VALUE_FileExt)
 csvDir = as3.tolua(VALUE_CSVDir)
 
+properties = ""
 laserstext = ""
 movingtext = ""
 dialogtext = ""
@@ -61,8 +62,11 @@ for groupIndex = 0,groupCount do
 		
 		if as3.tolua(layer.IsSpriteLayer()) == true then
 		-- DAME.CreateTextForSprites( layer:SpriteLayer, defaultCreationText:String, defaultClass:String, bmpfontText:String = "", baseDirectory:String = null )
-			enemytext = string.sub(as3.tolua(DAME.CreateTextForSprites(layer,',["%xpos%","%ypos%","%class%"%%if prop:direction%%,"%prop:direction%"%%endprop%%]',"ZBot")),2)
-			-- DAME.WriteFile(csvDir.."/".."mapCSV_"..groupName.."_"..layerSimpleName.."."..FileExt, "["..enemytext.."]")
+			enemytext = string.sub(as3.tolua(DAME.CreateTextForSprites(layer,',["%xpos%","%ypos%","%class%", {%%proploop%%"%propname%": "%propvalue%", %%proploopend%%}]',"ZBot")),2)
+			-- reversed = enemytext
+			reversed = string.reverse(enemytext)
+			reversed = string.gsub(reversed, "} ,", "}")
+			enemytext = string.reverse(reversed)
 		end
 		
 		if isMap == true then
@@ -75,11 +79,14 @@ for groupIndex = 0,groupCount do
 			-- maptextz = maptextz..',["'..as3.tolua(DAME.GetTextForProperties("%prop:Tilemap%", layer.properties))..'",\n'..mapText
 			if layerIndex == 0 then
 				maptextz = maptextz..'["'..as3.tolua(DAME.GetTextForProperties("%prop:Tilemap%", layer.properties))..'",\n'..mapText
+				
+				-- properties = properties.sub(1, -1)
 			end
 			if layerIndex ~= 0 then
 				maptextz = maptextz..',["'..as3.tolua(DAME.GetTextForProperties("%prop:Tilemap%", layer.properties))..'",\n'..mapText
-				if as3.tolua(DAME.GetTextForProperties("%prop:gamemode%", layer.properties)) == "Collide" then
-					gamemode = as3.tolua(DAME.GetTextForProperties("%prop:gamemode%", layer.properties))
+				if as3.tolua(DAME.GetTextForProperties("%prop:Tilemap%", layer.properties)) == "Collide" then
+					properties = as3.tolua(DAME.GetTextForProperties('%%proploop%%"%propname%": "%propvalue%", %%proploopend%%', layer.properties))
+					properties = string.sub(properties, 1, -3)
 				end
 			end
 		end
@@ -87,15 +94,13 @@ for groupIndex = 0,groupCount do
 	end
 end
 
+properties = "{"..properties.."}"
 lasertext = "["..laserstext.."]"
 enemytext = "["..enemytext.."]"
 movingtext = "["..movingtext.."]"
-dialogtext = "["..dialogtext.."]"
-mapname = as3.tolua(DAME.GetProjectName())
 
-finaltext = "["..lasertext..',\n'..enemytext..',\n'..dialogtext..',\n'..maptextz..']'..',\n'..movingtext..',"'..gamemode..'","'..mapname..'"'
+finaltext = "["..properties..',\n'..lasertext..',\n'..movingtext..',\n'..enemytext..',\n'..maptextz..']'
 
--- DAME.WriteFile(csvDir.."/".."level.z21", finaltext)
 DAME.WriteFile(as3.tolua(DAME.GetProjectFileLocation()).."/"..as3.tolua(DAME.GetProjectName())..'.hr', finaltext.."]")
 
 

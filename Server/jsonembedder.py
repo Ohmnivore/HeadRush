@@ -16,7 +16,7 @@ def FetchLvls():
                     print "k"
                     lvl = json.loads(open(os.path.join(mypath, 'src', 'lvls', lvl, file), 'r').read())
                     # container = open(os.path.join(mypath, 'src', 'lvls', lvl, file), 'r').read()#.replace('\n', ''))
-                    lvls[lvl[6]] = lvl
+                    lvls[lvl[0]["name"]] = lvl
                     # x += 1
                     # print open(os.path.join(mypath, 'src', 'lvls', lvl, file), 'r').read()
                     # print dicttoxml.dicttoxml(lvls)

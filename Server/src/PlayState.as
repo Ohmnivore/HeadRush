@@ -18,7 +18,7 @@ package
 		public var players:FlxGroup = new FlxGroup();
 		
 		public var random:Boolean = false;
-		public var levelindex:String = "Test";
+		public var levelindex:String = "TestMap";
 		
 		public var lasers:FlxGroup = new FlxGroup();
 		public var platforms:FlxGroup = new FlxGroup();
@@ -117,13 +117,13 @@ package
 			materialmap = new FlxTilemap();
 			lavamap = new FlxTilemap();
 			
-			for (var layer:int = 0; layer < Assets.LVLS[levelindex][3].length; layer++)
+			for (var layer:int = 0; layer < Assets.LVLS[levelindex][4].length; layer++)
 			{
 				maps[layer] = new FlxTilemap;
 				mapz[layer] = new BTNTilemap;
-				if (Assets.LVLS[levelindex][3][layer][0] == 'Collide') 
+				if (Assets.LVLS[levelindex][4][layer][0] == 'Collide') 
 				{
-					map = mapz[layer].loadMap(Assets.LVLS[levelindex][3][layer][1], Assets.T_COLLIDE, 8, 8);
+					map = mapz[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_COLLIDE, 8, 8);
 					map.setTileProperties(0, FlxObject.NONE);
 					map.setTileProperties(1, FlxObject.ANY);
 					FlxG.worldBounds = new FlxRect(0, 0, map.width, map.height);
@@ -134,7 +134,7 @@ package
 					//GenerateEdges();
 					
 					var pattern:RegExp = /1/g;
-					var materialstring:String = Assets.LVLS[levelindex][3][layer][1].replace(pattern, "0");
+					var materialstring:String = Assets.LVLS[levelindex][4][layer][1].replace(pattern, "0");
 					var pattern2:RegExp = /3/g;
 					materialstring = materialstring.replace(pattern2, "0");
 					pattern = /2/g;
@@ -145,7 +145,7 @@ package
 					materialmap.setTileProperties(1, FlxObject.ANY, CeilingWalk, Player);
 					
 					pattern = /1/g;
-					var lavastring:String = Assets.LVLS[levelindex][3][layer][1].replace(pattern, "0");
+					var lavastring:String = Assets.LVLS[levelindex][4][layer][1].replace(pattern, "0");
 					pattern2 = /2/g;
 					lavastring = lavastring.replace(pattern2, "0");
 					pattern = /3/g;
@@ -155,15 +155,15 @@ package
 					lavamap.setTileProperties(0, FlxObject.NONE);
 					lavamap.setTileProperties(1, FlxObject.ANY, LavaBurn, Player);
 				}
-				if (Assets.LVLS[levelindex][3][layer][0] == 'Snow') 
+				if (Assets.LVLS[levelindex][4][layer][0] == 'Snow') 
 				{
 					var frontmap:FlxTilemap;
-					frontmap = maps[layer].loadMap(Assets.LVLS[levelindex][3][layer][1], Assets.T_SNOW, 16, 16);
+					frontmap = maps[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_SNOW, 16, 16);
 				}
-				if (Assets.LVLS[levelindex][3][layer][0] == 'SnowBack') 
+				if (Assets.LVLS[levelindex][4][layer][0] == 'SnowBack') 
 				{
 					var backmap:FlxTilemap;
-					backmap = maps[layer].loadMap(Assets.LVLS[levelindex][3][layer][1], Assets.T_SNOW, 16, 16);
+					backmap = maps[layer].loadMap(Assets.LVLS[levelindex][4][layer][1], Assets.T_SNOW, 16, 16);
 					backmap.scrollFactor.x = backmap.scrollFactor.y = 0.8;
 				}
 			}
@@ -179,34 +179,34 @@ package
 			add(chats);
 			
 			//Load platforms
-			for (var platf:int = 0; platf < Assets.LVLS[levelindex][4].length; platf++)
+			for (var platf:int = 0; platf < Assets.LVLS[levelindex][2].length; platf++)
 			{
 				var pathlength:int;
 				var direc:String;
 				
-				trace(Assets.LVLS[levelindex][4][platf].w, ":", Assets.LVLS[levelindex][4][platf].h);
+				trace(Assets.LVLS[levelindex][2][platf].w, ":", Assets.LVLS[levelindex][2][platf].h);
 				
-				if (int(Assets.LVLS[levelindex][4][platf].w) > int(Assets.LVLS[levelindex][4][platf].h)) 
+				if (int(Assets.LVLS[levelindex][2][platf].w) > int(Assets.LVLS[levelindex][2][platf].h)) 
 				{
 					direc = "x";
-					pathlength = int(Assets.LVLS[levelindex][4][platf].w) - 48;
+					pathlength = int(Assets.LVLS[levelindex][2][platf].w) - 48;
 				}
 				else 
 				{
 					direc = "y";
-					pathlength = int(Assets.LVLS[levelindex][4][platf].h) - 16;
+					pathlength = int(Assets.LVLS[levelindex][2][platf].h) - 16;
 				}
 				
 				var reverse:Boolean = false;
-				if (Assets.LVLS[levelindex][4][platf].t == "R" || Assets.LVLS[levelindex][4][platf].t == "B") reverse = true;
-				var platform:OutPlatform = new OutPlatform(int(Assets.LVLS[levelindex][4][platf].x), int(Assets.LVLS[levelindex][4][platf].y), pathlength, 0, direc, reverse);
+				if (Assets.LVLS[levelindex][2][platf].t == "R" || Assets.LVLS[levelindex][2][platf].t == "B") reverse = true;
+				var platform:OutPlatform = new OutPlatform(int(Assets.LVLS[levelindex][2][platf].x), int(Assets.LVLS[levelindex][2][platf].y), pathlength, 0, direc, reverse);
 				platforms.add(platform);
 			}
 			
 			//Load game entities
-			for (var enem:int = 0; enem < Assets.LVLS[levelindex][1].length; enem++)
+			for (var enem:int = 0; enem < Assets.LVLS[levelindex][3].length; enem++)
 			{
-				switch (Assets.LVLS[levelindex][1][enem][2])
+				switch (Assets.LVLS[levelindex][3][enem][2])
 				{
 					case "Spawn":
 						break;
@@ -214,10 +214,10 @@ package
 			}
 			
 			//Load lasers
-			for (var laser:int = 0; laser < Assets.LVLS[levelindex][0].length; laser++)
+			for (var laser:int = 0; laser < Assets.LVLS[levelindex][1].length; laser++)
 			{
-				var laz:Laser = new Laser(new FlxPoint(int(Assets.LVLS[levelindex][0][laser][0]), int(Assets.LVLS[levelindex][0][laser][1])), 
-				new FlxPoint(int(Assets.LVLS[levelindex][0][laser][2]), int(Assets.LVLS[levelindex][0][laser][3])), this);
+				var laz:Laser = new Laser(new FlxPoint(int(Assets.LVLS[levelindex][1][laser][0]), int(Assets.LVLS[levelindex][1][laser][1])), 
+				new FlxPoint(int(Assets.LVLS[levelindex][1][laser][2]), int(Assets.LVLS[levelindex][1][laser][3])), this);
 				lasers.add(laz);
 			}
 		}

@@ -16,8 +16,8 @@ http://headrushms.appspot.com/
 
 TODO
 -Networked scoreboard
--Rework map exporting from DAME editor
 -Rework architecture for custom mods and plugins
+-Custom networked objects protocol
 -Server config GUI
 -Finish client-side implementations of things (announcer, chat, anims)
 
