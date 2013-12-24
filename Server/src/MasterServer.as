@@ -11,6 +11,7 @@ package
 	
 	public class MasterServer 
 	{
+		public var announced:Boolean = false;
 		public var addr:String;
 		public var request:URLRequest;
 		public var loader:URLLoader = new URLLoader();
@@ -22,91 +23,120 @@ package
 		
 		public function MasterServer(Address:String) 
 		{
-			request = new URLRequest(Address);
-			request.method = URLRequestMethod.POST;
-			addr = Address;
-			
-			variables.cmd = "";
-			variables.info = "";
-			loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
-			loader.addEventListener(Event.COMPLETE, on_complete);
-			//To send:
-			//request.data = variables;
-			//loader.load(request);
+			if (ServerInfo.pub)
+			{
+				request = new URLRequest(Address);
+				request.method = URLRequestMethod.POST;
+				addr = Address;
+				
+				variables.cmd = "";
+				variables.info = "";
+				loader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+				loader.addEventListener(Event.COMPLETE, on_complete);
+				//To send:
+				//request.data = variables;
+				//loader.load(request);
+			}
 		}
 		
 		public function announce():void
 		{
-			variables.cmd = "+";
-			justsent = "+";
-			if (ServerInfo.password.length > 0)
+			if (ServerInfo.pub)
 			{
-				variables.info = JSON.stringify([
-				ServerInfo.name, ServerInfo.map, ServerInfo.gamemode, ServerInfo.currentp, ServerInfo.maxp, true
-				]);
+				trace("Announced");
+				variables.cmd = "+";
+				justsent = "+";
+				if (ServerInfo.password.length > 0)
+				{
+					variables.info = JSON.stringify([
+					ServerInfo.name, ServerInfo.map, ServerInfo.gamemode, ServerInfo.currentp, ServerInfo.maxp, true
+					]);
+					trace(variables.info);
+				}
+				
+				else
+				{
+					variables.info = JSON.stringify([
+					ServerInfo.name, ServerInfo.map, ServerInfo.gamemode, ServerInfo.currentp, ServerInfo.maxp, false
+					]);
+					trace(variables.info);
+				}
+				
+				//serverx.name, serverx.mapname, serverx.gamemode, serverx.cp, serverx.mp, serverx.passworded, serverx.address
+				
+				request.data = variables;
+				loader.load(request);
+				
+				announced = true;
+				Registry.msannounced = true;
 			}
-			
-			else
-			{
-				variables.info = JSON.stringify([
-				ServerInfo.name, ServerInfo.map, ServerInfo.gamemode, ServerInfo.currentp, ServerInfo.maxp, false
-				]);
-			}
-			
-			//serverx.name, serverx.mapname, serverx.gamemode, serverx.cp, serverx.mp, serverx.passworded, serverx.address
-			
-			request.data = variables;
-			loader.load(request);
 		}
 		
 		public function shutdown():void
 		{
-			variables.cmd = "-";
-			justsent = "-";
-			variables.info = "";
-			
-			request.data = variables;
-			loader.load(request);
+			if (ServerInfo.pub)
+			{
+				variables.cmd = "-";
+				justsent = "-";
+				variables.info = "";
+				
+				request.data = variables;
+				loader.load(request);
+				
+				Registry.msannounced = false;
+			}
 		}
 		
 		public function setplayers():void
 		{
-			variables.cmd = "p";
-			justsent = "p";
-			variables.info = JSON.stringify([ServerInfo.currentp, ServerInfo.maxp]);
-			
-			request.data = variables;
-			loader.load(request);
+			if (ServerInfo.pub)
+			{
+				variables.cmd = "p";
+				justsent = "p";
+				variables.info = JSON.stringify([ServerInfo.currentp, ServerInfo.maxp]);
+				
+				request.data = variables;
+				loader.load(request);
+			}
 		}
 		
 		public function setmap():void
 		{
-			variables.cmd = "m";
-			justsent = "m";
-			variables.info = JSON.stringify(ServerInfo.map);
-			
-			request.data = variables;
-			loader.load(request);
+			if (ServerInfo.pub)
+			{
+				variables.cmd = "m";
+				justsent = "m";
+				variables.info = JSON.stringify(ServerInfo.map);
+				
+				request.data = variables;
+				loader.load(request);
+			}
 		}
 		
 		public function setmode():void
 		{
-			variables.cmd = "g";
-			justsent = "g";
-			variables.info = JSON.stringify(ServerInfo.gamemode);
-			
-			request.data = variables;
-			loader.load(request);
+			if (ServerInfo.pub)
+			{
+				variables.cmd = "g";
+				justsent = "g";
+				variables.info = JSON.stringify(ServerInfo.gamemode);
+				
+				request.data = variables;
+				loader.load(request);
+			}
 		}
 		
 		public function heartbeat():void
 		{
-			variables.cmd = "h";
-			justsent = "h";
-			variables.info = "";
-			
-			request.data = variables;
-			loader.load(request);
+			if (ServerInfo.pub)
+			{
+				variables.cmd = "h";
+				justsent = "h";
+				variables.info = "";
+				
+				request.data = variables;
+				loader.load(request);
+			}
 		}
 		
 		public function update(Seconds:Number):void

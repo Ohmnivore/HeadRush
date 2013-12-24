@@ -9,6 +9,12 @@ package gamemode
 			
 		}
 		
+		public function mapproperties(data:Object):void
+		{
+			ServerInfo.map = data["mapname"];
+			ServerInfo.gamemode = data["gamemode"];
+		}
+		
 		public function shutdown():void
 		{
 			

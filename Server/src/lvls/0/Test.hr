@@ -1,4 +1,4 @@
-[{"Tilemap": "Collide", "name": "TestMap"},
+[{"Tilemap": "Collide", "name": "TestMap", "gamemode": "FFA"},
 [["155","45","201","101"],["119","33","120","92"]],
 [{"x":"30", "y":"76", "w":"144", "h":"10", "t":"L"}],
 [["244","108","Life", {"Sample": "Samplevalue", "Item1": "0"}],["214","73","Life", {"K": "lol"}]],

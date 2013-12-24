@@ -1,12 +1,17 @@
 package  
 {
+	import entity.Life;
 	import flash.utils.Dictionary;
 	import gamemode.Base;
+	import gamemode.FFA;
 	import org.flixel.*;
 	import RushServer;
 
 	public class Registry 
 	{
+			public static var setupdone:Boolean = false;
+			public static var msannounced:Boolean = false;
+			
 			public static var totdiggers:int = 0;		
 			public static var mapray:Array;	
 			public static var ddig:int = 0;
@@ -14,7 +19,7 @@ package
 			public static var playstate:PlayState;
 			public static var server:RushServer;
 			public static var clients:Dictionary = new Dictionary();
-			public static var gamemode:Base;
+			public static var gm:Base;
 			
 			public static var spawntimer:uint;
 			

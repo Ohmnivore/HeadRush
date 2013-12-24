@@ -25,6 +25,9 @@ package
 		[Embed(source = "art/kongtext.regular.ttf", fontFamily = "Kongtext", embedAsCFF="false")] 	
 		public static const	kongtext:String;
 		
+		[Embed(source = "art/setupback.png")]
+		public static const SETUPBACK:Class;
+		
 		public static const LVLS = JSON.parse(String(new embedded_text()));
 		
 		public function Assets() 

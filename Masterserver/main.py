@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #HeadRush Google App Engine master server source
 
+import logging
 import webapp2
 import json
 import datetime
@@ -101,6 +102,8 @@ class ServerHandler(webapp2.RequestHandler):
         ip = self.request.remote_addr
         cmd = self.request.get('cmd')
         duplicate = False
+        logging.info(cmd)
+        logging.info(self.request.get('info'))
         if cmd == '+':
             for server in Server.query().iter():
                 if server.address == ip:
@@ -112,7 +115,7 @@ class ServerHandler(webapp2.RequestHandler):
                 x[0] = re.sub(r'[^\w]', '', x[0])
                 x[1] = re.sub(r'[^\w]', '', x[1])
                 x[2] = re.sub(r'[^\w]', '', x[2])
-                if x[3] <= 100 and x[4] <= 100 and (x[5] == True or x[5] == False) and len(x[0]) <= 20 and len(x[1]) <= 20 and len(x[2]) <= 3:
+                if x[3] <= 100 and x[4] <= 100 and (x[5] == True or x[5] == False) and len(x[0]) <= 20 and len(x[1]) <= 20 and len(x[2]) <= 20:
                     serverx = Server()
                     # serverx.name, serverx.mapname, serverx.gamemode, serverx.cp, serverx.mp, serverx.passworded, serverx.address = x
                     serverx.name = x[0]

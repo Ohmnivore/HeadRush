@@ -9,7 +9,9 @@ package
 	import org.flixel.system.FlxTile;
 	import flash.utils.getDefinitionByName;
 	import entity.*;
+	import gamemode.*;
 	import Spawn;
+	import com.jmx2.delayedFunctionCall;
 	
 	public class PlayState extends FlxState
 	{
@@ -20,7 +22,6 @@ package
 		public var spawns:Array = new Array();
 		public var players:FlxGroup = new FlxGroup();
 		
-		public var random:Boolean = false;
 		public var levelindex:String = "TestMap";
 		
 		public var lasers:FlxGroup = new FlxGroup();
@@ -46,6 +47,9 @@ package
 		{
 			super.create();
 			
+			Registry.ms = new MasterServer(ServerInfo.ms);
+			Registry.ms.announce();
+			
 			elapsed = 0;
 			rate = 1.0 / messagespersecond;
 			
@@ -60,23 +64,18 @@ package
 			FlxG.bgColor = 0xff7A7A7A;
 			FlxG.mouse.show();
 			
-			if (random) RandomMap();
+			spawns.push(new Spawn(30, 0, 0));
+			map = new BTNTilemap();
 			
-			else 
-			{
-				spawns.push(new Spawn(30, 0, 0));
-				map = new BTNTilemap();
-				
-				LoadMap();
-				
-				string = JSON.stringify(Assets.LVLS[levelindex]);
-				
-				var temp:String = new String();
-				temp = LZW.compress(string);
-				trace(string.length);
-				trace(temp.length);
-				Msg.mapstring.msg["compressed"] = temp;
-			}
+			LoadMap();
+			
+			string = JSON.stringify(Assets.LVLS[levelindex]);
+			
+			var temp:String = new String();
+			temp = LZW.compress(string);
+			trace(string.length);
+			trace(temp.length);
+			Msg.mapstring.msg["compressed"] = temp;
 			
 			add(map);
 			add(charunderlay);
@@ -100,19 +99,10 @@ package
 			
 			FlxG.worldBounds = bounds;
 			
-			//var chatbox:FlxInputText = new FlxInputText(0, 200*2, 320*2, 120*2, "->");
-			//chatbox.size = 20;
-			//chatbox.scrollFactor = new FlxPoint(0, 0);
-			//chatbox.borderVisible = false;
-			//chatbox.backgroundColor = 0x55949494;
 			chathist = new ChatHist();
-			//chathist.toggle();
 			
 			chatbox = new ChatBox();
 			chatbox.toggle();
-			
-			Registry.ms = new MasterServer(ServerInfo.ms);
-			Registry.ms.announce();
 		}
 		
 		public function LoadMap():void
@@ -126,6 +116,13 @@ package
 			const PLATFORMS = 2;
 			const ENTITIES = 3;
 			const MAPS = 4;
+			
+			var gm:Class = getDefinitionByName("gamemode.".concat(lvl[PROPERTIES]["gamemode"])) as Class;
+			Registry.gm = new gm();
+			
+			new delayedFunctionCall(
+			function () { Registry.gm.mapproperties(lvl[PROPERTIES]); }, 
+			4000);
 			
 			for (var layer:int = 0; layer < lvl[MAPS].length; layer++)
 			{
@@ -237,21 +234,6 @@ package
 				new FlxPoint(int(lvl[LASERS][laser][2]), int(lvl[LASERS][laser][3])), this);
 				lasers.add(laz);
 			}
-		}
-		
-		public function RandomMap():void
-		{
-			map = new BTNTilemap();
-			string = convertMatrixToStr(Registry.mapray);
-			var temp:String = new String();
-			temp = LZW.compress(string);
-			trace(string.length);
-			//temp.compress();
-			trace(temp.length);
-			Msg.mapstring.msg["compressed"] = temp;
-			map.loadMap(string, FlxTilemap.ImgAuto, 8, 8, FlxTilemap.AUTO);
-			
-			generatespawns();
 		}
 		
 		override public function update():void
@@ -437,23 +419,6 @@ package
 			}
 		}
 		
-		public function convertMatrixToStr( mat:Array ):String
-		{
-			var mapString:String = "";
-			
-			for ( var y:uint = 0; y < mat.length; y++ )
-			{
-				for ( var x:uint = 0; x < mat[y].length; x++ )
-				{
-					mapString += mat[y][x].toString() + ",";
-				}
-				
-				mapString += "\n";
-			}
-			
-			return mapString;
-		}
-		
 		public static function encode(ba:ByteArray):String 
 		{
 			var origPos:uint = ba.position;
@@ -467,44 +432,6 @@ package
 
 			ba.position = origPos;
 			return String.fromCharCode.apply(null, result);
-		}
-		
-		private function getspawn():FlxPoint
-		{
-			var ok:Boolean = false;
-			var x:int;
-			var y:int;
-			var xb:int = 300;
-			var yb:int = 300;
-			while (!ok)
-			{
-				x = xb / 8;
-				y = yb / 8;
-				
-				if (Registry.mapray[y][x] == 1 || xb == 300 || yb == 300)
-				{
-					xb = Math.floor(Math.random() * 300);
-					yb = Math.floor(Math.random() * 200);
-					FlxG.log(xb);
-					FlxG.log(yb);
-				}
-				
-				else
-				{
-				    ok = true;
-					return new FlxPoint(xb, yb);
-				}
-			}
-			return new FlxPoint(0, 0);
-		}
-		
-		private function generatespawns():void
-		{
-			
-			while (spawns.length < 10)
-			{
-				spawns.push(getspawn());
-			}
 		}
 	}
 }

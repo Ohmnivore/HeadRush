@@ -42,7 +42,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="-includes=entity.Life" />
+    <option additional="" />
     <option compilerConstants="" />
     <option minorVersion="" />
   </build>
