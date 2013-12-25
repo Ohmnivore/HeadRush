@@ -3,6 +3,8 @@ package
 	import flash.text.TextField;
 	import flash.text.TextFormat;
 	import flash.utils.ByteArray;
+	import gevent.HurtEvent;
+	import gevent.HurtInfo;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import org.flixel.plugin.photonstorm.BaseTypes.Bullet;
@@ -121,7 +123,7 @@ package
 			Registry.gm = new gm();
 			
 			new delayedFunctionCall(
-			function () { Registry.gm.mapproperties(lvl[PROPERTIES]); }, 
+			function () { Registry.gm.mapProperties(lvl[PROPERTIES]); }, 
 			4000);
 			
 			for (var layer:int = 0; layer < lvl[MAPS].length; layer++)
@@ -242,56 +244,7 @@ package
 			
 			Registry.ms.update(FlxG.elapsed);
 			
-			FlxG.collide(players, materialmap);
-			FlxG.collide(players, lavamap);
-			FlxG.collide(players, map);
-			FlxG.collide(bullets, map, explobullet);
-			FlxG.collide(bullets, platforms, explobullet);
-			FlxG.collide(bullets, players, explobullet);
-			FlxG.collide(players, platforms);
-			//FlxG.collide(heademitters, platforms);
-			FlxG.overlap(players, heademitters, collectedhead);
-			FlxG.collide(players, players, jumpkill);
-			
-			for each (var player:Player in players.members)
-			{
-				if (player.y > map.height + map.y + 100 && !player.dead) 
-				{
-					player.respawn(Registry.spawntimer);
-					
-					var announce:String = player.name.concat(" fell off the map.");
-					announcer.add(announce,
-								[
-								[11, player.teamcolor, 0, player.name.length],
-								[11, Registry.ORANGE, announce.length-4, announce.length-1]
-								]
-								);
-				}
-			}
-			
-			for each (var laser:Laser in lasers.members)
-			{
-				for each (var player:Player in players.members)
-				{
-					if (FlxCollision.pixelPerfectCheck(laser, player, 255))
-					{
-						if (!player.dead)
-						{
-							player.health -= 10;
-							if (player.health <= 0)
-							{
-								var announce:String = player.name.concat(" was burned by a laser!");
-								announcer.add(announce,
-											[
-											[11, player.teamcolor, 0, player.name.length],
-											[11, Registry.ORANGE, announce.length-6, announce.length-1]
-											]
-											);
-							}
-						}
-					}
-				}
-			}
+			Registry.gm.update(FlxG.elapsed);
 			
 			if (FlxG.keys.justReleased("ESCAPE")) Registry.cli.toggle();
 			if (FlxG.keys.justReleased("Z")) Registry.devconsole.toggle();
@@ -319,75 +272,6 @@ package
 			}
 		}
 		
-		private function explobullet(bullet:Bullet, placeholder):void
-		{
-			for each (var player:Player in players.members)
-			{
-				var ppos:FlxPoint = new FlxPoint(player.x + player.width / 2, player.y + player.height / 2);
-				var bpos:FlxPoint = new FlxPoint(bullet.x + bullet.width / 2, bullet.y + bullet.height / 2);
-				
-				var dist:Vector2D = new Vector2D(ppos.x - bpos.x, ppos.y - bpos.y);
-				var length:Number = dist.length;
-				//VMath.reverse(dist);
-				if (length <= 36)
-				{
-					//player.velocity.x += 36*sign(dist.x) - dist.x;
-					player.velocity.y += 360 * sign(dist.y) - dist.y * 10;
-					//player.velocity.x += dist.x * 15 - 0.4 * Math.pow(dist.x, 2);
-					if (Math.abs(dist.x) > 5)
-						player.velocity.x += 180 * sign(dist.x) - dist.x * 5;
-				}
-				VMath.normalize(dist);
-				
-				if (length <= 36)
-				{
-					player.health -= (90 - 2.5 * length);
-				}
-				
-				bullet.kill();
-			}
-		}
-		
-		public function sign(num) {
-			  return (num > 0) ? 1 : ((num < 0) ? -1 : 0);
-			}
-		
-		private function collectedhead(player:Player, head:Head):void
-		{
-			if (!player.dead)
-			{
-				head.kill();
-				player.heads++;
-			}
-		}
-		
-		private function jumpkill(player:Player, player2:Player):void
-		{
-			var winner:Player;
-			var loser:Player;
-			
-			if (player.touching & FlxObject.DOWN)
-			{
-				if (player.y <= player2.y + 1)
-				{
-					winner = player;
-					loser = player2;
-				}
-			}
-			
-			if (player2.touching & FlxObject.DOWN)
-			{
-				if (player2.y <= player.y + 1)
-				{
-					winner = player2;
-					loser = player;
-				}
-			}
-			
-			winner.kills++;
-			loser.respawn(Registry.spawntimer);
-		}
-		
 		public function CeilingWalk(tile:FlxTile, player:Player):void
 		{
 			if (player.touching & FlxObject.UP)
@@ -398,25 +282,18 @@ package
 					player.acceleration.y = -420;
 				}
 			}
-			
-			//player.acceleration.y = -420;
-			//trace("walk");
 		}
 		
 		public function LavaBurn(tile:FlxTile, player:Player):void
 		{
-			player.health -= 1;
-			if (player.health <= 0 && !player.dead)
-			{
-				player.respawn(Registry.spawntimer);
-				var announce:String = player.name.concat(" was scorched by lava.");
-				announcer.add(announce,
-							[
-							[11, player.teamcolor, 0, player.name.length],
-							[11, Registry.ORANGE, announce.length-6, announce.length - 1]
-							]
-							);
-			}
+			var info:HurtInfo = new HurtInfo;
+			info.attacker = BaseGamemode.LAVA;
+			info.victim = player.ID;
+			info.dmg = 2;
+			info.dmgsource = tile.getMidpoint();
+			info.type = BaseGamemode.ENVIRONMENT;
+			
+			Registry.gm.dispatchEvent(new HurtEvent(HurtEvent.HURT_EVENT, info));
 		}
 		
 		public static function encode(ba:ByteArray):String 

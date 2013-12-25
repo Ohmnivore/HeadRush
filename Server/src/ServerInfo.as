@@ -32,7 +32,6 @@ package
 		public static function registercustoms():void
 		{
 			//Gamemodes
-			Base
 			FFA
 			
 			//Entities

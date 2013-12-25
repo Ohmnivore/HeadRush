@@ -55,7 +55,10 @@ package plugin
 		
 		override public function DeleteUI():void
 		{
-			config.getCompById("GWind").dispatchEvent(new Event(Event.CLOSE));
+			super.DeleteUI();
+			Save();
+			if (helping) helpwindow.dispatchEvent(new Event(Event.CLOSE));
+			FlxG.stage.removeChild(config.getCompById("GWind"));
 		}
 		
 		public function setName(e:Event):void
@@ -75,9 +78,7 @@ package plugin
 		
 		public function onClose(event:Event):void
         {
-            Save();
-			if (helping) helpwindow.dispatchEvent(new Event(Event.CLOSE));
-			FlxG.stage.removeChild(config.getCompById("GWind"));
+            DeleteUI();
         }
 	}
 }

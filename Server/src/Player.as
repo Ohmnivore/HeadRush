@@ -1,5 +1,7 @@
 package  
 {
+	import gevent.DeathEvent;
+	import gevent.HurtInfo;
 	import mx.core.FlexSprite;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
@@ -33,6 +35,8 @@ package
 		public var deaths:uint;
 		public var heads:uint;
 		
+		public var hurtinfo:HurtInfo;
+		
 		public var a:Number = 1;
 		public var right:Boolean = true;
 		
@@ -64,6 +68,7 @@ package
             maxVelocity.y = JUMP_SPEED;
 			
 			cannon = new FlxWeapon("blaster", this, "x", "y");
+			cannon.player = this;
 			cannon.makePixelBullet(5, 6, 6, 0xff000000);
 			cannon.setBulletSpeed(160);
 			cannon.setFireRate(2000);
@@ -237,7 +242,8 @@ package
 			
 			if (health <= 0)
 			{
-				respawn(Registry.spawntimer);
+				//Registry.gm.dispatchEvent(new DeathEvent(DeathEvent.DEATH_EVENT, hurtinfo));
+				//respawn(Registry.spawntimer);
 			}
 		}
 		

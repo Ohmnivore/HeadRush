@@ -34,6 +34,7 @@ package org.flixel.plugin.photonstorm
 	
 	public class FlxWeapon 
 	{
+		public var player:Player;
 		/**
 		 * Internal name for this weapon (i.e. "pulse rifle")
 		 */

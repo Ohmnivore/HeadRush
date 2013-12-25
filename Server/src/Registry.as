@@ -2,7 +2,7 @@ package
 {
 	import entity.Life;
 	import flash.utils.Dictionary;
-	import gamemode.Base;
+	import gamemode.BaseGamemode;
 	import gamemode.FFA;
 	import org.flixel.*;
 	import RushServer;
@@ -19,7 +19,7 @@ package
 			public static var playstate:PlayState;
 			public static var server:RushServer;
 			public static var clients:Dictionary = new Dictionary();
-			public static var gm:Base;
+			public static var gm:BaseGamemode;
 			
 			public static var spawntimer:uint;
 			

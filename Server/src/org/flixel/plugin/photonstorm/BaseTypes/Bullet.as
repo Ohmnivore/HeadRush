@@ -22,7 +22,7 @@ package org.flixel.plugin.photonstorm.BaseTypes
 
 	public class Bullet extends FlxSprite
 	{
-		protected var weapon:FlxWeapon;
+		public var weapon:FlxWeapon;
 		
 		protected var bulletSpeed:int;
 		

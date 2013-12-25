@@ -2,13 +2,14 @@ package plugin
 {
 	import com.bit101.components.*;
 	import com.bit101.utils.MinimalConfigurator;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flixel.FlxG;
 	
-	public class BasePlugin
+	public class BasePlugin extends Sprite
 	{
-		public var name:String;
+		public var pname:String;
 		public var version:uint;
 		public var runtimesafe:Boolean;
 		
@@ -26,15 +27,16 @@ package plugin
 		
 		public function BasePlugin() 
 		{
+			super();
 			//name = "Setup2";
 			//version = 0;
 		}
 		
 		public function LoadFromSave():void
 		{
-			if (ServerInfo.tosave[name])
+			if (ServerInfo.tosave[pname])
 			{
-				var save = ServerInfo.tosave[name];
+				var save = ServerInfo.tosave[pname];
 				
 				for (var data:String in save)
 				{
@@ -103,11 +105,12 @@ package plugin
 				data[comp] = getCompValue(config.getCompById(comp));
 			}
 			
-			ServerInfo.tosave[name] = data;
+			ServerInfo.tosave[pname] = data;
 		}
 		
 		public function CreateUI():void
 		{
+			SetupState.currentgui = this;
 			initx = FlxG.width / 2 + 10;
 			helptext = "";
 			runtimeunsafe = [];
@@ -120,7 +123,7 @@ package plugin
 		
 		public function DeleteUI():void
 		{
-			//config.getCompById("GWind").dispatchEvent(new Event(Event.CLOSE));
+			SetupState.currentgui = undefined;
 		}
 		
 		public function applyRuntimes(components:Array):void
