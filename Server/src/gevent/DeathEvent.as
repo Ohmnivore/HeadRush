@@ -15,7 +15,7 @@ package gevent
 		
 		public override function clone():Event
 		{
-			return new HurtEvent(type, deathinfo, bubbles, cancelable);
+			return new DeathEvent(type, deathinfo, bubbles, cancelable);
 		}
 	}
 

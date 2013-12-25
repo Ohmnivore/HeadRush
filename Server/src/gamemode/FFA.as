@@ -18,7 +18,7 @@ package gamemode
 		
 		override public function onDeath(e:DeathEvent):void
 		{
-			
+			DefaultHooks.handleDeath(e.deathinfo);
 		}
 	}
 

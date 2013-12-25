@@ -267,6 +267,7 @@ package
 			
 			else
 			{
+				health = 100;
 				visible = true;
 				gun.visible = true;
 				gun2.visible = true;

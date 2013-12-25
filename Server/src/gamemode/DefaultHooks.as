@@ -187,7 +187,25 @@ package gamemode
 			var p:Player = Registry.clients[info.victim];
 			p.health -= info.dmg;
 			
-			if (p.health <= 0) Registry.gm.dispatchEvent(new DeathEvent(DeathEvent.DEATH_EVENT, info));
+			if (!p.dead)
+				if (p.health <= 0) Registry.gm.dispatchEvent(new DeathEvent(DeathEvent.DEATH_EVENT, info));
+		}
+		
+		public static function handleDeath(info:HurtInfo):void
+		{
+			var t:int = info.type;
+			var player:Player = Registry.clients[info.victim];
+			
+			if (t == BaseGamemode.ENVIRONMENT)
+			{
+				DefaultHooks.respawn(player);
+				
+				var k:int = info.attacker;
+				
+				if (k == BaseGamemode.LASER) DefaultHooks.announceLaser(player);
+				if (k == BaseGamemode.FALL) DefaultHooks.announceFall(player);
+				if (k == BaseGamemode.LAVA) DefaultHooks.announceLava(player);
+			}
 		}
 	}
 
