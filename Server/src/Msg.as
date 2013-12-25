@@ -55,8 +55,6 @@ package
 			dl = new Message(18, network);
 			dl.SetFields("dlurl", "jsonmanifests");
 			dl.SetTypes("String", "String");
-			
-			
 		}
 	}
 

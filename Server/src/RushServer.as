@@ -2,6 +2,8 @@ package
 {
 	import flash.events.ServerSocketConnectEvent;
 	import flash.utils.Dictionary;
+	import gevent.JoinEvent;
+	import gevent.LeaveEvent;
 	import org.flixel.FlxPoint;
 	import HUDLabel;
 	import Streamy.MsgHandler;
@@ -24,75 +26,18 @@ package
 			id = 0;
 		}
 		
-		override public function onClientClose( event:Event ):void 
+		override public function onClientClose(event:Event):void 
         {
-			
-			var sock:Socket = event.target as Socket;
-			var id:String = sock.remoteAddress.concat(sock.remotePort);
-			var peer:ServerPeer = peers[id];
-			
-			Msg.clientdisco.msg["id"] = peer.identifier;
-			
-			Registry.playstate.players.remove(clients[peer.identifier], true);
-			clients[peer.identifier].kill();
-			clients[peer.identifier].destroy();
+			Registry.gm.dispatchEvent(new LeaveEvent(LeaveEvent.LEAVE_EVENT, event));
 			
 			super.onClientClose(event);
-			
-			Msg.clientdisco.SendReliableToAll();
-			
-			
 		}
 		
 		override public function NewClient(event:ServerSocketConnectEvent):void
 		{
-			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
-			Msg.newclient.msg["id"] = id;
-			Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
-			Msg.newclient.SendReliableToAll();
+			super.NewClient(event.clone() as ServerSocketConnectEvent);
 			
-			super.NewClient(event);
-			
-			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
-			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
-			Msg.dl.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			
-			var newplayer:Player = new Player(0, 0);
-			
-			//Equivalent to clients[peer.id], but we don't have a reference
-			//to the peer object.
-			peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = id;
-			clients[id] = newplayer;
-			newplayer.ID = id;
-			//trace(Msg.mapstring.msg["compressed"].length);
-			Msg.mapstring.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			//id++;
-			
-			Msg.fellowclients.msg["yourid"] = id;
-			var peerarray:Array = new Array();
-			for each (var client:Player in Registry.playstate.players.members)
-			{
-				var infoarray:Array = new Array();
-				infoarray.push(client.ID);
-				infoarray.push(client.name);
-				peerarray.push(infoarray);
-			}
-			Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
-			Msg.fellowclients.SendReliable(peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			id++;
-			Registry.playstate.players.add(newplayer);
-			newplayer.peer = peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
-			
-			var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
-			testhud.pos = new FlxPoint(100, 0);
-			testhud.Init(newplayer);
-			testhud.Set(newplayer);
-			testhud.Pos(newplayer);
-			
-			var testtimer:HUDTimer = new HUDTimer(2, 0, 500);
-			testtimer.Init(newplayer);
-			testtimer.Set(newplayer);
-			testtimer.Start(newplayer);
+			Registry.gm.dispatchEvent(new JoinEvent(JoinEvent.JOIN_EVENT, event.clone() as ServerSocketConnectEvent));
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void
@@ -100,6 +45,8 @@ package
 			super.HandleMsg(event);
 			
 			var p:Player = clients[event.peer.identifier];
+			
+			try{
 			
 			if (event.id == Msg.keystatus.ID)
 			{
@@ -169,6 +116,12 @@ package
 				clients[event.peer.identifier].right = Msg.keystatus.msg["lookright"];
 				
 				clients[event.peer.identifier].a = Msg.keystatus.msg["a"];
+			}
+			}
+			
+			catch (e:Error)
+			{
+				trace(e);
 			}
 		}
 	}

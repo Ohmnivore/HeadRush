@@ -78,17 +78,14 @@ package
 			
 			if (selected != list.selectedIndex && list.selectedIndex != 0)
 			{
-				if (currentgui != undefined) 
-				{
-					trace(currentgui);
-					currentgui.DeleteUI();
-				}
+				if (currentgui != undefined) currentgui.DeleteUI();
 				ServerInfo.pl[list.selectedIndex-1].CreateUI();
 				selected = list.selectedIndex;
 			}
 			
 			if (Registry.setupdone)
 			{
+				if (currentgui != undefined) currentgui.DeleteUI();
 				FlxG.stage.removeChild(window);
 				ServerInfo.save.close();
 				go("placeholder");
@@ -96,6 +93,7 @@ package
 		}
 		private function go(placeholder:*):void
 		{
+			if (currentgui != undefined) currentgui.DeleteUI();
 			FlxG.stage.removeChild(window);
 			ServerInfo.save.close();
 			FlxG.switchState(new PlayState);

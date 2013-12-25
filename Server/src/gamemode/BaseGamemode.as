@@ -1,8 +1,11 @@
 package gamemode 
 {
 	import flash.display.Sprite;
+	import flash.events.ServerSocketConnectEvent;
 	import gevent.DeathEvent;
 	import gevent.HurtEvent;
+	import gevent.JoinEvent;
+	import gevent.LeaveEvent;
 	
 	public class BaseGamemode extends Sprite
 	{
@@ -19,8 +22,6 @@ package gamemode
 		public function BaseGamemode() 
 		{
 			super();
-			addEventListener(HurtEvent.HURT_EVENT, onHurt);
-			addEventListener(DeathEvent.DEATH_EVENT, onDeath);
 		}
 		
 		public function mapProperties(data:Object):void
@@ -45,6 +46,21 @@ package gamemode
 		}
 		
 		public function onDeath(e:DeathEvent):void
+		{
+			
+		}
+		
+		public function onJoin(e:JoinEvent):void
+		{
+			
+		}
+		
+		public function onLeave(e:LeaveEvent):void
+		{
+			
+		}
+		
+		public function onMsg(e:DeathEvent):void
 		{
 			
 		}

@@ -105,6 +105,8 @@ package
 			
 			chatbox = new ChatBox();
 			chatbox.toggle();
+			chatbox.close();
+			chathist.toggle();
 		}
 		
 		public function LoadMap():void

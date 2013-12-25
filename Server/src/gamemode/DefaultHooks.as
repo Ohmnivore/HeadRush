@@ -1,8 +1,14 @@
 package gamemode 
 {
+	import flash.net.Socket;
+	import Streamy.*;
+	import flash.events.Event;
+	import flash.events.ServerSocketConnectEvent;
 	import gevent.DeathEvent;
 	import gevent.HurtEvent;
 	import gevent.HurtInfo;
+	import gevent.JoinEvent;
+	import gevent.LeaveEvent;
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import org.flixel.plugin.photonstorm.BaseTypes.Bullet;
@@ -16,6 +22,14 @@ package gamemode
 			collideWorld();
 			checkWorldBounds();
 			checkLasers();
+		}
+		
+		public static function hookEvents(gm:BaseGamemode):void
+		{
+			gm.addEventListener(HurtEvent.HURT_EVENT, gm.onHurt, false, 10);
+			gm.addEventListener(DeathEvent.DEATH_EVENT, gm.onDeath, false, 10);
+			gm.addEventListener(JoinEvent.JOIN_EVENT, gm.onJoin, false, 10);
+			gm.addEventListener(LeaveEvent.LEAVE_EVENT, gm.onLeave, false, 10);
 		}
 		
 		public static function collideWorld():void
@@ -206,6 +220,86 @@ package gamemode
 				if (k == BaseGamemode.FALL) DefaultHooks.announceFall(player);
 				if (k == BaseGamemode.LAVA) DefaultHooks.announceLava(player);
 			}
+		}
+		
+		public static function handleJoin(e:JoinEvent):void
+		{
+			var s:RushServer = Registry.server;
+			var event:ServerSocketConnectEvent = e.joininfo;
+			
+			ServerInfo.currentp++;
+			
+			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
+			Msg.newclient.msg["id"] = id;
+			Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
+			for (var id:String in Registry.server.peers)
+			{
+				if (id != event.socket.remoteAddress.concat(event.socket.remotePort))
+				{
+					Msg.newclient.SendReliable(Registry.server.peers[id]);
+				}
+			}
+			
+			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
+			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
+			Msg.dl.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			
+			var newplayer:Player = new Player(0, 0);
+			
+			//Equivalent to clients[peer.id], but we don't have a reference
+			//to the peer object.
+			s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = s.id;
+			s.clients[s.id] = newplayer;
+			newplayer.ID = s.id;
+			//trace(Msg.mapstring.msg["compressed"].length);
+			Msg.mapstring.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			//id++;
+			
+			Msg.fellowclients.msg["yourid"] = s.id;
+			var peerarray:Array = new Array();
+			for each (var client:Player in Registry.playstate.players.members)
+			{
+				var infoarray:Array = new Array();
+				infoarray.push(client.ID);
+				infoarray.push(client.name);
+				peerarray.push(infoarray);
+			}
+			Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
+			Msg.fellowclients.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			s.id++;
+			Registry.playstate.players.add(newplayer);
+			newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
+			
+			//var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
+			//testhud.pos = new FlxPoint(100, 0);
+			//testhud.Init(newplayer);
+			//testhud.Set(newplayer);
+			//testhud.Pos(newplayer);
+			//
+			//var testtimer:HUDTimer = new HUDTimer(2, 0, 500);
+			//testtimer.Init(newplayer);
+			//testtimer.Set(newplayer);
+			//testtimer.Start(newplayer);
+		}
+		
+		public static function handleLeave(e:LeaveEvent):void
+		{
+			var s:RushServer = Registry.server;
+			var event:Event = e.leaveinfo;
+			
+			var sock:Socket = event.target as Socket;
+			var id:String = sock.remoteAddress.concat(sock.remotePort);
+			var peer:ServerPeer = s.peers[id];
+			
+			FlxG.log("[Server]Client disconnected: ".concat(sock.remoteAddress));
+			
+			Msg.clientdisco.msg["id"] = peer.identifier;
+			
+			Registry.playstate.players.remove(s.clients[peer.identifier], true);
+			s.clients[peer.identifier].kill();
+			s.clients[peer.identifier].destroy();
+			
+			Msg.clientdisco.SendReliableToAll();
 		}
 	}
 
