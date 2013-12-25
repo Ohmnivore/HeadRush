@@ -1,180 +1,83 @@
 package plugin 
 {
-	import com.bit101.charts.*;
 	import com.bit101.components.*;
+	import com.bit101.utils.MinimalConfigurator;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import org.flixel.FlxG;
 	
-	public class Setup 
+	public class Setup extends BasePlugin
 	{
-		public var name:String;
-		public var version:uint;
-		
-		//GUI variables
-		public var initx:int;
-		public var window:Window;
-		public var helptext:String;
-		public var helping:Boolean;
-		public var helpwindow:Window;
-		public var placeheight:uint;
-		public var maxpp:VIntSlider;
-		public var namep:InputText;
-		public var passp:InputText;
-		
-		//GUI settables
-		public var sname:String = "New Server";
-		public var spass:String = "";
-		public var smaxp:uint = 12;
-		
 		public function Setup() 
 		{
 			name = "Setup";
 			version = 0;
-			
-			LoadFromSave();
+			runtimesafe = true;
 		}
 		
-		public function LoadFromSave():void
+		override public function CreateUI():void
 		{
-			if (ServerInfo.tosave[name])
-			{
-				var save = ServerInfo.tosave[name];
-				sname = save["name"];
-				spass = save["password"]; 
-				smaxp = save["maxp"];
-				
-				ServerInfo.name = sname;
-				ServerInfo.password = spass;
-				ServerInfo.maxp = smaxp;
-			}
+			super.CreateUI();
 			
-			else
-			{
-				//FlxG.log(e);
-				
-				ServerInfo.name = sname;
-				ServerInfo.password = spass;
-				ServerInfo.maxp = smaxp;
-			}
-		}
-		
-		public function WriteToSave():void
-		{
-			var data:Object = new Object();
-			data["name"] = ServerInfo.name;
-			data["password"] = ServerInfo.password;
-			data["maxp"] = ServerInfo.maxp;
-			
-			ServerInfo.tosave[name] = data;
-			
-			trace(data["maxp"]);
-		}
-		
-		public function CreateUI():void
-		{
 			helptext = ( [
 
 "This plugin allows to set usefull info for your server.",
 "Leave the password field blank if you don't want one.",
+"Server name is runtime-unsafe.",
 
 ] ).join("\n");
-
+		
 			initx = FlxG.width / 2 + 10;
-			helping = false;
-			placeheight = 0;
 			
-			window = new Window(FlxG.stage, initx, 0, name);
-			window.hasCloseButton = true;
-			window.draggable = false;
-			window.height = FlxG.height * 2;
-			window.width = FlxG.width * 2 - initx;
+			var xml:XML = <comps>
+							<Window id="GWind" x={initx} y="0" title={name} event="close:onClose" hasCloseButton="true" height={FlxG.height*2} width={FlxG.width*3/2 - 20}>
+								<VBox x="0" y="0">
+									<Label id="namelabel" x="10" y="0" text="Name"/>
+									<InputText id="name" x="10" y="20" event="change:setName"/>
+									<Label id="passlabel" x="10" y="40" text="Password"/>
+									<InputText id="pass" x="10" y="60" event="change:setPass"/>
+									<VIntSlider id="maxp" x="10" y="80" label="Max players" event="change:setMaxP" minimum="6" maximum="32" value={12}/>
+									<PushButton id="helpbutton" label="Help" x="10" y="120" event="click:createHelper"/>
+								</VBox>
+							</Window>
+                          </comps>;
 			
-			window.addEventListener(Event.CLOSE, close);
+			config.parseXML(xml);
 			
-			createHeader(0, placeheight, "Server name");
-			namep = new InputText(window, 0, placeheight, sname, setName);
-			addLH(namep);
+			runtimeunsafe = ["name"];
+			applyRuntimes(runtimeunsafe);
 			
-			createHeader(0, placeheight, "Password");
-			passp = new InputText(window, 0, placeheight, spass, setPass);
-			addLH(passp);
+			savecomps = ["name", "pass", "maxp"];
+			savecompsdefault = ["New_Server", "", 12];
 			
-			maxpp = new VIntSlider(window, 0, placeheight, "Max players", setMaxP);
-			maxpp.setSliderParams(6, 32, smaxp);
-			addLH(maxpp);
-			
-			var helpbutton = new PushButton(window, 0, placeheight, "Help", createHelper);
-			addLH(helpbutton);
+			LoadFromSave();
 		}
 		
-		public function DeleteUI():void
+		override public function DeleteUI():void
 		{
-			window.dispatchEvent(new Event(Event.CLOSE));
+			config.getCompById("GWind").dispatchEvent(new Event(Event.CLOSE));
 		}
 		
-		public function addLH(component:*):void
+		public function setName(e:Event):void
 		{
-			placeheight += component.height;
+			ServerInfo.name = config.getCompById("name")["text"];
 		}
 		
-		public function createHelper(placeholder:*):void
+		public function setPass(e:Event):void
 		{
-			helping = true;
-			
-			helpwindow = new Window(FlxG.stage, 0, 0, "Help");
-			helpwindow.hasCloseButton = true;
-			helpwindow.addEventListener(Event.CLOSE, helpclose);
-			
-			var help:TextArea = new TextArea(helpwindow, 0, 0, helptext);
-			help.editable = false;
-			
-			helpwindow.width = help.width;
-			helpwindow.height = help.height;
-		}
-
-		public function createHeader(x:int, y:int, text:String)
-		{
-			var t:Label = new Label(window, x, y, text);
-			t.height = 20;
-			t.width = t.textField.textWidth;
-			
-			addLH(t);
+			ServerInfo.password = config.getCompById("pass")["text"];
 		}
 		
-		public function setName(data:String):void
+		public function setMaxP(e:Event):void
 		{
-			ServerInfo.name = namep.text;
+			ServerInfo.maxp = uint(config.getCompById("maxp")["value"]);
 		}
 		
-		public function setPass(data:String):void
-		{
-			ServerInfo.password = passp.text;
-		}
-		
-		public function setMaxP(data:int):void
-		{
-			ServerInfo.maxp = uint(maxpp.value);
-		}
-		
-		public function Save():void
-		{
-			WriteToSave();
-			ServerInfo.save.data["json"] = JSON.stringify(ServerInfo.tosave);
-			ServerInfo.save.flush();
-		}
-		
-		public function helpclose(e:Event):void
-		{
-			helping = false;
-			FlxG.stage.removeChild(helpwindow);
-		}
-		
-		public function close(e:Event):void
-		{
-			Save();
-			FlxG.stage.removeChild(window);
-			
+		public function onClose(event:Event):void
+        {
+            Save();
 			if (helping) helpwindow.dispatchEvent(new Event(Event.CLOSE));
-		}
+			FlxG.stage.removeChild(config.getCompById("GWind"));
+        }
 	}
 }

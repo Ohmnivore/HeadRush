@@ -38,7 +38,7 @@ package com.bit101.components
 		protected var _back:Sprite;
 		protected var _password:Boolean = false;
 		protected var _text:String = "";
-		protected var _tf:TextField;
+		public var _tf:TextField;
 		
 		/**
 		 * Constructor
