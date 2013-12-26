@@ -375,6 +375,36 @@ package gamemode
 			
 			Registry.server.clients[event.peer.identifier].a = Msg.keystatus.msg["a"];
 		}
+		
+		public static function handleScore(event:MsgHandler):void
+		{
+			var s:ScoreSet = new ScoreSet;
+			s.header = "Scores";
+			s.headermarkup = [];
+			s.titles = ["Player", "Kills", "Deaths"];
+			s.columns = [[], [], []];
+			
+			var allp:Array = [];
+			
+			for each (var id:Player in Registry.clients)
+			{
+				allp.push(id);
+			}
+			
+			allp.sortOn("kills");
+			
+			for each (var play:Player in allp)
+			{
+				s.columns[0].push(play.ID);
+				s.columns[1].push(play.kills);
+				s.columns[2].push(play.deaths);
+			}
+			
+			var scoreboard:Array = [s];
+			
+			Msg.score.msg["json"] = JSON.stringify(scoreboard);
+			Msg.score.SendReliable(event.peer);
+		}
 	}
 
 }

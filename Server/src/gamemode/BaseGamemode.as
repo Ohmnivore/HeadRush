@@ -6,6 +6,7 @@ package gamemode
 	import gevent.HurtEvent;
 	import gevent.JoinEvent;
 	import gevent.LeaveEvent;
+	import plugin.BasePlugin;
 	import Streamy.MsgHandler;
 	
 	public class BaseGamemode extends Sprite
@@ -23,6 +24,10 @@ package gamemode
 		public function BaseGamemode() 
 		{
 			super();
+			for each (var plug:BasePlugin in ServerInfo.pl)
+			{
+				plug.init();
+			}
 		}
 		
 		public function mapProperties(data:Object):void

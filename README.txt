@@ -15,11 +15,10 @@ A Google App Engine master server is active at
 http://headrushms.appspot.com/
 
 TODO
-2)-Networked scoreboard
-1)-Rework architecture for custom mods and plugins -WIP
-5)-Custom networked objects protocol
-3)-Finish client-side implementations of things (announcer, chat, anims)
-4)-Client-side GUI (mostly server browser)
+1)-Networked scoreboard
+4)-Custom networked objects protocol
+2)-Finish client-side implementations of things (announcer, chat, anims)
+3)-Client-side GUI (mostly server browser)
 
 TOFIX
 -Better knock back

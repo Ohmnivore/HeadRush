@@ -37,9 +37,16 @@ package gamemode
 		
 		override public function onMsg(event:MsgHandler):void
 		{
+			super.onMsg(event);
+			
 			if (event.id == Msg.keystatus.ID)
 			{
 				DefaultHooks.handleKeys(event);
+			}
+			
+			if (event.id == Msg.score.ID)
+			{
+				DefaultHooks.handleScore(event);
 			}
 		}
 	}

@@ -190,7 +190,6 @@ package
 		{
 			super.update();
 			
-			//if (Registry.loadedmap)
 			if (Registry.loadedmap)
 			{
 				FlxG.collide(players, map);
@@ -241,6 +240,11 @@ package
 					{
 						player.velocity.y = -player.maxVelocity.y / 2;
 						Msg.keystatus.msg["up"] = true;
+					}
+					if (FlxG.keys.TAB)
+					{
+						Msg.score.msg["json"] = "";
+						Msg.score.SendReliable();
 					}
 					
 					Msg.keystatus.SendUnreliable();

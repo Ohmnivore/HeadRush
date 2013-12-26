@@ -5,6 +5,7 @@ package
 	public class Msg 
 	{
 		public static var network:RushServer;
+		public static const USERMSG:uint = 50;
 		
 		public static var mapstring:Message;
 		public static var fellowclients:Message;
@@ -15,6 +16,7 @@ package
 		public static var announce:Message;
 		public static var hud:Message;
 		public static var dl:Message;
+		public static var score:Message;
 		
 		public static function init():void
 		{
@@ -55,6 +57,10 @@ package
 			dl = new Message(18, network);
 			dl.SetFields("dlurl", "jsonmanifests");
 			dl.SetTypes("String", "String");
+			
+			score = new Message(19, network);
+			score.SetFields("json");
+			score.SetTypes("String");
 		}
 	}
 

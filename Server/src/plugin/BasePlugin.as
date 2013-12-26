@@ -174,6 +174,11 @@ package plugin
 		}
 		
 		//Here be templates for hooking onto Registry.gm events
+		public function init():void
+		{
+			
+		}
+		
 		public function update(elapsed:Number):void
 		{
 			

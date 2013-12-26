@@ -185,6 +185,11 @@ package
 				//FlxG.log("");
 				Downloader.Go();
 			}
+			
+			if (event.id == Msg.score.ID)
+			{
+				FlxG.log("got scoreboard");
+			}
 		}
 		
 		public static function decode(str:String):ByteArray 
