@@ -12,6 +12,7 @@ package
 	import flash.utils.getDefinitionByName;
 	import entity.*;
 	import gamemode.*;
+	import plugin.BasePlugin;
 	import Spawn;
 	import com.jmx2.delayedFunctionCall;
 	
@@ -247,6 +248,11 @@ package
 			Registry.ms.update(FlxG.elapsed);
 			
 			Registry.gm.update(FlxG.elapsed);
+			
+			for each (var plug:BasePlugin in ServerInfo.pl)
+			{
+				plug.update(FlxG.elapsed);
+			}
 			
 			if (FlxG.keys.justReleased("ESCAPE")) Registry.cli.toggle();
 			if (FlxG.keys.justReleased("Z")) Registry.devconsole.toggle();

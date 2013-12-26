@@ -1,4 +1,4 @@
-package gevent 
+package gevent
 {
 	import flash.events.Event;
 	import gevent.HurtInfo;

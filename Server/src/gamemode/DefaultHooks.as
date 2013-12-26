@@ -30,6 +30,7 @@ package gamemode
 			gm.addEventListener(DeathEvent.DEATH_EVENT, gm.onDeath, false, 10);
 			gm.addEventListener(JoinEvent.JOIN_EVENT, gm.onJoin, false, 10);
 			gm.addEventListener(LeaveEvent.LEAVE_EVENT, gm.onLeave, false, 10);
+			gm.addEventListener(MsgHandler.MSG_EVENT, gm.onMsg, false, 10);
 		}
 		
 		public static function collideWorld():void
@@ -227,7 +228,7 @@ package gamemode
 			var s:RushServer = Registry.server;
 			var event:ServerSocketConnectEvent = e.joininfo;
 			
-			ServerInfo.currentp++;
+			ServerInfo.currentp = ServerInfo.currentp + 1;
 			
 			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
 			Msg.newclient.msg["id"] = id;
@@ -287,6 +288,8 @@ package gamemode
 			var s:RushServer = Registry.server;
 			var event:Event = e.leaveinfo;
 			
+			ServerInfo.currentp = ServerInfo.currentp - 1;
+			
 			var sock:Socket = event.target as Socket;
 			var id:String = sock.remoteAddress.concat(sock.remotePort);
 			var peer:ServerPeer = s.peers[id];
@@ -300,6 +303,77 @@ package gamemode
 			s.clients[peer.identifier].destroy();
 			
 			Msg.clientdisco.SendReliableToAll();
+		}
+		
+		public static function handleKeys(event:MsgHandler):void
+		{
+			var p:Player = Registry.server.clients[event.peer.identifier];
+			
+			if (!Msg.keystatus.msg["left"] && !Msg.keystatus.msg["right"])
+			{
+				//if (!p.isTouching(FlxObject.NONE)) p.acceleration.x = 0;
+			}
+			
+			if (Msg.keystatus.msg["left"])
+			{
+				//clients[event.peer.identifier].acceleration.x = -clients[event.peer.identifier].maxVelocity.x * 4;
+				p.velocity.x -= 5;
+			}
+			
+			//event.id is 11, since we checked that earlier.
+			
+			if (Msg.keystatus.msg["right"])
+			{
+				//clients[event.peer.identifier].acceleration.x = clients[event.peer.identifier].maxVelocity.x * 4;
+				p.velocity.x += 5;
+			}
+			
+			if (Msg.keystatus.msg["down"])
+			{
+				//clients[event.peer.identifier].acceleration.y = 420;
+				p.acceleration.y = 420;
+			}
+			
+			//See how we check if the player is actually touching the floor?
+			//Although the same check is already used in the update function,
+			//never trust the client.
+			if (Msg.keystatus.msg["up"])
+			{
+				//trace(
+				//FlxG.collide(Registry.playstate.map, p.wallshade));
+				//FlxObject.separateX(p.wallshade, Registry.playstate.map);
+				//trace(p.wallslide);
+				if (p.wallslide)
+				{
+					if (p.walleft)
+					{
+						p.velocity.y = -p.maxVelocity.y / 2;
+						p.velocity.x = 60;
+					}
+					
+					if (p.wallright)
+					{
+						p.velocity.y = -p.maxVelocity.y / 2;
+						p.velocity.x = -60;
+					}
+				}
+				
+				else
+				{
+					if (p.isTouching(FlxObject.DOWN))
+						p.velocity.y = -p.maxVelocity.y / 2;
+				}
+			}
+			
+			if (Msg.keystatus.msg["shooting"])
+			{
+				Registry.server.clients[event.peer.identifier].shoot();
+				//trace("shot");
+			}
+			
+			Registry.server.clients[event.peer.identifier].right = Msg.keystatus.msg["lookright"];
+			
+			Registry.server.clients[event.peer.identifier].a = Msg.keystatus.msg["a"];
 		}
 	}
 

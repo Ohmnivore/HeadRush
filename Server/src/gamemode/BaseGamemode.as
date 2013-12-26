@@ -6,6 +6,7 @@ package gamemode
 	import gevent.HurtEvent;
 	import gevent.JoinEvent;
 	import gevent.LeaveEvent;
+	import Streamy.MsgHandler;
 	
 	public class BaseGamemode extends Sprite
 	{
@@ -60,7 +61,7 @@ package gamemode
 			
 		}
 		
-		public function onMsg(e:DeathEvent):void
+		public function onMsg(e:MsgHandler):void
 		{
 			
 		}

@@ -137,10 +137,9 @@ class ServerHandler(webapp2.RequestHandler):
         if cmd == 'p':
             query = Server.gql("WHERE address = :1", ip)
             server = query.get()
-            if int(self.request.get('info')) <= 100:
-                pstats = json.loads(self.request.get('info'))
-                server.cp = int(pstats[0])
-                server.mp = int(pstats[1])
+            pstats = json.loads(self.request.get('info'))
+            server.cp = int(pstats[0])
+            server.mp = int(pstats[1])
             server.put()
         #if cmd == '+p':
         #    query = Server.gql("WHERE address = :1", ip)

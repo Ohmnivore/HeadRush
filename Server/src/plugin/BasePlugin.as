@@ -6,6 +6,12 @@ package plugin
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flixel.FlxG;
+	import gevent.HurtEvent;
+	import gevent.DeathEvent;
+	import gevent.JoinEvent;
+	import gevent.LeaveEvent;
+	import Streamy.MsgHandler;
+	import plugin.BasePlugin;
 	
 	public class BasePlugin extends Sprite
 	{
@@ -31,6 +37,8 @@ package plugin
 			//name = "Setup2";
 			//version = 0;
 		}
+		
+		//Here be GUI functions. Much scary.
 		
 		public function LoadFromSave():void
 		{
@@ -163,6 +171,42 @@ package plugin
 		{
 			helping = false;
 			FlxG.stage.removeChild(helpwindow);
+		}
+		
+		//Here be templates for hooking onto Registry.gm events
+		public function update(elapsed:Number):void
+		{
+			
+		}
+		
+		public function shutdown():void
+		{
+			
+		}
+		
+		public function onHurt(e:HurtEvent):void
+		{
+			
+		}
+		
+		public function onDeath(e:DeathEvent):void
+		{
+			
+		}
+		
+		public function onJoin(e:JoinEvent):void
+		{
+			
+		}
+		
+		public function onLeave(e:LeaveEvent):void
+		{
+			
+		}
+		
+		public function onMsg(e:MsgHandler):void
+		{
+			
 		}
 	}
 }

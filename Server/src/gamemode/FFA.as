@@ -4,6 +4,7 @@ package gamemode
 	import gevent.HurtEvent;
 	import gevent.JoinEvent;
 	import gevent.LeaveEvent;
+	import Streamy.MsgHandler;
 	
 	public class FFA extends BaseGamemode
 	{
@@ -32,6 +33,14 @@ package gamemode
 		override public function onLeave(e:LeaveEvent):void
 		{
 			DefaultHooks.handleLeave(e);
+		}
+		
+		override public function onMsg(event:MsgHandler):void
+		{
+			if (event.id == Msg.keystatus.ID)
+			{
+				DefaultHooks.handleKeys(event);
+			}
 		}
 	}
 

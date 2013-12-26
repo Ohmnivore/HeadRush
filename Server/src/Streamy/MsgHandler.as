@@ -7,6 +7,7 @@ package Streamy
 		public var id:uint;
 		public var isTCP:Boolean;
 		public var peer:ServerPeer;
+		public static const MSG_EVENT:String = "msgevent";
 		
 		public function MsgHandler(Peer:ServerPeer = null, ID:uint = 10, IsTCP:Boolean = false) 
 		{
@@ -17,6 +18,10 @@ package Streamy
 			super("msgevent");
 		}
 		
+		public override function clone():Event
+		{
+			return new MsgHandler(peer, id, isTCP);
+		}
 	}
 
 }

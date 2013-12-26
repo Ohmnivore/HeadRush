@@ -81,7 +81,7 @@ package Streamy
 			}
 			
 			udpsocket.addEventListener(DatagramSocketDataEvent.DATA, ReceivedUDP);
-			udpsocket.addEventListener("msgevent", HandleMsg);
+			udpsocket.addEventListener(MsgHandler.MSG_EVENT, HandleMsg);
 			udpsocket.receive();
 			
 			var udpportdeclare:Message = new Message(0, this);
