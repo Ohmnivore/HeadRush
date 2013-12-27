@@ -11,20 +11,21 @@ package
 			super();
 		}
 		
-		public function add(message:String):void
+		public function add(text:MarkupText):void
 		{
-			var text:FlxText = new FlxText(0, 0, 200, message, true, true);
 			text.scrollFactor.x = text.scrollFactor.y = 0;
-			//text.font = "Kongtext";
-			//text.width = message.length * text.size * 1.4;
 			text.x = 320 - text.width - 2;
 			
 			for (var i:uint = 0; i < msg.length; i++)
 			{
-				msg[i].y += 12;
+				if (i == 0)
+				{
+					msg[i].y += text.height;
+				}
+				
+				else msg[i].y += msg[i - 1].height;
 			}
 			msg.push(text);
-			//for each (var test:FlxText in Registry.playstate.hud.members) test.y += 40;
 			
 			Registry.playstate.hud.add(text);
 			

@@ -15,11 +15,10 @@ package org.flixel
 	 */
 	public class FlxText extends FlxSprite
 	{
-		public var autowidth:Boolean;
 		/**
 		 * Internal reference to a Flash <code>TextField</code> object.
 		 */
-		public var _textField:TextField;
+		protected var _textField:TextField;
 		/**
 		 * Whether the actual text field needs to be regenerated and stamped again.
 		 * This is NOT the same thing as <code>FlxSprite.dirty</code>.
@@ -39,12 +38,9 @@ package org.flixel
 		 * @param	Text			The actual text you would like to display initially.
 		 * @param	EmbeddedFont	Whether this text field uses embedded fonts or nto
 		 */
-		public function FlxText(X:Number, Y:Number, Width:uint, Text:String=null, EmbeddedFont:Boolean=true, Autowidth = false)
+		public function FlxText(X:Number, Y:Number, Width:uint, Text:String=null, EmbeddedFont:Boolean=true)
 		{
-			super(X, Y);
-			
-			autowidth = Autowidth;
-			
+			super(X,Y);
 			makeGraphic(Width,1,0);
 			
 			if(Text == null)
@@ -54,14 +50,8 @@ package org.flixel
 			_textField.embedFonts = EmbeddedFont;
 			_textField.selectable = false;
 			_textField.sharpness = 100;
-			if (!autowidth)
-				_textField.multiline = true;
-			else
-				_textField.multiline = false;
-			if (!autowidth)
-				_textField.wordWrap = true;
-			else
-				_textField.wordWrap = false;
+			_textField.multiline = true;
+			_textField.wordWrap = true;
 			_textField.text = Text;
 			var format:TextFormat = new TextFormat("system",8,0xffffff);
 			_textField.defaultTextFormat = format;
@@ -74,14 +64,6 @@ package org.flixel
 			_regen = true;
 			_shadow = 0;
 			allowCollisions = NONE;
-			calcFrame();
-		}
-		
-		public function Markup(markuparray:Array):void
-		{
-			_textField.setTextFormat(new TextFormat("system", markuparray[0], markuparray[1]), 
-									markuparray[2], markuparray[3]);
-			_regen = true;
 			calcFrame();
 		}
 		
@@ -255,20 +237,12 @@ package org.flixel
 				//Need to generate a new buffer to store the text graphic
 				var i:uint = 0;
 				var nl:uint = _textField.numLines;
-				//trace(_textField.numLines);
 				height = 0;
-				if (autowidth) width = 0;
 				while(i < nl)
-					height += _textField.getLineMetrics(i++).height;				
-					if (autowidth) 
-					{
-						width += _textField.textWidth * FlxG.camera.zoom;
-						//trace(_textField.textWidth * FlxG.camera.zoom);
-					}
+					height += _textField.getLineMetrics(i++).height;
 				height += 4; //account for 2px gutter on top and bottom
 				_pixels = new BitmapData(width,height,true,0);
 				frameHeight = height;
-				if (autowidth) frameWidth = width;
 				_textField.height = height*1.2;
 				_flashRect.x = 0;
 				_flashRect.y = 0;
@@ -289,7 +263,7 @@ package org.flixel
 				if((format.align == "center") && (_textField.numLines == 1))
 				{
 					formatAdjusted = new TextFormat(format.font,format.size,format.color,null,null,null,null,null,"left");
-					if (!autowidth) _textField.setTextFormat(formatAdjusted);				
+					_textField.setTextFormat(formatAdjusted);				
 					_matrix.translate(Math.floor((width - _textField.getLineMetrics(0).width)/2),0);
 				}
 				//Render a single pixel shadow beneath the text
@@ -299,11 +273,11 @@ package org.flixel
 					_matrix.translate(1,1);
 					_pixels.draw(_textField,_matrix,_colorTransform);
 					_matrix.translate(-1,-1);
-					if (!autowidth) _textField.setTextFormat(new TextFormat(formatAdjusted.font,formatAdjusted.size,formatAdjusted.color,null,null,null,null,null,formatAdjusted.align));
+					_textField.setTextFormat(new TextFormat(formatAdjusted.font,formatAdjusted.size,formatAdjusted.color,null,null,null,null,null,formatAdjusted.align));
 				}
 				//Actually draw the text onto the buffer
 				_pixels.draw(_textField,_matrix,_colorTransform);
-				if (!autowidth) _textField.setTextFormat(new TextFormat(format.font,format.size,format.color,null,null,null,null,null,format.align));
+				_textField.setTextFormat(new TextFormat(format.font,format.size,format.color,null,null,null,null,null,format.align));
 			}
 			
 			//Finally, update the visible pixels

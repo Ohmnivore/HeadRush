@@ -92,34 +92,25 @@ package gamemode
 		public static function announceLava(player:Player):void
 		{
 			var announce:String = player.name.concat(" was scorched by lava.");
-			PlayState.announcer.add(announce,
-						[
-						[11, player.teamcolor, 0, player.name.length],
-						[11, Registry.ORANGE, announce.length-6, announce.length - 1]
-						]
-						);
+			var pmarkup:Markup = new Markup(0, player.name.length, 11, player.teamcolor);
+			var lmarkup:Markup = new Markup(announce.length - 6, announce.length - 1, 11, Registry.ORANGE);
+			PlayState.announcer.add(new MarkupText(0, 0, 500, announce, true, true, [pmarkup, lmarkup]));
 		}
 		
 		public static function announceFall(player:Player):void
 		{
 			var announce:String = player.name.concat(" fell off the map.");
-			PlayState.announcer.add(announce,
-						[
-						[11, player.teamcolor, 0, player.name.length],
-						[11, Registry.ORANGE, announce.length-4, announce.length-1]
-						]
-						);
+			var pmarkup:Markup = new Markup(0, player.name.length, 11, player.teamcolor);
+			var fmarkup:Markup = new Markup(announce.length - 4, announce.length - 1, 11, Registry.ORANGE);
+			PlayState.announcer.add(new MarkupText(0, 0, 500, announce, true, true, [pmarkup, fmarkup]));
 		}
 		
 		public static function announceLaser(player:Player):void
 		{
 			var announce:String = player.name.concat(" was burned by a laser!");
-			PlayState.announcer.add(announce,
-						[
-						[11, player.teamcolor, 0, player.name.length],
-						[11, Registry.ORANGE, announce.length-6, announce.length-1]
-						]
-						);
+			var pmarkup:Markup = new Markup(0, player.name.length, 11, player.teamcolor);
+			var lmarkup:Markup = new Markup(announce.length - 6, announce.length - 1, 11, Registry.ORANGE);
+			PlayState.announcer.add(new MarkupText(0, 0, 500, announce, true, true, [pmarkup, lmarkup]));
 		}
 		
 		public static function explobullet(bullet:Bullet, placeholder):void

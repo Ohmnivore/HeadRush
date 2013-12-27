@@ -31,20 +31,9 @@ package
 			}
 		}
 		
-		public function add(message:String, markup:Array = null):void
+		public function add(text:MarkupText):void
 		{
-			var text:FlxText = new FlxText(0, FlxG.height-inity, FlxG.width, message, true, true);
-			//text.size = 8;
-			//text._textField
-			//text.alpha = 0.85;
-			//text.Markup(new Array(20, 0xff000000, 0, 3));
-			if (markup != null)
-			{
-				for each (var x:Array in markup) text.Markup(x);
-			}
 			text.scrollFactor.x = text.scrollFactor.y = 0;
-			//text.font = "Kongtext";
-			//text.width = message.length * text.size * 1.4;
 			text.x = 0;
 			
 			for (var i:uint = 0; i < msg.length; i++)
@@ -57,9 +46,6 @@ package
 				else msg[i].y += msg[i - 1].height;
 			}
 			msg.push(text);
-			//text.width = FlxG.width * 2;
-			//text.
-			//for each (var test:FlxText in Registry.playstate.hud.members) test.y += 40;
 			
 			Registry.playstate.chats.add(text);
 			

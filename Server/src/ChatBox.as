@@ -118,13 +118,12 @@ package
 			// Enter
 			if (e.keyCode == 13 && text != "")
 			{
-				//Send message
+				var smarkup:Markup = new Markup(0, 6, 10, FlxG.RED);
+				
 				Registry.playstate.chathist.add(
-				new String("Server: ").concat(text),
-				[
-				[10, FlxG.RED, 0, 6]
-				]
-				)
+					new MarkupText(0, 0, 500, "Server: ".concat(text), true, true, [smarkup])
+					);
+				
 				text = "";
 			}
 			if (e.keyCode == 13) toggle();

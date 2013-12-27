@@ -98,8 +98,11 @@ package
 			
 			if (event.id == Msg.announce.ID)
 			{
-				//Registry.playstate.announcer.add(Msg.announce.msg["msg"]);
-				//FlxG.log(Msg.announce.msg["msg"]);
+				var core:MarkupText = new MarkupText(0, 0, 500, Msg.announce.msg["text"], true, true);
+				trace(Msg.announce.msg["markup"]);
+				if (Msg.announce.msg["markup"].length > 0) core.ImportMarkups(Msg.announce.msg["markup"]);
+				
+				Registry.playstate.announcer.add(core);
 			}
 			
 			if (event.id == Msg.hud.ID)
@@ -111,7 +114,7 @@ package
 					if (msgarray[1] == "label")
 					{
 						//var arr:Array = ["i", "label", id, scrollfact];
-						var t:FlxText = new FlxText(0, 0, 100, "", true, false);
+						var t:FlxText = new FlxText(0, 0, 100, "", true);
 						t.scrollFactor = new FlxPoint(msgarray[3], msgarray[3]);
 						Registry.huds[msgarray[2]] = t;
 						Registry.playstate.huds.add(t);
