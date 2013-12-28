@@ -4,7 +4,7 @@ package
 	
 	public class Msg 
 	{
-		public static var client:RushClient;
+		public static var network:RushClient;
 		public static const USERMSG:uint = 50;
 		
 		public static var mapstring:Message;
@@ -17,50 +17,55 @@ package
 		public static var hud:Message;
 		public static var dl:Message;
 		public static var score:Message;
+		public static var chat:Message;
 		
 		public static function init():void
 		{
-			client = Registry.client;
+			network = Registry.client;
 			
-			mapstring = new Message(10, client);
+			mapstring = new Message(10, network);
 			mapstring.SetFields("compressed");
 			mapstring.SetTypes("String");
 			
-			fellowclients = new Message(11, client);
+			fellowclients = new Message(11, network);
 			fellowclients.SetFields("yourid", "json");
 			fellowclients.SetTypes("Int", "String");
 			
-			clientpositions = new Message(12, client);
+			clientpositions = new Message(12, network);
 			clientpositions.SetFields("json");
 			clientpositions.SetTypes("String");
 			
-			keystatus = new Message(13, client);
+			keystatus = new Message(13, network);
 			keystatus.SetFields("right", "left", "up", "a", "lookright", "shooting", "down");
 			keystatus.SetTypes("Boolean", "Boolean", "Boolean", "Float", "Boolean", "Boolean", "Boolean");
 			
-			newclient = new Message(14, client);
+			newclient = new Message(14, network);
 			newclient.SetFields("id", "json");
 			newclient.SetTypes("Int", "String");
 			
-			clientdisco = new Message(15, client);
+			clientdisco = new Message(15, network);
 			clientdisco.SetFields("id");
 			clientdisco.SetTypes("Int");
 			
-			announce = new Message(16, client);
+			announce = new Message(16, network);
 			announce.SetFields("text", "markup");
 			announce.SetTypes("String", "String");
 			
-			hud = new Message(17, client);
+			hud = new Message(17, network);
 			hud.SetFields("json");
 			hud.SetTypes("String");
 			
-			dl = new Message(18, client);
+			dl = new Message(18, network);
 			dl.SetFields("dlurl", "jsonmanifests");
 			dl.SetTypes("String", "String");
 			
-			score = new Message(19, client);
+			score = new Message(19, network);
 			score.SetFields("json");
 			score.SetTypes("String");
+			
+			chat = new Message(20, network);
+			chat.SetFields("text", "markup");
+			chat.SetTypes("String", "String");
 		}
 	}
 

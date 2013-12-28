@@ -17,8 +17,8 @@ http://headrushms.appspot.com/
 TODO
 1)-Networked scoreboard
 4)-Custom networked objects protocol
-2)-Finish client-side implementations of things (announcer, chat, anims)
-3)-Client-side GUI (mostly server browser)
+2)-Finish client-side animations for player class
+3)-Client-side GUI (mostly server browser) -LAN server discovery has me stumped
 
 TOFIX
 -Better knock back

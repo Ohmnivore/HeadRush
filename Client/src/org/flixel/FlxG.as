@@ -37,7 +37,7 @@ package org.flixel
 		 * Assign a minor version to your library.
 		 * Appears after the decimal in the console.
 		 */
-		static public var LIBRARY_MINOR_VERSION:uint = 57;
+		static public var LIBRARY_MINOR_VERSION:uint = 56;
 		
 		/**
 		 * Debugger overlay layout preset: Wide but low windows at the bottom of the screen.
@@ -94,7 +94,7 @@ package org.flixel
 		/**
 		 * Internal tracker for game object.
 		 */
-		static internal var _game:FlxGame;
+		static public var _game:FlxGame;
 		/**
 		 * Handy shared variable for implementing your own pause behavior.
 		 */

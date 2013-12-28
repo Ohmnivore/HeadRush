@@ -193,6 +193,19 @@ package
 			{
 				FlxG.log("got scoreboard");
 			}
+			
+			if (event.id == Msg.chat.ID)
+			{
+				//Check if it's the client's own message.
+				if (Msg.chat.msg["text"].slice(0, Registry.playstate.player.name.length) != Registry.playstate.player.name)
+				{
+					var core:MarkupText = new MarkupText(0, 0, 500, Msg.chat.msg["text"], true, true);
+					trace(Msg.chat.msg["markup"]);
+					if (Msg.chat.msg["markup"].length > 0) core.ImportMarkups(Msg.chat.msg["markup"]);
+					
+					Registry.playstate.chathist.add(core);
+				}
+			}
 		}
 		
 		public static function decode(str:String):ByteArray 

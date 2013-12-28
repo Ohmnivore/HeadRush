@@ -15,6 +15,7 @@ package
 		public var charunderlay:FlxGroup = new FlxGroup();
 		public var huds:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
+		public var chats:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public var announcer:Announcer = new Announcer();
@@ -22,6 +23,9 @@ package
 		internal var elapsed:Number;
 		internal var messagespersecond:uint;
 		internal var rate:Number;
+		
+		public var chatbox:ChatBox;
+		public var chathist:ChatHist;
 		
 		override public function create():void 
 		{
@@ -54,6 +58,13 @@ package
 			
 			//FlxG.camera.setBounds(0, 0, map.width, map.height);
 			FlxG.camera.follow(player);
+			
+			chathist = new ChatHist();
+			
+			chatbox = new ChatBox();
+			chatbox.toggle();
+			chatbox.close();
+			chathist.toggle();
 		}
 		
 		public function loadmap(mapstring:String):void
@@ -125,8 +136,10 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(Registry.chatrect);
 			add(hud);
 			add(huds);
+			add(chats);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < damap[PLATFORMS].length; platf++)
@@ -246,6 +259,8 @@ package
 						Msg.score.msg["json"] = "";
 						Msg.score.SendReliable();
 					}
+					
+					if (FlxG.keys.justReleased("T")) chatbox.toggle();
 					
 					Msg.keystatus.SendUnreliable();
 				}

@@ -17,6 +17,7 @@ package
 		public static var hud:Message;
 		public static var dl:Message;
 		public static var score:Message;
+		public static var chat:Message;
 		
 		public static function init():void
 		{
@@ -61,6 +62,10 @@ package
 			score = new Message(19, network);
 			score.SetFields("json");
 			score.SetTypes("String");
+			
+			chat = new Message(20, network);
+			chat.SetFields("text", "markup");
+			chat.SetTypes("String", "String");
 		}
 	}
 

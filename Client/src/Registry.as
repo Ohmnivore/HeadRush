@@ -12,6 +12,7 @@ package
 		public static var peers:Dictionary = new Dictionary;
 		public static var loadedpeers:Boolean = false;
 		public static var huds:Dictionary = new Dictionary;
+		public static var chatrect:FlxSprite = new FlxSprite(0, 0);
 	}
 
 }

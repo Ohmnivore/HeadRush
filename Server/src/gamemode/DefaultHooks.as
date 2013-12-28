@@ -396,6 +396,17 @@ package gamemode
 			Msg.score.msg["json"] = JSON.stringify(scoreboard);
 			Msg.score.SendReliable(event.peer);
 		}
+		
+		public static function handleChat(event:MsgHandler):void
+		{
+			var p:Player = Registry.clients[event.peer.identifier];
+			var thecore:MarkupText = new MarkupText(0, 0, 500, 
+			p.name.concat(": ").concat(Msg.chat.msg["text"]), 
+			true, true);
+			var mark:Markup = new Markup(0, p.name.length, 10, p.teamcolor);
+			thecore.Markitup(mark);
+			Registry.playstate.chathist.add(thecore);
+		}
 	}
 
 }

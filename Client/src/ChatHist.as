@@ -49,11 +49,6 @@ package
 			
 			Registry.playstate.chats.add(text);
 			
-			Msg.chat.msg["text"] = text.text;
-			if (text.markups.length > 0) Msg.chat.msg["markup"] = text.ExportMarkups();
-			else Msg.chat.msg["markup"] = "";
-			Msg.chat.SendReliableToAll();
-			
 			if (msg.length > 4)
 			{
 				Registry.playstate.chats.remove(msg[0], true);

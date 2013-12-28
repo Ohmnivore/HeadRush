@@ -118,11 +118,18 @@ package
 			// Enter
 			if (e.keyCode == 13 && text != "")
 			{
-				var smarkup:Markup = new Markup(0, 6, 10, FlxG.RED);
+				var smarkup:Markup = new Markup(0, Registry.playstate.player.name.length, 10, 
+				Registry.playstate.player.teamcolor);
 				
 				Registry.playstate.chathist.add(
-					new MarkupText(0, 0, 500, "Server: ".concat(text), true, false, [smarkup])
+					new MarkupText(0, 0, 500, 
+					Registry.playstate.player.name.concat(": ").concat(text), 
+					true, false, [smarkup])
 					);
+					
+				Msg.chat.msg["text"] = text;
+				Msg.chat.msg["markup"] = "";
+				Msg.chat.SendReliable();
 				
 				text = "";
 			}

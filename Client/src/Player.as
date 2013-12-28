@@ -6,6 +6,7 @@ package
 	{
 		public var name:String;
 		public var a:Number;
+		public var teamcolor:uint;
 
 		public function Player(_x:int, _y:int):void 
 		{		
@@ -15,6 +16,7 @@ package
 			maxVelocity.y = 200;
 			acceleration.y = 200;
 			drag.x = maxVelocity.x * 4;
+			teamcolor = 0xff000000;
 			
 			name = "Ohmni";
 		}

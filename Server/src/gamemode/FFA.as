@@ -48,6 +48,11 @@ package gamemode
 			{
 				DefaultHooks.handleScore(event);
 			}
+			
+			if (event.id == Msg.chat.ID)
+			{
+				DefaultHooks.handleChat(event);
+			}
 		}
 	}
 
