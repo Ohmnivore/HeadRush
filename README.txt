@@ -17,17 +17,11 @@ http://headrushms.appspot.com/
 TODO
 1)-Networked scoreboard *(4)
 4)-Custom networked objects protocol *(2)
-3)-Client-side GUI (mostly server browser) -LAN server discovery has me stumped *(1)
-5)-Make Streamy secure and add flow control *(5)
+5)-Add flow control to Streamy *(5)
 6)-I forgot about audio. Must think about audio.
 
 TOFIX
 -Better knock back
-
-*(1)Okay, done some research. Turns out the client will have
-to broadcast over the LAN. flash.net.InterfaceAddress luckily
-automatically finds the broadcast address. Should be a piece
-of cake. Yay!
 
 *(2)This will be heavy-duty. Really. In short, it will
 allow the remote creation+handling of FlxSprites on
@@ -41,9 +35,7 @@ scoreboards (yes, I know, things are getting very
 custom, but I like it that way. Modding will be more
 flexible.)
 
-*(5)At the moment there is a blatant security hole
-I'm a bit ashamed to talk about. It's an easy fix though.
-As of now, there is no flow control and that's very bad.
+*(5)As of now, there is no flow control and that's very bad.
 I'll implement a basic ACK system for UDP to monitor not only
-RTT, but also lost packets so as to better manage the
+RTT, but also lost packets to better manage the
 reliable and unreliable queues.
