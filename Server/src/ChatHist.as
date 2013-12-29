@@ -99,8 +99,8 @@ package
 				for (var x:int = msg.length-1; x > -1; x--)
 				{
 					if (x < 0) x = 0;
-					trace(x);
-					trace(String(msg.length).concat("-> x"));
+					//trace(x);
+					//trace(String(msg.length).concat("-> x"));
 					msg[x].y = (FlxG.height - toty) + z;
 					z += msg[x].height;
 				}

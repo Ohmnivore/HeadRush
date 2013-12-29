@@ -4,19 +4,36 @@ package plugin
 	import com.bit101.utils.MinimalConfigurator;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.net.InterfaceAddress;
+	import flash.net.DatagramSocket;
+	import flash.events.DatagramSocketDataEvent;
+	import flash.utils.ByteArray;
 	import org.flixel.FlxG;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.net.NetworkInfo;
+	import flash.net.NetworkInterface;
+	import flash.events.ProgressEvent;
+	import flash.events.SecurityErrorEvent;
+	import flash.events.IOErrorEvent;
 	
-	public class PublicBrowser extends BasePlugin
+	public class LANBrowser extends BasePlugin
 	{
 		public var servarr:Array = [];
-		public var d:Array = [];
 		public var found:Boolean = false;
 		
-		public function PublicBrowser() 
+		public var d:Array = [];
+		
+		public var net:Vector.<NetworkInterface>;
+		public var broad:String = "127.0.0.1";
+		
+		public var udpsocket:DatagramSocket;
+		
+		public var tries:uint = 0;
+		
+		public function LANBrowser() 
 		{
-			pname = "Public browser";
+			pname = "LAN browser";
 			version = 0;
 			runtimesafe = false;
 		}
@@ -27,9 +44,8 @@ package plugin
 			
 			helptext = ( [
 
-"This plugin allows you to browse public servers registered at headrushms.appspot.com",
-"If you suspect there's a problem displaying servers just visit the above-mentioned website.",
-"Note that this tool will not work for servers on your LAN because another technique is needed for LAN server discovery.",
+"This plugin allows you to browse servers on your LAN.",
+"It uses the address set in the 'Address' menu to find the broadcast address.",
 
 ] ).join("\n");
 		
@@ -54,18 +70,36 @@ package plugin
 			l.height = FlxG.height * 2 - 120;
 			l.width = FlxG.width * 3 / 2 - 40;
 			
-			refresh();
-			
 			savecomps = [];
 			savecompsdefault = [];
 			
-			//LoadFromSave();
+			net = NetworkInfo.networkInfo.findInterfaces();
+			
+			for each (var inter:NetworkInterface in net)
+			{
+				for each (var addr:InterfaceAddress in inter.addresses)
+				{
+					if (addr.address == Registry.address) broad = addr.broadcast;
+				}
+			}
+			
+			trace(broad);
+			
+			udpsocket = new DatagramSocket();
+			udpsocket.bind(5620, Registry.address);
+			udpsocket.addEventListener(DatagramSocketDataEvent.DATA, onLAN);
+			//udpsocket.connect(broad, 5614);
+			udpsocket.receive();
+			
+			refresh();
 		}
 		
 		override public function DeleteUI():void
 		{
 			super.DeleteUI();
 			FlxG.stage.removeChild(config.getCompById("GWind"));
+			
+			udpsocket.close();
 		}
 		
 		public function join(e:MouseEvent):void
@@ -77,6 +111,7 @@ package plugin
 				var index:int = l.selectedIndex;
 				
 				Registry.servaddr = d[index][6];
+				FlxG.log(Registry.servaddr);
 				
 				//DeleteUI();
 				
@@ -91,51 +126,58 @@ package plugin
 		
 		public function refresh():void
 		{
-			var myTextLoader:URLLoader = new URLLoader();
-			
-			myTextLoader.addEventListener(Event.COMPLETE, onReceive);
-			
-			myTextLoader.load(new URLRequest(Registry.ms));
-		}
-		
-		public function onReceive(e:Event):void
-		{
-			if (e.target.data.length > 0)
+			try
 			{
-				found = true;
-				//FlxG.log(e.target.data);
-				d = JSON.parse(e.target.data) as Array;
-				var l:List = config.getCompById("list") as List;
+				var placeholder:ByteArray = new ByteArray();
+				placeholder.writeBoolean(true);
 				
-				var items:Array = [];
-				
-				for each (var serv in d)
-				{
-					var s:String = "";
-					
-					s += serv[0];
-					s += " | ";
-					s += serv[1];
-					s += " | ";
-					s += serv[2];
-					s += " | ";
-					s += serv[3];
-					s += "/";
-					s += serv[4];
-					s += " | ";
-					s += serv[5];
-					
-					items.push(s);
-				}
-				
-				l.items = items;
-				l.selectedIndex = 0;
+				udpsocket.send(placeholder, 0, 0, broad, 5614);
 			}
 			
-			else
+			catch (e:Error) 
 			{
-				found = false;
-				config.getCompById("list")["items"] = ["There are no public servers at the moment."];
+				trace(e);
+				
+				while (tries < 10)
+				{
+					//refresh();
+					tries++;
+				}
+			}
+		}
+		
+		public function onLAN(event:DatagramSocketDataEvent):void
+		{			
+			var buffer:ByteArray = event.data;
+			
+			FlxG.log(buffer.toString());
+			var serv:Array = JSON.parse(buffer.readUTF()) as Array;
+			
+			var l:List = config.getCompById("list") as List;
+			
+			var s:String = "";
+			
+			s += serv[0];
+			s += " | ";
+			s += serv[1];
+			s += " | ";
+			s += serv[2];
+			s += " | ";
+			s += serv[3];
+			s += "/";
+			s += serv[4];
+			s += " | ";
+			s += serv[5];
+			
+			FlxG.log(s);
+			
+			l.items.push(s);
+			d.push(serv);
+			
+			if (!found)	
+			{
+				found = true;
+				config.getCompById("list")["selectedIndex"] = 0;
 			}
 		}
 		

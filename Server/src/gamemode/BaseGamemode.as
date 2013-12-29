@@ -32,7 +32,7 @@ package gamemode
 		
 		public function mapProperties(data:Object):void
 		{
-			ServerInfo.map = data["mapname"];
+			ServerInfo.map = data["name"];
 			ServerInfo.gamemode = data["gamemode"];
 		}
 		

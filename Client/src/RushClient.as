@@ -1,5 +1,6 @@
 package  
 {
+	import flash.net.Socket;
 	import flash.utils.ByteArray;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxText;
@@ -9,8 +10,7 @@ package
 	import org.flixel.FlxG;
 	
 	public class RushClient extends Client
-	{
-		
+	{	
 		public function RushClient(address:String = null, addresstoconnect:String = null) 
 		{
 			super(Registry.address, 5600);

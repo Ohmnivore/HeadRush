@@ -15,7 +15,7 @@ package
 		public static var huds:Dictionary = new Dictionary;
 		public static var chatrect:FlxSprite = new FlxSprite(0, 0);
 		
-		public static var plugins:Array = ["PublicBrowser", "DirectConnect", "Address"];
+		public static var plugins:Array = ["Address", "PublicBrowser", "LANBrowser", "DirectConnect"];
 		public static var pl:Array = [];
 		public static var save:FlxSave;
 		public static var tosave:Object;
@@ -31,6 +31,7 @@ package
 		{
 			//Plugins to activate
 			PublicBrowser
+			LANBrowser
 			DirectConnect
 			Address
 		}

@@ -107,7 +107,7 @@ package
 					facing = LEFT;
 				}
 			}
-			FlxG.log(velocity.x);
+			//FlxG.log(velocity.x);
 			if (!ceilingwalk)
 			{
 				if (facing == RIGHT && velocity.x > 0) { play("walking"); }

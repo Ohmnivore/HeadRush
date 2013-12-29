@@ -14,6 +14,9 @@ package plugin
 		public var showing:Boolean = false;
 		public var showwindow:Window;
 		
+		public var net:Vector.<NetworkInterface>;
+		//public var broadcasts:Array = [];
+		
 		public function Address() 
 		{
 			pname = "Address";
@@ -79,7 +82,7 @@ package plugin
 			
 			help.text += '\n';
 			
-			var net:Vector.<NetworkInterface> = NetworkInfo.networkInfo.findInterfaces();
+			net = NetworkInfo.networkInfo.findInterfaces();
 			
 			for each (var inter:NetworkInterface in net)
 			{
