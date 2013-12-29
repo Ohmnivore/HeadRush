@@ -48,7 +48,8 @@ package plugin
 					
 					setCompValue(save[data], comp);
 					
-					comp.dispatchEvent(new Event(Event.CHANGE));
+					if (comp is CheckBox) comp.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					else comp.dispatchEvent(new Event(Event.CHANGE));
 				}
 			}
 			
@@ -59,7 +60,8 @@ package plugin
 					var comp:Component = config.getCompById(savecomps[x]);
 					setCompValue(savecompsdefault[x], comp);
 					
-					comp.dispatchEvent(new Event(Event.CHANGE));
+					if (comp is CheckBox) comp.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					else comp.dispatchEvent(new Event(Event.CHANGE));
 				}
 			}
 		}
@@ -67,6 +69,11 @@ package plugin
 		public function setCompValue(value:*, comp:Component):void
 		{
 			if (comp is InputText)
+			{
+				comp["text"] = value;
+			}
+			
+			if (comp is TextArea)
 			{
 				comp["text"] = value;
 			}
@@ -85,6 +92,11 @@ package plugin
 		public function getCompValue(comp:Component):*
 		{
 			if (comp is InputText)
+			{
+				return comp["text"];
+			}
+			
+			if (comp is TextArea)
 			{
 				return comp["text"];
 			}

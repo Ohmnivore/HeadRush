@@ -77,6 +77,11 @@ package plugin
 				comp["text"] = value;
 			}
 			
+			if (comp is TextArea)
+			{
+				comp["text"] = value;
+			}
+			
 			if (comp is VIntSlider || comp is Slider)
 			{
 				comp["value"] = value;
@@ -91,6 +96,11 @@ package plugin
 		public function getCompValue(comp:Component):*
 		{
 			if (comp is InputText)
+			{
+				return comp["text"];
+			}
+			
+			if (comp is TextArea)
 			{
 				return comp["text"];
 			}

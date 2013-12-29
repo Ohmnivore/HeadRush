@@ -13,7 +13,7 @@ package
 		
 		public function RushClient(address:String = null, addresstoconnect:String = null) 
 		{
-			super("127.0.0.1", 5600, 5600);
+			super(Registry.address, 5600);
 			Connect(Registry.servaddr, 5613, 5613);
 		}
 		
