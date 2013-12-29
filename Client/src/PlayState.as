@@ -16,6 +16,8 @@ package
 		public var huds:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
 		public var chats:FlxGroup = new FlxGroup();
+		public var bullets:FlxGroup = new FlxGroup();
+		public var charoverlay:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public var announcer:Announcer = new Announcer();
@@ -136,6 +138,8 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(charoverlay);
+			add(bullets);
 			add(Registry.chatrect);
 			add(hud);
 			add(huds);
@@ -213,15 +217,22 @@ package
 				if (deltax == 0) deltax = 0.1;
 				
 				Msg.keystatus.msg["a"] = deltay / deltax;
+				player.a = Msg.keystatus.msg["a"];
 				
-				if (FlxG.mouse.x > (player.x + player.width / 2)) Msg.keystatus.msg["lookright"] = true;
-				else Msg.keystatus.msg["lookright"] = false;
-				//FlxG.log(toString(FlxG.mouse).concat(new String("player: ").concat(toString(player.x + player.width/2))));
+				if (FlxG.mouse.x > (player.x + player.width / 2)) 
+				{
+					player.right = true;
+					Msg.keystatus.msg["lookright"] = true;
+				}
+				
+				else 
+				{
+					player.right = false;
+					Msg.keystatus.msg["lookright"] = false;
+				}
 				
 				if (FlxG.mouse.pressed()) Msg.keystatus.msg["shooting"] = true;
 				else Msg.keystatus.msg["shooting"] = false;
-				
-				//FlxG.log(StriFlxG.mouse.pressed);
 				
 				elapsed += FlxG.elapsed;
 				if (elapsed >= messagespersecond)

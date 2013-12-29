@@ -6,11 +6,6 @@ package plugin
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flixel.FlxG;
-	import gevent.HurtEvent;
-	import gevent.DeathEvent;
-	import gevent.JoinEvent;
-	import gevent.LeaveEvent;
-	import Streamy.MsgHandler;
 	import plugin.BasePlugin;
 	
 	public class BasePlugin extends Sprite
@@ -43,9 +38,9 @@ package plugin
 		public function LoadFromSave():void
 		{
 			//if (ServerInfo.tosave[pname])
-			if (pname in ServerInfo.tosave)
+			if (pname in Registry.tosave)
 			{
-				var save = ServerInfo.tosave[pname];
+				var save = Registry.tosave[pname];
 				
 				for (var data:String in save)
 				{
@@ -64,8 +59,7 @@ package plugin
 					var comp:Component = config.getCompById(savecomps[x]);
 					setCompValue(savecompsdefault[x], comp);
 					
-					if (comp is CheckBox) comp.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
-					else comp.dispatchEvent(new Event(Event.CHANGE));
+					comp.dispatchEvent(new Event(Event.CHANGE));
 				}
 			}
 		}
@@ -115,7 +109,7 @@ package plugin
 				data[comp] = getCompValue(config.getCompById(comp));
 			}
 			
-			ServerInfo.tosave[pname] = data;
+			Registry.tosave[pname] = data;
 		}
 		
 		public function CreateUI():void
@@ -165,55 +159,14 @@ package plugin
 		public function Save():void
 		{
 			WriteToSave();
-			ServerInfo.save.data["json"] = JSON.stringify(ServerInfo.tosave);
-			ServerInfo.save.flush();
+			Registry.save.data["json"] = JSON.stringify(Registry.tosave);
+			Registry.save.flush();
 		}
 		
 		public function helpclose(e:Event):void
 		{
 			helping = false;
 			FlxG.stage.removeChild(helpwindow);
-		}
-		
-		//Here be templates for hooking onto Registry.gm events
-		public function init():void
-		{
-			
-		}
-		
-		public function update(elapsed:Number):void
-		{
-			
-		}
-		
-		public function shutdown():void
-		{
-			
-		}
-		
-		public function onHurt(e:HurtEvent):void
-		{
-			
-		}
-		
-		public function onDeath(e:DeathEvent):void
-		{
-			
-		}
-		
-		public function onJoin(e:JoinEvent):void
-		{
-			
-		}
-		
-		public function onLeave(e:LeaveEvent):void
-		{
-			
-		}
-		
-		public function onMsg(e:MsgHandler):void
-		{
-			
 		}
 	}
 }

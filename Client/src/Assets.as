@@ -13,6 +13,8 @@ package
 
 		[Embed(source = "art/gun.png")]
 		public static const GUN:Class;
+		[Embed(source = "art/gun2.png")]
+		public static const GUN2:Class;
 		
 		[Embed(source = "art/sprites/player4.png")]
 		public static const PLAYER:Class;
@@ -22,6 +24,9 @@ package
 		
 		[Embed(source = "art/kongtext.regular.ttf", fontFamily = "Kongtext", embedAsCFF="false")] 	
 		public static const	kongtext:String;
+		
+		[Embed(source = "art/setupback.png")]
+		public static const SETUPBACK:Class;
 		
 		public function Assets() 
 		{

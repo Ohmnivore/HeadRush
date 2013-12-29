@@ -108,6 +108,7 @@ class ServerHandler(webapp2.RequestHandler):
             for server in Server.query().iter():
                 if server.address == ip:
                     duplicate = True
+                    server.timer = datetime.datetime.now()
             if duplicate == False:
                 #try:
                 x = json.loads(self.request.get('info'))

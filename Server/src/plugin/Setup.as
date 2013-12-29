@@ -10,7 +10,7 @@ package plugin
 	{
 		public function Setup() 
 		{
-			name = "Setup";
+			pname = "Setup";
 			version = 0;
 			runtimesafe = true;
 		}
@@ -30,14 +30,15 @@ package plugin
 			initx = FlxG.width / 2 + 10;
 			
 			var xml:XML = <comps>
-							<Window id="GWind" x={initx} y="0" title={name} event="close:onClose" hasCloseButton="true" height={FlxG.height*2} width={FlxG.width*3/2 - 20}>
+							<Window id="GWind" x={initx} y="0" title={pname} event="close:onClose" hasCloseButton="true" height={FlxG.height*2} width={FlxG.width*3/2 - 20}>
 								<VBox x="0" y="0">
 									<Label id="namelabel" x="10" y="0" text="Name"/>
 									<InputText id="name" x="10" y="20" event="change:setName"/>
 									<Label id="passlabel" x="10" y="40" text="Password"/>
 									<InputText id="pass" x="10" y="60" event="change:setPass"/>
 									<VIntSlider id="maxp" x="10" y="80" label="Max players" event="change:setMaxP" minimum="6" maximum="32" value={12}/>
-									<PushButton id="helpbutton" label="Help" x="10" y="120" event="click:createHelper"/>
+									<CheckBox id="pubbox" label="Public" x="10" y="120" event="click:setPub"/>
+									<PushButton id="helpbutton" label="Help" x="10" y="140" event="click:createHelper"/>
 								</VBox>
 							</Window>
                           </comps>;
@@ -47,8 +48,8 @@ package plugin
 			runtimeunsafe = ["name"];
 			applyRuntimes(runtimeunsafe);
 			
-			savecomps = ["name", "pass", "maxp"];
-			savecompsdefault = ["New_Server", "", 12];
+			savecomps = ["name", "pass", "maxp", "pubbox"];
+			savecompsdefault = ["New_Server", "", 12, true];
 			
 			LoadFromSave();
 		}
@@ -59,6 +60,11 @@ package plugin
 			Save();
 			if (helping) helpwindow.dispatchEvent(new Event(Event.CLOSE));
 			FlxG.stage.removeChild(config.getCompById("GWind"));
+		}
+		
+		public function setPub(e:Event):void
+		{
+			ServerInfo._pub = config.getCompById("pubbox")["selected"];
 		}
 		
 		public function setName(e:Event):void

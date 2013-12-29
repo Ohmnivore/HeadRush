@@ -14,8 +14,7 @@ package
 		public function RushClient(address:String = null, addresstoconnect:String = null) 
 		{
 			super("127.0.0.1", 5600, 5600);
-			if (addresstoconnect == null) Connect("127.0.0.1", 5613, 5613);
-			else Connect("127.0.0.1", 5613, 5613);
+			Connect(Registry.servaddr, 5613, 5613);
 		}
 		
 		override public function HandleMsg(event:MsgHandler):void
@@ -89,8 +88,8 @@ package
 				for each (var peerstate:Array in peerstates)
 				{
 					//FlxG.log(peerstate[0]);
-					Registry.peers[peerstate[0]].velocity.x = Registry.peers[peerstate[0]].x - peerstate[1];
-					Registry.peers[peerstate[0]].velocity.y = Registry.peers[peerstate[0]].y - peerstate[2];
+					Registry.peers[peerstate[0]].velocity.x = peerstate[1] - Registry.peers[peerstate[0]].x;
+					Registry.peers[peerstate[0]].velocity.y = peerstate[2] - Registry.peers[peerstate[0]].y;
 					Registry.peers[peerstate[0]].x = peerstate[1];
 					Registry.peers[peerstate[0]].y = peerstate[2];
 				}

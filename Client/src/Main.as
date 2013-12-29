@@ -12,7 +12,7 @@ package
 		public function Main()
 		{
 			FlxG.debug = true;
-			super(320, 240, PlayState, 2,60,30);
+			super(320, 240, SetupState, 2,60,30);
 		}
 		
 		override protected function create(FlashEvent:Event):void
@@ -20,6 +20,7 @@ package
             super.create(FlashEvent);
             stage.removeEventListener(Event.DEACTIVATE, onFocusLost);
             stage.removeEventListener(Event.ACTIVATE, onFocus);
+			Registry.registercustoms();
         }
 	}
 	

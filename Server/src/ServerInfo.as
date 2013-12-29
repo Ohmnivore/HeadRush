@@ -18,16 +18,13 @@ package
 		public static var dlurl:String = "https://dl.dropboxusercontent.com/u/229424261/hr/";
 		public static var dlmanifests = ["splash.json"];
 		
-		public static var plugins:Array = ["Setup"];
+		public static var address:String = "127.0.0.1";
+		
+		public static var plugins:Array = ["Setup", "Address"];
 		public static var pl:Array = [];
 		
 		public static var save:FlxSave;
 		public static var tosave:Object;
-		
-		public function ServerInfo() 
-		{
-			
-		}
 		
 		public static function registercustoms():void
 		{
@@ -39,6 +36,7 @@ package
 			
 			//Plugins
 			Setup
+			Address
 		}
 		
 		public static function get currentp():uint 

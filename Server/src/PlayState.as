@@ -52,6 +52,7 @@ package
 			
 			Registry.ms = new MasterServer(ServerInfo.ms);
 			Registry.ms.announce();
+			new delayedFunctionCall(Registry.ms.announce, 2000);
 			
 			elapsed = 0;
 			rate = 1.0 / messagespersecond;

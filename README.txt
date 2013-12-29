@@ -17,9 +17,9 @@ http://headrushms.appspot.com/
 TODO
 1)-Networked scoreboard *(4)
 4)-Custom networked objects protocol *(2)
-2)-Finish client-side animations for player class *(3)
 3)-Client-side GUI (mostly server browser) -LAN server discovery has me stumped *(1)
 5)-Make Streamy secure and add flow control *(5)
+6)-I forgot about audio. Must think about audio.
 
 TOFIX
 -Better knock back
@@ -34,11 +34,6 @@ allow the remote creation+handling of FlxSprites on
 a target client while keeping bandwidth usage to a minimum.
 Similar concept to Source engine entities, I guess,
 but I don't know how these work under the hood.
-
-*(3)The player class will not be implementing the custom
-networked object protocol in order to optimise bandwidth.
-It will be compiled along with the client application.
-Things are faster and simpler that way.
 
 *(4)I'm thinking of a protocol that will handle
 creation of sets, consisting of tables for flexible

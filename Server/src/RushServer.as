@@ -22,7 +22,7 @@ package
 		
 		public function RushServer() 
 		{
-			super("127.0.0.1", 5613, 5613);
+			super(ServerInfo.address, 5613, 5613);
 			id = 0;
 		}
 		

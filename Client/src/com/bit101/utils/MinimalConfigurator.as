@@ -43,6 +43,7 @@ package com.bit101.utils
 	 */
 	public class MinimalConfigurator extends EventDispatcher
 	{
+		public var flixelparent:*;
 		protected var loader:URLLoader;
 		protected var parent:DisplayObjectContainer;
 		protected var idMap:Object;
@@ -51,9 +52,10 @@ package com.bit101.utils
 		 * Constructor.
 		 * @param parent The display object container on which to create components and look for ids and event handlers.
 		 */
-		public function MinimalConfigurator(parent:DisplayObjectContainer)
+		public function MinimalConfigurator(parent:DisplayObjectContainer, flixelparent:*)
 		{
 			this.parent = parent;
+			this.flixelparent = flixelparent;
 			idMap = new Object();
 		}
 		
@@ -136,24 +138,27 @@ package com.bit101.utils
 					idMap[id] = compInst;
 					
 					// if id exists on parent as a public property, assign this component to it.
-					if(parent.hasOwnProperty(id))
+					if(flixelparent.hasOwnProperty(id))
 					{
-						parent[id] = compInst;
+						//flixelparent[id] = compInst;
 					}
 				}
 				
 				// event is another special case
-				if(xml.@event.toString() != "")
+				if (xml.@event.toString() != "")
+				//if (xml.hasOwnProperty("@event"))
+				//if ("@event" in xml)
 				{
 					// events are in the format: event="eventName:eventHandler"
 					// i.e. event="click:onClick"
 					var parts:Array = xml.@event.split(":");
 					var eventName:String = trim(parts[0]);
 					var handler:String = trim(parts[1]);
-					if(parent.hasOwnProperty(handler))
+					
+					if(flixelparent.hasOwnProperty(handler))
 					{
 						// if event handler exists on parent as a public method, assign it as a handler for the event.
-						compInst.addEventListener(eventName, parent[handler]);
+						compInst.addEventListener(eventName, flixelparent[handler]);
 					}
 				}
 				
@@ -199,7 +204,7 @@ package com.bit101.utils
 			}
 			catch(e:Error)
 			{
-				
+				trace(e);
 			}
 			return compInst as Component;
 		}
