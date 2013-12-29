@@ -3,7 +3,7 @@ multiplayer 2D platformer shooter.
 
 Basically, it's a 2D port of Quake-like
 gameplay built upon an open and moddable
-engine, inspired from Source engine modding.
+engine, inspired by Source engine modding.
 
 It's built using Streamy and Flixel.
 
