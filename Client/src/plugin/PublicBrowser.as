@@ -42,7 +42,8 @@ package plugin
 									<PushButton id="refrbtn" label="Refresh list" x="10" y="0" event="click:refreshbtn"/>
 									<PushButton id="joinbtn" label="Join" x="10" y="20" event="click:join"/>
 									<Label id="helplabel" x="10" y="40" text="Select a server and click 'Join'."/>
-									<List id="list" x="10" y="60"/>
+									<Label id="helplabel2" x="10" y="60" text="Name | Map | Gamemode | Current players/Max | Requires password?"/>
+									<List id="list" x="10" y="80"/>
 								</VBox>
 							</Window>
                           </comps>;
@@ -50,7 +51,7 @@ package plugin
 			config.parseXML(xml);
 			
 			var l:List = config.getCompById("list") as List;
-			l.height = FlxG.height * 2 - 100;
+			l.height = FlxG.height * 2 - 120;
 			l.width = FlxG.width * 3 / 2 - 40;
 			
 			refresh();
@@ -110,7 +111,21 @@ package plugin
 				
 				for each (var serv in d)
 				{
-					items.push(serv[0]);
+					var s:String = "";
+					
+					s += serv[0];
+					s += " | ";
+					s += serv[1];
+					s += " | ";
+					s += serv[2];
+					s += " | ";
+					s += serv[3];
+					s += "/";
+					s += serv[4];
+					s += " | ";
+					s += serv[5];
+					
+					items.push(s);
 				}
 				
 				l.items = items;
