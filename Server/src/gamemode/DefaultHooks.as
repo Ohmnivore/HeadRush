@@ -222,15 +222,15 @@ package gamemode
 			ServerInfo.currentp = ServerInfo.currentp + 1;
 			
 			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
-			Msg.newclient.msg["id"] = id;
-			Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
-			for (var id:String in Registry.server.peers)
-			{
-				if (id != event.socket.remoteAddress.concat(event.socket.remotePort))
-				{
-					Msg.newclient.SendReliable(Registry.server.peers[id]);
-				}
-			}
+			//Msg.newclient.msg["id"] = id;
+			//Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
+			//for (var id:String in Registry.server.peers)
+			//{
+				//if (id != event.socket.remoteAddress.concat(event.socket.remotePort))
+				//{
+					//Msg.newclient.SendReliable(Registry.server.peers[id]);
+				//}
+			//}
 			
 			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
 			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
@@ -247,18 +247,18 @@ package gamemode
 			Msg.mapstring.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			//id++;
 			
-			Msg.fellowclients.msg["yourid"] = s.id;
-			var peerarray:Array = new Array();
-			for each (var client:Player in Registry.playstate.players.members)
-			{
-				var infoarray:Array = new Array();
-				infoarray.push(client.ID);
-				infoarray.push(client.name);
-				peerarray.push(infoarray);
-			}
-			Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
-			Msg.fellowclients.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			s.id++;
+			//Msg.fellowclients.msg["yourid"] = s.id;
+			//var peerarray:Array = new Array();
+			//for each (var client:Player in Registry.playstate.players.members)
+			//{
+				//var infoarray:Array = new Array();
+				//infoarray.push(client.ID);
+				//infoarray.push(client.name);
+				//peerarray.push(infoarray);
+			//}
+			//Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
+			//Msg.fellowclients.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			//s.id++;
 			Registry.playstate.players.add(newplayer);
 			newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
 			
@@ -272,6 +272,57 @@ package gamemode
 			//testtimer.Init(newplayer);
 			//testtimer.Set(newplayer);
 			//testtimer.Start(newplayer);
+		}
+		
+		public static function handleClientInfo(event:MsgHandler):void
+		{
+			var s:RushServer = Registry.server;
+			var p:Player = s.clients[event.peer.identifier];
+			var i:Array = JSON.parse(Msg.newclient.msg["json"]) as Array;
+			
+			p.name = i[0];
+			
+			switch(i[1])
+			{
+				case "Green":
+					p.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
+					break;
+				
+				case "Yellow":
+					p.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
+					break;
+				
+				case "Red":
+					p.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
+					break;
+			}
+			
+			FlxG.log("[Server]"+event.peer.identifier+" was assigned info: "+Msg.newclient.msg["json"]);
+			Msg.newclient.msg["id"] = p.ID;
+			Msg.newclient.msg["json"] = i;
+			for (var id:String in Registry.server.peers)
+			{
+				if (id != event.peer.id)
+				{
+					//trace(id, event.peer.id);
+					Msg.newclient.SendReliable(Registry.server.peers[id]);
+				}
+			}
+			
+			Msg.fellowclients.msg["yourid"] = p.ID;
+			var peerarray:Array = new Array();
+			for each (var client:Player in Registry.playstate.players.members)
+			{
+				if (client.ID != event.peer.identifier)
+				{
+					var infoarray:Array = new Array();
+					infoarray.push(client.ID);
+					infoarray.push(client.name);
+					peerarray.push(infoarray);
+				}
+			}
+			Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
+			Msg.fellowclients.SendReliable(event.peer);
 		}
 		
 		public static function handleLeave(e:LeaveEvent):void

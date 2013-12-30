@@ -64,7 +64,7 @@ package plugin
 					var comp:Component = config.getCompById(savecomps[x]);
 					setCompValue(savecompsdefault[x], comp);
 					
-					if (comp is CheckBox) comp.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					if (comp is CheckBox || comp is RadioButton) comp.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
 					else comp.dispatchEvent(new Event(Event.CHANGE));
 				}
 			}
@@ -91,6 +91,11 @@ package plugin
 			{
 				comp["selected"] = value;
 			}
+			
+			if (comp is RadioButton)
+			{
+				comp["selected"] = value;
+			}
 		}
 		
 		public function getCompValue(comp:Component):*
@@ -111,6 +116,11 @@ package plugin
 			}
 			
 			if (comp is CheckBox)
+			{
+				return comp["selected"];
+			}
+			
+			if (comp is RadioButton)
 			{
 				return comp["selected"];
 			}

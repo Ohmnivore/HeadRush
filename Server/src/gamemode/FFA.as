@@ -53,6 +53,11 @@ package gamemode
 			{
 				DefaultHooks.handleChat(event);
 			}
+			
+			if (event.id == Msg.newclient.ID)
+			{
+				DefaultHooks.handleClientInfo(event);
+			}
 		}
 		
 		override public function createScore():void

@@ -18,6 +18,7 @@ package
 		public static var dl:Message;
 		public static var score:Message;
 		public static var chat:Message;
+		public static var pinfo:Message;
 		
 		public static function init():void
 		{

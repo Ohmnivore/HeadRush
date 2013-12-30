@@ -13,6 +13,7 @@ package
 		protected static const GRAVITY:int =420;
 		protected static const JUMP_SPEED:int = 420;
 		public var peer:ServerPeer;
+		//public var ID:int;
 		public var healthBar:FlxBar;
 		public var cannon:FlxWeapon;
 		public var gun:FlxSprite;

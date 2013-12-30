@@ -31,6 +31,7 @@ package com.bit101.components
 {
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
 	public class RadioButton extends Component
@@ -172,6 +173,8 @@ package com.bit101.components
 		protected function onClick(event:MouseEvent):void
 		{
 			selected = true;
+			//trace("k");
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		

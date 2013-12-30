@@ -33,7 +33,7 @@ package
 		public var leadcount:int = 0;
 		
 		override public function create():void 
-		{
+		{	
 			super.create();
 			
 			elapsed = 0;
@@ -43,8 +43,28 @@ package
 			Registry.client = new RushClient("127.0.0.1", "127.0.0.1");
 			Msg.init();
 			
+			Msg.newclient.msg["id"] = 0;
+			Msg.newclient.msg["json"] = JSON.stringify([Registry.name, Registry.color]);
+			Msg.newclient.SendReliable();
+			
 			player = new Player(70, 70);
 			players.add(player);
+			player.name = Registry.name;
+			
+			switch(Registry.color)
+			{
+				case "Green":
+					player.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
+					break;
+				
+				case "Yellow":
+					player.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
+					break;
+				
+				case "Red":
+					player.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
+					break;
+			}
 			
 			FlxG.bgColor = 0xff7A7A7A;
 			FlxG.mouse.show();

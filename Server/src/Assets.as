@@ -18,6 +18,12 @@ package
 		
 		[Embed(source = "art/sprites/player4.png")]
 		public static const PLAYER:Class;
+		[Embed(source = "art/sprites/playergreen.png")]
+		public static const PLAYER_GREEN:Class;
+		[Embed(source = "art/sprites/playeryellow.png")]
+		public static const PLAYER_YELLOW:Class;
+		[Embed(source = "art/sprites/playerred.png")]
+		public static const PLAYER_RED:Class;
 		
 		[Embed(source = "art/platform.png")]
 		public static const PLATFORM:Class;

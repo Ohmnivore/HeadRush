@@ -15,7 +15,8 @@ package
 		public static var huds:Dictionary = new Dictionary;
 		public static var chatrect:FlxSprite = new FlxSprite(0, 0);
 		
-		public static var plugins:Array = ["Address", "PublicBrowser", "LANBrowser", "DirectConnect"];
+		public static var plugins:Array = ["Address", "PublicBrowser", "LANBrowser", "DirectConnect", 
+			"PlayerSettings"];
 		public static var pl:Array = [];
 		public static var save:FlxSave;
 		public static var tosave:Object;
@@ -29,6 +30,10 @@ package
 		
 		public static var leadset:ScoreSet;
 		
+		public static var name:String = "Unnamed_player";
+		
+		public static var color:String = "Blue";
+		
 		public static function registercustoms():void
 		{
 			//Plugins to activate
@@ -36,6 +41,7 @@ package
 			LANBrowser
 			DirectConnect
 			Address
+			PlayerSettings
 		}
 		
 		public static function noScroll(s:FlxObject):void
