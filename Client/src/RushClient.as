@@ -191,6 +191,7 @@ package
 			if (event.id == Msg.score.ID)
 			{
 				FlxG.log("got scoreboard");
+				Registry.leadset.importSet(Msg.score.msg["json"]);
 			}
 			
 			if (event.id == Msg.chat.ID)

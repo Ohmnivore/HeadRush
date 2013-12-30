@@ -70,6 +70,11 @@ package gamemode
 		{
 			
 		}
+		
+		public function createScore():void
+		{
+			
+		}
 	}
 
 }

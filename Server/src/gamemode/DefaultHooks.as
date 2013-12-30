@@ -369,11 +369,25 @@ package gamemode
 		
 		public static function handleScore(event:MsgHandler):void
 		{
-			var s:ScoreSet = new ScoreSet;
-			s.header = "Scores";
-			s.headermarkup = [];
-			s.titles = ["Player", "Kills", "Deaths"];
-			s.columns = [[], [], []];
+			Msg.score.msg["json"] = Registry.leadsetjson;
+			Msg.score.SendUnreliable(event.peer);
+		}
+		
+		public static function createScore():void
+		{
+			var lead:ScoreTable = new ScoreTable;
+			lead.header = new MarkupText(0, 0, 500, "Leaderboard", true, true, 
+				[new Markup(0, 11, 11, FlxG.RED)]);
+			lead.titles = [
+				new MarkupText(0, 0, 500, "|Player      |", true, true, [new Markup(0, 14, 9, FlxG.RED)]),
+				new MarkupText(0, 0, 500, "Kills |", true, true, [new Markup(0, 7, 9, FlxG.RED)]),
+				new MarkupText(0, 0, 500, "Deaths", true, true, [new Markup(0, 6, 9, FlxG.RED)])
+			];
+			lead.content = [
+				[],
+				[],
+				[]
+			];
 			
 			var allp:Array = [];
 			
@@ -386,15 +400,12 @@ package gamemode
 			
 			for each (var play:Player in allp)
 			{
-				s.columns[0].push(play.ID);
-				s.columns[1].push(play.kills);
-				s.columns[2].push(play.deaths);
+				lead.content[0].push(play.name);
+				lead.content[1].push(String(play.kills));
+				lead.content[2].push(String(play.deaths));
 			}
 			
-			var scoreboard:Array = [s];
-			
-			Msg.score.msg["json"] = JSON.stringify(scoreboard);
-			Msg.score.SendReliable(event.peer);
+			Registry.leadset.importSet("["+lead.exportTable()+"]");
 		}
 		
 		public static function handleChat(event:MsgHandler):void

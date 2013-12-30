@@ -32,10 +32,19 @@ package
 			
 			public static var ms:MasterServer;
 			
+			public static var leadset:ScoreSet;
+			
+			public static var leadsetjson:String;
+			
 			public static function getRandomElementOf(array:Array):* 
 			{
 				var idx:int=Math.floor(Math.random() * array.length);
 				return array[idx];
+			}
+			
+			public static function noScroll(s:FlxObject):void
+			{
+				s.scrollFactor.x = s.scrollFactor.y = 0;
 			}
 	}
 

@@ -54,6 +54,11 @@ package gamemode
 				DefaultHooks.handleChat(event);
 			}
 		}
+		
+		override public function createScore():void
+		{
+			DefaultHooks.createScore();
+		}
 	}
 
 }

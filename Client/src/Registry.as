@@ -27,6 +27,8 @@ package
 		
 		public static var address:String = "127.0.0.1";
 		
+		public static var leadset:ScoreSet;
+		
 		public static function registercustoms():void
 		{
 			//Plugins to activate
@@ -34,6 +36,11 @@ package
 			LANBrowser
 			DirectConnect
 			Address
+		}
+		
+		public static function noScroll(s:FlxObject):void
+		{
+			s.scrollFactor.x = s.scrollFactor.y = 0;
 		}
 	}
 }

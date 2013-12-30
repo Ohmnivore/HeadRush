@@ -18,6 +18,7 @@ package
 		public var chats:FlxGroup = new FlxGroup();
 		public var bullets:FlxGroup = new FlxGroup();
 		public var charoverlay:FlxGroup = new FlxGroup();
+		public var scores:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public var announcer:Announcer = new Announcer();
@@ -28,6 +29,8 @@ package
 		
 		public var chatbox:ChatBox;
 		public var chathist:ChatHist;
+		
+		public var leadcount:int = 0;
 		
 		override public function create():void 
 		{
@@ -40,7 +43,6 @@ package
 			Registry.client = new RushClient("127.0.0.1", "127.0.0.1");
 			Msg.init();
 			
-			add(players);
 			player = new Player(70, 70);
 			players.add(player);
 			
@@ -67,6 +69,8 @@ package
 			chatbox.toggle();
 			chatbox.close();
 			chathist.toggle();
+			
+			Registry.leadset = new ScoreSet();
 		}
 		
 		public function loadmap(mapstring:String):void
@@ -138,12 +142,14 @@ package
 			add(frontmap);
 			add(materialmap);
 			add(platforms);
+			add(players);
 			add(charoverlay);
 			add(bullets);
 			add(Registry.chatrect);
 			add(hud);
 			add(huds);
 			add(chats);
+			add(scores);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < damap[PLATFORMS].length; platf++)
@@ -209,6 +215,18 @@ package
 			
 			if (Registry.loadedmap)
 			{
+				if (Registry.leadset.open)
+				{
+					leadcount++;
+					
+					if (leadcount > 30)
+					{
+						Msg.score.msg["json"] = "";
+						Msg.score.SendUnreliable();
+						leadcount = 0;
+					}
+				}
+				
 				FlxG.collide(players, map);
 				
 				var deltay:Number = (player.y + player.height / 2) - FlxG.mouse.y;
@@ -265,10 +283,11 @@ package
 						player.velocity.y = -player.maxVelocity.y / 2;
 						Msg.keystatus.msg["up"] = true;
 					}
-					if (FlxG.keys.TAB)
+					if (FlxG.keys.justReleased("TAB"))
 					{
+						Registry.leadset.toggle();
 						Msg.score.msg["json"] = "";
-						Msg.score.SendReliable();
+						Msg.score.SendUnreliable();
 					}
 					
 					if (FlxG.keys.justReleased("T")) chatbox.toggle();

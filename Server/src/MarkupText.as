@@ -82,7 +82,8 @@ package
 				arr.push(arrm);
 			}
 			
-			return JSON.stringify(arr);
+			if (arr.length > 0) return JSON.stringify(arr);
+			else return "[]";
 		}
 		
 		/**
@@ -90,11 +91,14 @@ package
 		 */
 		public function ImportMarkups(jsonedmarkups:String):void 
 		{
-			var arr:Array = JSON.parse(jsonedmarkups) as Array;
-			
-			for each (var m:Array in arr)
+			if (jsonedmarkups.length > 2)
 			{
-				Markitup(new Markup(m[0], m[1], m[2], m[3]));
+				var arr:Array = JSON.parse(jsonedmarkups) as Array;
+				
+				for each (var m:Array in arr)
+				{
+					Markitup(new Markup(m[0], m[1], m[2], m[3]));
+				}
 			}
 		}
 		
@@ -110,7 +114,7 @@ package
 				var nl:uint = _textField.numLines;
 				//trace(_textField.numLines);
 				height = 0;
-				if (autowidth) width = _textField.textWidth;
+				if (autowidth) width = _textField.textWidth+2;
 				while(i < nl)
 					height += _textField.getLineMetrics(i++).height;
 				height += 4; //account for 2px gutter on top and bottom

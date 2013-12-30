@@ -14,7 +14,7 @@ package
 		public function add(text:MarkupText):void
 		{
 			text.scrollFactor.x = text.scrollFactor.y = 0;
-			text.x = 320 - text.width - 2;
+			text.x = 320 - text.width;
 			
 			for (var i:uint = 0; i < msg.length; i++)
 			{

@@ -35,6 +35,7 @@ package
 		public var bullets:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
 		public var chats:FlxGroup = new FlxGroup();
+		public var scores:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public static var announcer:Announcer = new Announcer();
@@ -45,6 +46,8 @@ package
 		
 		public var chatbox:ChatBox;
 		public var chathist:ChatHist;
+		
+		public var leadcount:uint = 0;
 		
 		override public function create():void 
 		{
@@ -81,13 +84,6 @@ package
 			trace(temp.length);
 			Msg.mapstring.msg["compressed"] = temp;
 			
-			add(map);
-			add(charunderlay);
-			add(players);
-			add(charoverlay);
-			add(bullets);
-			add(heademitters);
-			
 			var spect:Spectator = new Spectator(0, 0);
 			add(spect);
 			
@@ -109,6 +105,9 @@ package
 			chatbox.toggle();
 			chatbox.close();
 			chathist.toggle();
+			
+			Registry.leadset = new ScoreSet();
+			Registry.gm.createScore();
 		}
 		
 		public function LoadMap():void
@@ -191,6 +190,14 @@ package
 			add(Registry.chatrect);
 			add(hud);
 			add(chats);
+			add(scores);
+			
+			add(map);
+			add(charunderlay);
+			add(players);
+			add(charoverlay);
+			add(bullets);
+			add(heademitters);
 			
 			//Load platforms
 			for (var platf:int = 0; platf < lvl[PLATFORMS].length; platf++)
@@ -250,6 +257,15 @@ package
 			
 			Registry.gm.update(FlxG.elapsed);
 			
+			leadcount++;
+			
+			if (leadcount > 60)
+			{
+				Registry.gm.createScore();
+				Registry.leadsetjson = Registry.leadset.exportSet();
+				leadcount = 0;
+			}
+			
 			for each (var plug:BasePlugin in ServerInfo.pl)
 			{
 				plug.update(FlxG.elapsed);
@@ -259,6 +275,7 @@ package
 			if (FlxG.keys.justReleased("Z")) Registry.devconsole.toggle();
 			if (FlxG.keys.justReleased("F1")) Registry.devconsole.toggle();
 			if (FlxG.keys.justReleased("T")) chatbox.toggle();
+			if (FlxG.keys.justReleased("TAB")) Registry.leadset.toggle();
 			
 			elapsed += FlxG.elapsed;
 			if (elapsed >= messagespersecond)
