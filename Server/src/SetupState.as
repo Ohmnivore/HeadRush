@@ -85,9 +85,9 @@ package
 			
 			if (Registry.setupdone)
 			{
-				if (currentgui != undefined) currentgui.DeleteUI();
-				FlxG.stage.removeChild(window);
-				ServerInfo.save.close();
+				//if (currentgui != undefined) currentgui.DeleteUI();
+				//FlxG.stage.removeChild(window);
+				//ServerInfo.save.close();
 				go("placeholder");
 			}
 		}
@@ -96,6 +96,7 @@ package
 			if (currentgui != undefined) currentgui.DeleteUI();
 			FlxG.stage.removeChild(window);
 			ServerInfo.save.close();
+			Mouse.hide();
 			FlxG.switchState(new PlayState);
 		}
 	}

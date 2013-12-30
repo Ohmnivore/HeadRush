@@ -64,7 +64,23 @@ package plugin
 		
 		public function color(e:Event):void
 		{
-			if (e.target.selected) Registry.color = e.target.label;
+			if (e.target.selected)
+			{
+				switch(e.target.label)
+				{
+					case "Green":
+						Registry.color = 0xff438b17;
+						break;
+					
+					case "Yellow":
+						Registry.color = 0xffe79800; 
+						break;
+					
+					case "Red":
+						Registry.color = 0xff9c3030;
+						break;
+				}
+			}
 			trace(e.target.selected);
 			//case 
 			//trace(e.target.y);

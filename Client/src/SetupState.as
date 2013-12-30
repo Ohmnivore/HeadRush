@@ -94,6 +94,7 @@ package
 			if (currentgui != undefined) currentgui.DeleteUI();
 			FlxG.stage.removeChild(window);
 			Registry.save.close();
+			Mouse.hide();
 			FlxG.switchState(new PlayState);
 		}
 	}

@@ -32,7 +32,7 @@ package
 		
 		public static var name:String = "Unnamed_player";
 		
-		public static var color:String = "Blue";
+		public static var color:uint = 0xff00A8C2;
 		
 		public static function registercustoms():void
 		{

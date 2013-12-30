@@ -53,17 +53,17 @@ package
 			
 			switch(Registry.color)
 			{
-				case "Green":
+				case 0xff438b17:
 					player.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
 					player.teamcolor = 0xff438b17;
 					break;
 				
-				case "Yellow":
+				case 0xffe79800:
 					player.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
 					player.teamcolor = 0xffe79800;
 					break;
 				
-				case "Red":
+				case 0xff9c3030:
 					player.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
 					player.teamcolor = 0xff9c3030;
 					break;

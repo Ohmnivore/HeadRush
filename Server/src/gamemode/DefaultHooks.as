@@ -284,17 +284,17 @@ package gamemode
 			
 			switch(i[1])
 			{
-				case "Green":
+				case 0xff438b17:
 					p.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
 					p.teamcolor = 0xff438b17;
 					break;
 				
-				case "Yellow":
+				case 0xffe79800:
 					p.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
 					p.teamcolor = 0xffe79800;
 					break;
 				
-				case "Red":
+				case 0xff9c3030:
 					p.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
 					p.teamcolor = 0xff9c3030;
 					break;
@@ -321,6 +321,7 @@ package gamemode
 					var infoarray:Array = new Array();
 					infoarray.push(client.ID);
 					infoarray.push(client.name);
+					infoarray.push(client.teamcolor);
 					peerarray.push(infoarray);
 				}
 			}

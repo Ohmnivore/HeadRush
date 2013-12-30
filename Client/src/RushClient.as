@@ -54,6 +54,24 @@ package
 					peer.ID = peerdescription[0];
 					Registry.peers[peerdescription[0]] = peer;
 					Registry.playstate.players.add(peer);
+					
+					switch(peerdescription[2])
+					{
+						case 0xff438b17:
+							peer.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
+							peer.teamcolor = 0xff438b17;
+							break;
+						
+						case 0xffe79800:
+							peer.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
+							peer.teamcolor = 0xffe79800;
+							break;
+						
+						case 0xff9c3030:
+							peer.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
+							peer.teamcolor = 0xff9c3030;
+							break;
+					}
 				}
 				Registry.loadedpeers = true;
 			}
