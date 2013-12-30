@@ -286,14 +286,17 @@ package gamemode
 			{
 				case "Green":
 					p.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
+					p.teamcolor = 0xff438b17;
 					break;
 				
 				case "Yellow":
 					p.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
+					p.teamcolor = 0xffe79800;
 					break;
 				
 				case "Red":
 					p.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
+					p.teamcolor = 0xff9c3030;
 					break;
 			}
 			
