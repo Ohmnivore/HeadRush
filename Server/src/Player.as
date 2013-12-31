@@ -140,12 +140,19 @@ package
 			header.text = name;
 		}
 
-		public override function update():void
+		public override function draw():void
 		{
-			super.update();
-			
 			header.y = y - header.height - 4;
 			header.x = x - (header.width - width) / 2;
+			super.draw();
+		}
+
+		public override function update():void
+		{	
+			super.update();
+			
+			//header.y = y - header.height - 4;
+			//header.x = x - (header.width - width) / 2;
 			
 			wallshade.update();
 			wallshade2.update();

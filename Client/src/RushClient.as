@@ -109,10 +109,16 @@ package
 				for each (var peerstate:Array in peerstates)
 				{
 					//FlxG.log(peerstate[0]);
-					Registry.peers[peerstate[0]].velocity.x = peerstate[1] - Registry.peers[peerstate[0]].x;
-					Registry.peers[peerstate[0]].velocity.y = peerstate[2] - Registry.peers[peerstate[0]].y;
-					Registry.peers[peerstate[0]].x = peerstate[1];
-					Registry.peers[peerstate[0]].y = peerstate[2];
+					var p:Player = Registry.peers[peerstate[0]];
+					p.velocity.x = peerstate[1] - p.x;
+					p.velocity.y = peerstate[2] - p.y;
+					p.x = peerstate[1];
+					p.y = peerstate[2];
+					
+					if ((p.health > 0) && (peerstate[3] == -100)) p.respawn();
+					if ((p.dead) && (peerstate[3] != -100)) p.respawn();
+					
+					p.health = peerstate[3];
 				}
 			}
 			

@@ -290,6 +290,8 @@ package
 					peerstate.push(peer.ID);
 					peerstate.push(peer.x);
 					peerstate.push(peer.y);
+					if (!peer.dead) peerstate.push(peer.health);
+					else peerstate.push(-100);
 					peerstates.push(peerstate);
 				}
 				

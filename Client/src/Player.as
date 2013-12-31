@@ -83,11 +83,9 @@ package
 			header.color = teamcolor;
 			header.text = name;
 		}
-
-		public override function update():void
+	
+		public override function draw():void
 		{
-			super.update();
-			
 			header.y = y - header.height - 4;
 			header.x = x - (header.width - width) / 2;
 			
@@ -96,6 +94,16 @@ package
 			
 			gun2.x = x;
 			gun2.y = y + 2;
+			
+			super.draw();
+		}
+		
+		public override function update():void
+		{
+			super.update();
+			
+			if (velocity.y < 0.2 && isTouching(UP)) ceilingwalk = true;
+			else ceilingwalk = false;
 			
 			if (!dead)
 			{
@@ -154,7 +162,11 @@ package
 				healthBar.visible = false;
 				solid = false;
 				dead = true;
-				health = 100;
+				
+				if (ID == state.player.ID)
+				{
+					FlxG.camera.follow(getMidpoint() as FlxObject);
+				}
 			}
 			
 			else
@@ -171,6 +183,11 @@ package
 				flicker(1);
 				gun.flicker(1);
 				gun2.flicker(1);
+				
+				if (ID == state.player.ID)
+				{
+					FlxG.camera.follow(this);
+				}
 			}
 		}
 		
