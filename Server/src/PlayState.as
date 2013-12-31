@@ -291,7 +291,8 @@ package
 					peerstate.push(peer.x);
 					peerstate.push(peer.y);
 					if (!peer.dead) peerstate.push(peer.health);
-					else peerstate.push(-100);
+					else peerstate.push( -100);
+					if (peer.ceilingwalk) peerstate.push(true);
 					peerstates.push(peerstate);
 				}
 				

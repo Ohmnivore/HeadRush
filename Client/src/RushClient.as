@@ -119,6 +119,9 @@ package
 					if ((p.dead) && (peerstate[3] != -100)) p.respawn();
 					
 					p.health = peerstate[3];
+					
+					if (peerstate.length > 4) p.ceilingwalk = true;
+					else p.ceilingwalk = false;
 				}
 			}
 			

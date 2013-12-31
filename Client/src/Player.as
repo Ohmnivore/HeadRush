@@ -102,9 +102,6 @@ package
 		{
 			super.update();
 			
-			if (velocity.y < 0.2 && isTouching(UP)) ceilingwalk = true;
-			else ceilingwalk = false;
-			
 			if (!dead)
 			{
 				if (right) 
