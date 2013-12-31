@@ -69,6 +69,9 @@ package
 					break;
 			}
 			
+			player.header.text = player.name;
+			player.setTextColor(player.teamcolor);
+			
 			FlxG.bgColor = 0xff7A7A7A;
 			FlxG.mouse.show();
 			

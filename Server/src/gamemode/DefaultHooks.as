@@ -281,6 +281,7 @@ package gamemode
 			var i:Array = JSON.parse(Msg.newclient.msg["json"]) as Array;
 			
 			p.name = i[0];
+			p.header.text = p.name;
 			
 			switch(i[1])
 			{
@@ -299,6 +300,8 @@ package gamemode
 					p.teamcolor = 0xff9c3030;
 					break;
 			}
+			
+			p.setTextColor(p.teamcolor);
 			
 			FlxG.log("[Server]"+event.peer.identifier+" was assigned info: "+Msg.newclient.msg["json"]);
 			Msg.newclient.msg["id"] = p.ID;

@@ -72,6 +72,9 @@ package
 							peer.teamcolor = 0xff9c3030;
 							break;
 					}
+					
+					peer.header.text = peer.name;
+					peer.setTextColor(peer.teamcolor);
 				}
 				Registry.loadedpeers = true;
 			}

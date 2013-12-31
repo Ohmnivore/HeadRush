@@ -27,6 +27,8 @@ package
 		public var a:Number = 1;
 		public var right:Boolean = true;
 		public var ceilingwalk:Boolean = false;
+		
+		public var header:MarkupText = new MarkupText(0, 0, 500, "Unnamed_player", true, true);
 
 		public function Player(_x:int, _y:int):void
 		{		
@@ -69,18 +71,25 @@ package
 			
 			health = 100;
 			healthBar = new FlxBar(8, 26, FlxBar.FILL_LEFT_TO_RIGHT, 38, 6, this, "health", 0, 100, true);
-			healthBar.trackParent(-6, -10);
+			healthBar.trackParent(-6, -7);
 			healthBar.createFilledBar(0xFFFF0000, 0xFF09FF00, true, 0xff000000);
 			state.charoverlay.add(healthBar);
 			
 			name = "Ohmnivore";
 			team = 0;
 			teamcolor = 0xff00A8C2;
+			
+			state.charoverlay.add(header);
+			header.color = teamcolor;
+			header.text = name;
 		}
 
 		public override function update():void
 		{
 			super.update();
+			
+			header.y = y - header.height - 4;
+			header.x = x - (header.width - width) / 2;
 			
 			gun.x = x;
 			gun.y = y + 2;
@@ -127,12 +136,19 @@ package
 			}
 		}
 		
+		public function setTextColor(col:uint):void
+		{
+			header.color = col;
+			teamcolor = col;
+		}
+		
 		public function respawn(timer:uint = 1000):void
 		{
 			if (!dead)
 			{
 				deaths++;
 				visible = false;
+				header.visible = false;
 				gun.visible = false;
 				gun2.visible = false;
 				healthBar.visible = false;
@@ -145,6 +161,7 @@ package
 			{
 				health = 100;
 				visible = true;
+				header.visible = true;
 				gun.visible = true;
 				gun2.visible = true;
 				healthBar.visible = true;
@@ -173,6 +190,8 @@ package
 			healthBar.destroy();
 			cannon.group.kill();
 			cannon.group.destroy();
+			header.kill();
+			header.destroy();
 			super.destroy();
 		}
 	}
