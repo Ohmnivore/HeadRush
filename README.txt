@@ -18,6 +18,7 @@ TODO
 1)-Custom networked objects protocol *(1)
 2)-Add flow control to Streamy *(2)
 3)-I forgot about audio. Must think about audio. *(3)
+4)-Networked particle emitters? Why not?
 
 TOFIX
 -Better knock back

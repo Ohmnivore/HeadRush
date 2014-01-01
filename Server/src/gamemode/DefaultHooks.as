@@ -258,7 +258,7 @@ package gamemode
 			//}
 			//Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
 			//Msg.fellowclients.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			//s.id++;
+			s.id++;
 			Registry.playstate.players.add(newplayer);
 			newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
 			
