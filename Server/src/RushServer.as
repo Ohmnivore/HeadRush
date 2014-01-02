@@ -86,7 +86,7 @@ package
 		override public function HandleMsg(event:MsgHandler):void
 		{
 			super.HandleMsg(event);
-			
+			//trace(event.peer.identifier);
 			Registry.gm.dispatchEvent(event.clone() as MsgHandler);
 		}
 	}

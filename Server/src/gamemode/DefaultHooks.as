@@ -160,12 +160,15 @@ package gamemode
 			var winner:Player;
 			var loser:Player;
 			
+			var iskill:Boolean = false;
+			
 			if (player.touching & FlxObject.DOWN)
 			{
 				if (player.y <= player2.y + 1)
 				{
 					winner = player;
 					loser = player2;
+					iskill = true;
 				}
 			}
 			
@@ -175,17 +178,21 @@ package gamemode
 				{
 					winner = player2;
 					loser = player;
+					iskill = true;
 				}
 			}
 			
-			var info:HurtInfo = new HurtInfo;
-			info.attacker = winner.ID;
-			info.victim = loser.ID;
-			info.dmg = 100;
-			info.type = BaseGamemode.JUMPKILL;
-			info.dmgsource = winner.getMidpoint();
-			
-			Registry.gm.dispatchEvent(new HurtEvent(HurtEvent.HURT_EVENT, info));
+			if (iskill)
+			{
+				var info:HurtInfo = new HurtInfo;
+				info.attacker = winner.ID;
+				info.victim = loser.ID;
+				info.dmg = 100;
+				info.type = BaseGamemode.JUMPKILL;
+				info.dmgsource = winner.getMidpoint();
+				
+				Registry.gm.dispatchEvent(new HurtEvent(HurtEvent.HURT_EVENT, info));
+			}
 		}
 		
 		public static function handleDamage(info:HurtInfo):void
@@ -219,48 +226,25 @@ package gamemode
 			var s:RushServer = Registry.server;
 			var event:ServerSocketConnectEvent = e.joininfo;
 			
-			ServerInfo.currentp = ServerInfo.currentp + 1;
+			//ServerInfo.currentp = ServerInfo.currentp + 1;
 			
 			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
-			//Msg.newclient.msg["id"] = id;
-			//Msg.newclient.msg["json"] = JSON.stringify(["Ohmnivore"]);
-			//for (var id:String in Registry.server.peers)
-			//{
-				//if (id != event.socket.remoteAddress.concat(event.socket.remotePort))
-				//{
-					//Msg.newclient.SendReliable(Registry.server.peers[id]);
-				//}
-			//}
 			
 			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
 			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
 			Msg.dl.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			
-			var newplayer:Player = new Player(0, 0);
-			
+			//var newplayer:Player = new Player(0, 0);
+			//
 			//Equivalent to clients[peer.id], but we don't have a reference
 			//to the peer object.
-			s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = s.id;
-			s.clients[s.id] = newplayer;
-			newplayer.ID = s.id;
-			//trace(Msg.mapstring.msg["compressed"].length);
+			//s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = s.id;
+			//s.clients[s.id] = newplayer;
+			//newplayer.ID = s.id;
 			Msg.mapstring.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			//id++;
-			
-			//Msg.fellowclients.msg["yourid"] = s.id;
-			//var peerarray:Array = new Array();
-			//for each (var client:Player in Registry.playstate.players.members)
-			//{
-				//var infoarray:Array = new Array();
-				//infoarray.push(client.ID);
-				//infoarray.push(client.name);
-				//peerarray.push(infoarray);
-			//}
-			//Msg.fellowclients.msg["json"] = JSON.stringify(peerarray);
-			//Msg.fellowclients.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			s.id++;
-			Registry.playstate.players.add(newplayer);
-			newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
+			//s.id++;
+			//Registry.playstate.players.add(newplayer);
+			//newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
 			
 			//var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
 			//testhud.pos = new FlxPoint(100, 0);
@@ -277,7 +261,18 @@ package gamemode
 		public static function handleClientInfo(event:MsgHandler):void
 		{
 			var s:RushServer = Registry.server;
-			var p:Player = s.clients[event.peer.identifier];
+			
+			var p:Player = new Player(0, 0);
+			
+			ServerInfo.currentp = ServerInfo.currentp + 1;
+			
+			event.peer.identifier = s.id;
+			s.clients[s.id] = p;
+			p.ID = s.id;
+			s.id++;
+			Registry.playstate.players.add(p);
+			p.peer = event.peer;
+			
 			var i:Array = JSON.parse(Msg.newclient.msg["json"]) as Array;
 			
 			p.name = i[0];
@@ -305,7 +300,7 @@ package gamemode
 			
 			FlxG.log("[Server]"+event.peer.identifier+" was assigned info: "+Msg.newclient.msg["json"]);
 			Msg.newclient.msg["id"] = p.ID;
-			Msg.newclient.msg["json"] = i;
+			Msg.newclient.msg["json"] = JSON.stringify(i);
 			for (var id:String in Registry.server.peers)
 			{
 				if (id != event.peer.id)
@@ -351,11 +346,16 @@ package gamemode
 			s.clients[peer.identifier].kill();
 			s.clients[peer.identifier].destroy();
 			
+			delete s.peers[id];
+			
 			Msg.clientdisco.SendReliableToAll();
 		}
 		
 		public static function handleKeys(event:MsgHandler):void
 		{
+			//if (Registry.server.clients[event.peer.identifier] !== undefined)
+			//{
+			//trace(event.peer.identifier);
 			var p:Player = Registry.server.clients[event.peer.identifier];
 			
 			if (!Msg.keystatus.msg["left"] && !Msg.keystatus.msg["right"])
@@ -423,6 +423,7 @@ package gamemode
 			Registry.server.clients[event.peer.identifier].right = Msg.keystatus.msg["lookright"];
 			
 			Registry.server.clients[event.peer.identifier].a = Msg.keystatus.msg["a"];
+			//}
 		}
 		
 		public static function handleScore(event:MsgHandler):void

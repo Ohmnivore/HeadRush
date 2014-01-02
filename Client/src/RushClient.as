@@ -90,14 +90,34 @@ package
 			if (event.id == Msg.newclient.ID)
 			{
 				FlxG.log("gotnewclient");
-				var peerinfo:Object = new Array();
-				peerinfo = JSON.parse(Msg.newclient.msg["json"]);
+				var peerinfo:Array = JSON.parse(Msg.newclient.msg["json"]) as Array;
 				var id:uint = Msg.newclient.msg["id"];
 				var peer:Player = new Player(0, 0);
 				peer.name = peerinfo[0];
 				peer.ID = id;
 				Registry.peers[id] = peer;
 				Registry.playstate.players.add(peer);
+				
+				switch(peerinfo[1])
+				{
+					case 0xff438b17:
+						peer.loadGraphic(Assets.PLAYER_GREEN, true, true, 24, 24);
+						peer.teamcolor = 0xff438b17;
+						break;
+					
+					case 0xffe79800:
+						peer.loadGraphic(Assets.PLAYER_YELLOW, true, true, 24, 24);
+						peer.teamcolor = 0xffe79800;
+						break;
+					
+					case 0xff9c3030:
+						peer.loadGraphic(Assets.PLAYER_RED, true, true, 24, 24);
+						peer.teamcolor = 0xff9c3030;
+						break;
+				}
+				
+				peer.header.text = peer.name;
+				peer.setTextColor(peer.teamcolor);
 			}
 			
 			if (event.id == Msg.clientpositions.ID && Registry.loadedpeers)
@@ -109,6 +129,8 @@ package
 				for each (var peerstate:Array in peerstates)
 				{
 					//FlxG.log(peerstate[0]);
+					//if (Registry.peers[peerstate[0]] !== undefined)
+					//{
 					var p:Player = Registry.peers[peerstate[0]];
 					p.velocity.x = peerstate[1] - p.x;
 					p.velocity.y = peerstate[2] - p.y;
@@ -122,6 +144,7 @@ package
 					
 					if (peerstate.length > 4) p.ceilingwalk = true;
 					else p.ceilingwalk = false;
+					//}
 				}
 			}
 			

@@ -116,6 +116,7 @@ package Streamy
 		{
 			var peer:ServerPeer = new ServerPeer(event.socket.remoteAddress, event.socket.remotePort, event.socket);
 			peers[peer.id] = peer;
+			//peer.address = event.re
 			event.socket.addEventListener(ProgressEvent.SOCKET_DATA, ReceivedTCP);
 			event.socket.addEventListener( Event.CLOSE, onClientClose ); 
             event.socket.addEventListener( IOErrorEvent.IO_ERROR, onIOError ); 
@@ -195,6 +196,8 @@ package Streamy
 		
 		private function ReceivedUDP(event:DatagramSocketDataEvent):void
         {
+			//trace(event.srcAddress);
+			
 			try
 			{
 				var inputarray:Array = new Array();
@@ -221,7 +224,9 @@ package Streamy
 				var unreliableevent:UnreliableEvent = new UnreliableEvent(inputarray);
 				udpsocket.dispatchEvent(unreliableevent);
 				
-				var peer:ServerPeer = peers[event.srcAddress.concat(portmappings[event.srcPort])];
+				var peer:ServerPeer = peers[event.srcAddress.concat(portmappings[event.srcAddress+event.srcPort])];
+				
+				//trace(peer.id);
 				
 				var msgevent:MsgHandler = new MsgHandler(peer, inputarray[0], false);
 				udpsocket.dispatchEvent(msgevent);
@@ -246,7 +251,7 @@ package Streamy
 			{
 				if (event.peer.udpport == 0)
 				{
-					portmappings[messages[event.id].msg["udpport"]] = event.peer.tcpport;
+					portmappings[event.peer.ip+messages[event.id].msg["udpport"]] = event.peer.tcpport;
 					peers[event.peer.id].udpport = messages[event.id].msg["udpport"];
 				}
 			}
@@ -286,7 +291,7 @@ package Streamy
 			var sock:Socket = event.target as Socket;
 			var id:String = sock.remoteAddress.concat(sock.remotePort);
 			
-			delete peers[id];
+			//delete peers[id];
             //Should also remove from clientSockets array... 
         } 
  

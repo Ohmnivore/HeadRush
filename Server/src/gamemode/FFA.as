@@ -39,6 +39,7 @@ package gamemode
 		{
 			super.onMsg(event);
 			
+			try {
 			if (event.id == Msg.keystatus.ID)
 			{
 				DefaultHooks.handleKeys(event);
@@ -58,6 +59,9 @@ package gamemode
 			{
 				DefaultHooks.handleClientInfo(event);
 			}
+			}
+			
+			catch (e:Error) {}
 		}
 		
 		override public function createScore():void
