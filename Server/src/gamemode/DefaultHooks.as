@@ -113,6 +113,22 @@ package gamemode
 			PlayState.announcer.add(new MarkupText(0, 0, 500, announce, true, true, [pmarkup, lmarkup]));
 		}
 		
+		public static function announceSquish(killer:Player, victim:Player):void
+		{
+			var a:String = killer.name.concat(" squished ") + victim.name + "!";
+			var kmarkup:Markup = new Markup(0, killer.name.length, 11, killer.teamcolor);
+			var vmarkup:Markup = new Markup(killer.name.length + 9, a.length - 1, 11, victim.teamcolor)
+			PlayState.announcer.add(new MarkupText(0, 0, 500, a, true, true, [kmarkup, vmarkup]));
+		}
+		
+		public static function announceGibbed(killer:Player, victim:Player):void
+		{
+			var a:String = killer.name.concat(" gunned ") + victim.name + ".";
+			var kmarkup:Markup = new Markup(0, killer.name.length, 11, killer.teamcolor);
+			var vmarkup:Markup = new Markup(killer.name.length + 7, a.length - 1, 11, victim.teamcolor)
+			PlayState.announcer.add(new MarkupText(0, 0, 500, a, true, true, [kmarkup, vmarkup]));
+		}
+		
 		public static function explobullet(bullet:Bullet, placeholder):void
 		{
 			for each (var player:Player in p.players.members)
@@ -198,7 +214,7 @@ package gamemode
 		public static function handleDamage(info:HurtInfo):void
 		{
 			var p:Player = Registry.clients[info.victim];
-			p.health -= info.dmg;
+			if (info.victim != info.attacker) p.health -= info.dmg;
 			
 			if (!p.dead)
 				if (p.health <= 0) Registry.gm.dispatchEvent(new DeathEvent(DeathEvent.DEATH_EVENT, info));
@@ -218,6 +234,24 @@ package gamemode
 				if (k == BaseGamemode.LASER) DefaultHooks.announceLaser(player);
 				if (k == BaseGamemode.FALL) DefaultHooks.announceFall(player);
 				if (k == BaseGamemode.LAVA) DefaultHooks.announceLava(player);
+			}
+			
+			if (t == BaseGamemode.BULLET)
+			{
+				var killer:Player = Registry.clients[info.attacker];
+				var victim:Player = Registry.clients[info.victim];
+				
+				DefaultHooks.respawn(victim);
+				announceGibbed(killer, victim);
+			}
+			
+			if (t == BaseGamemode.JUMPKILL)
+			{
+				var killer:Player = Registry.clients[info.attacker];
+				var victim:Player = Registry.clients[info.victim];
+				
+				DefaultHooks.respawn(victim);
+				announceSquish(killer, victim);
 			}
 		}
 		

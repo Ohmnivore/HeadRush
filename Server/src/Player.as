@@ -76,7 +76,12 @@ package
 			cannon.setBulletSpeed(160);
 			cannon.setFireRate(2000);
 			cannon.setBulletOffset(10, 10);
-			cannon.setBulletBounds(Registry.playstate.map.getBounds());
+			var b:FlxRect = Registry.playstate.map.getBounds();
+			b.x -= FlxG.width;
+			b.y -= FlxG.height;
+			b.width += 2 * FlxG.width;
+			b.height += 2 * FlxG.height;
+			cannon.setBulletBounds(b);
 			state.bullets.add(cannon.group);
 			
 			gun = new FlxSprite(0, 0, Assets.GUN);
