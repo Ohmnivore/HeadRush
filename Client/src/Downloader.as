@@ -28,14 +28,28 @@ package
 		
 		public static function Go():void
 		{
-			loader = new BulkLoader("hashloader");
+			if (dlmanifests.length > 0)
+			{
+				FlxG.fade(FlxG.BLACK, 1000, null, true);
+				
+				loader = new BulkLoader("hashloader");
+				
+				loader.add(dlurl.concat("hashes.json"), {id:"HASH"});
+				
+				
+				loader.get("HASH").addEventListener(Event.COMPLETE, onHashLoaded);
+				
+				loader.start();
+			}
 			
-			loader.add(dlurl.concat("hashes.json"), {id:"HASH"});
-			
-			
-			loader.get("HASH").addEventListener(Event.COMPLETE, onHashLoaded);
-			
-			loader.start();
+			else
+			{
+				FlxG.flash(FlxG.BLACK, 1, null, true);
+				
+				Msg.newclient.msg["id"] = 0;
+				Msg.newclient.msg["json"] = JSON.stringify([Registry.name, Registry.color]);
+				Msg.newclient.SendReliable();
+			}
 		}
 		
 		public static function onHashLoaded(event:Event):void 
@@ -88,14 +102,15 @@ package
 		
 		public static function onFilesLoaded(event:Event):void 
 		{
+			FlxG.flash(FlxG.BLACK, 1, null, true);
+			
 			for each (var manifest in manifests)
 			{
 				for (var key in manifest)
 				{
-					//var d:Bitmap = loader.getBitmap(dlurl.concat(manifest[key]));
-					Assets[key] = loader.getBitmap(dlurl.concat(manifest[key]));
-					//FlxG.stage.addChild(d);
-					//FlxG.log(key);
+					if (manifest[key].slice(-1, -3) == "png")
+						Assets[key] = loader.getBitmap(dlurl.concat(manifest[key]));
+						FlxG.log(key);
 				}
 			}
 			
