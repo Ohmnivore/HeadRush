@@ -15,24 +15,24 @@ package
 	import plugin.BasePlugin;
 	import Spawn;
 	import com.jmx2.delayedFunctionCall;
+	import Streamy.ServerPeer;
 	
 	public class PlayState extends FlxState
 	{
-		public var map:BTNTilemap;
+		public var map:BTNTilemap = new BTNTilemap();
 		public var materialmap:FlxTilemap;
 		public var lavamap:FlxTilemap;
 		public var string:String;
 		public var spawns:Array = new Array();
 		public var players:FlxGroup = new FlxGroup();
 		
-		public var levelindex:String = "TestMap";
-		
 		public var lasers:FlxGroup = new FlxGroup();
 		public var platforms:FlxGroup = new FlxGroup();
 		public var charunderlay:FlxGroup = new FlxGroup();
 		public var charoverlay:FlxGroup = new FlxGroup();
-		public var heademitters:FlxGroup = new FlxGroup();
+		public var emitters:FlxGroup = new FlxGroup();
 		public var bullets:FlxGroup = new FlxGroup();
+		public var entities:FlxGroup = new FlxGroup();
 		public var hud:FlxGroup = new FlxGroup();
 		public var chats:FlxGroup = new FlxGroup();
 		public var scores:FlxGroup = new FlxGroup();
@@ -53,15 +53,10 @@ package
 		{
 			super.create();
 			
-			Registry.ms = new MasterServer(ServerInfo.ms);
-			Registry.ms.announce();
-			new delayedFunctionCall(Registry.ms.announce, 2000);
-			
 			elapsed = 0;
 			rate = 1.0 / messagespersecond;
 			
 			Registry.playstate = this;
-			Registry.server = new RushServer();
 			Registry.spawntimer = 3000;
 			Registry.devconsole = new DeveloperConsole(FlxG._game, this);
 			FlxG._game.stage.addChild(Registry.devconsole);
@@ -72,32 +67,8 @@ package
 			FlxG.mouse.show();
 			
 			spawns.push(new Spawn(30, 0, 0));
-			map = new BTNTilemap();
 			
 			LoadMap();
-			
-			string = JSON.stringify(Assets.LVLS[levelindex]);
-			
-			var temp:String = new String();
-			temp = LZW.compress(string);
-			trace(string.length);
-			trace(temp.length);
-			Msg.mapstring.msg["compressed"] = temp;
-			
-			var spect:Spectator = new Spectator(0, 0);
-			add(spect);
-			
-			FlxG.camera.setBounds(0, 0, map.width, map.height);
-			FlxG.camera.follow(spect);
-			
-			var bounds:FlxRect;
-			bounds = new FlxRect(map.x, map.y, map.width, map.height);
-			bounds.x -= 100;
-			bounds.y -= 100;
-			bounds.width += 200;
-			bounds.height += 200;
-			
-			FlxG.worldBounds = bounds;
 			
 			chathist = new ChatHist();
 			
@@ -105,17 +76,28 @@ package
 			chatbox.toggle();
 			chatbox.close();
 			chathist.toggle();
-			
-			Registry.leadset = new ScoreSet();
-			Registry.gm.createScore();
 		}
 		
 		public function LoadMap():void
 		{
+			if (Registry.maploaded)
+			{
+				Registry.makeSkeleton(lasers);
+				Registry.makeSkeleton(platforms);
+				//Registry.makeSkeleton(charunderlay);
+				//Registry.makeSkeleton(charoverlay);
+				Registry.makeSkeleton(emitters);
+				//Registry.makeSkeleton(bullets);
+				Registry.makeSkeleton(entities);
+				Registry.makeSkeleton(hud);
+				Registry.makeSkeleton(chats);
+				Registry.makeSkeleton(scores);
+			}
+			
 			materialmap = new FlxTilemap();
 			lavamap = new FlxTilemap();
 			
-			var lvl = Assets.LVLS[levelindex];
+			var lvl = Assets.LVLS[Registry.maprotation[Registry.levelindex]];
 			const PROPERTIES = 0;
 			const LASERS = 1;
 			const PLATFORMS = 2;
@@ -180,24 +162,28 @@ package
 				}
 			}
 			
-			//Add all layers to playstate
-			add(backmap);
-			add(lasers);
-			add(lavamap);
-			add(frontmap);
-			add(materialmap);
-			add(platforms);
-			add(Registry.chatrect);
-			add(hud);
-			add(chats);
-			add(scores);
-			
-			add(map);
-			add(charunderlay);
-			add(players);
-			add(charoverlay);
-			add(bullets);
-			add(heademitters);
+			if (!Registry.maploaded)
+			{
+				//Add all layers to playstate
+				add(backmap);
+				add(lasers);
+				add(lavamap);
+				add(frontmap);
+				add(materialmap);
+				add(platforms);
+				add(emitters);
+				add(charunderlay);
+				add(players);
+				add(charoverlay);
+				add(bullets);
+				add(entities);
+				add(Registry.chatrect);
+				add(hud);
+				add(chats);
+				add(scores);
+				
+				add(map);
+			}
 			
 			//Load platforms
 			for (var platf:int = 0; platf < lvl[PLATFORMS].length; platf++)
@@ -247,6 +233,36 @@ package
 				new FlxPoint(int(lvl[LASERS][laser][2]), int(lvl[LASERS][laser][3])), this);
 				lasers.add(laz);
 			}
+			
+			string = JSON.stringify(Assets.LVLS[Registry.maprotation[Registry.levelindex]]);
+			
+			var temp:String = new String();
+			temp = LZW.compress(string);
+			trace(string.length);
+			trace(temp.length);
+			Msg.mapstring.msg["compressed"] = temp;
+			
+			var spect:Spectator = new Spectator(0, 0);
+			add(spect);
+			
+			FlxG.camera.setBounds(0, 0, map.width, map.height);
+			FlxG.camera.follow(spect);
+			
+			var bounds:FlxRect;
+			bounds = new FlxRect(map.x, map.y, map.width, map.height);
+			bounds.x -= 100;
+			bounds.y -= 100;
+			bounds.width += 200;
+			bounds.height += 200;
+			
+			FlxG.worldBounds = bounds;
+			
+			Registry.leadset = new ScoreSet();
+			Registry.gm.createScore();
+			
+			Msg.mapstring.SendReliableToAll();
+			
+			Registry.maploaded = true;
 		}
 		
 		override public function update():void

@@ -62,7 +62,7 @@ package
 			
 			
 			emitter = new FlxEmitter(0, 0);
-			state.charunderlay.add(emitter);
+			state.emitters.add(emitter);
 			
 			var particles:int = 20;
 			
@@ -82,6 +82,19 @@ package
 			emitter.setSize(0, 0);
 			emitter.start(false,0.25,0.1);
         }
+		
+		//override public function kill():void 
+		//{
+			//super.kill();
+			//emitter.active = false;
+			//emitter.kill();
+		//}
+		//
+		//override public function destroy():void 
+		//{
+			//super.destroy();
+			//emitter.destroy();
+		//}
 		
 		public override function update():void
         {

@@ -20,7 +20,7 @@ package
 		
 		public static var address:String = "127.0.0.1";
 		
-		public static var plugins:Array = ["Setup", "Address"];
+		public static var plugins:Array = ["Setup", "Address", "MapRotation"];
 		public static var pl:Array = [];
 		
 		public static var save:FlxSave;
@@ -37,6 +37,7 @@ package
 			//Plugins
 			Setup
 			Address
+			MapRotation
 		}
 		
 		public static function get currentp():uint 

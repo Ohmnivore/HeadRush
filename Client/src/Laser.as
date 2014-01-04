@@ -62,7 +62,7 @@ package
 			
 			
 			emitter = new FlxEmitter(0, 0);
-			state.charunderlay.add(emitter);
+			state.emitters.add(emitter);
 			
 			var particles:int = 20;
 			

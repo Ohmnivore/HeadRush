@@ -9,6 +9,7 @@ package
 	import flash.ui.Mouse;
 	import flash.events.Event;
 	import plugin.BasePlugin;
+	import com.jmx2.delayedFunctionCall;
 	
 	public class SetupState extends FlxState
 	{	
@@ -97,6 +98,15 @@ package
 			FlxG.stage.removeChild(window);
 			ServerInfo.save.close();
 			Mouse.hide();
+			
+			Registry.ms = new MasterServer(ServerInfo.ms);
+			Registry.ms.announce();
+			new delayedFunctionCall(Registry.ms.announce, 2000);
+			
+			Registry.server = new RushServer();
+			
+			Registry.cli.setCommand("map", "changemap");
+			
 			FlxG.switchState(new PlayState);
 		}
 	}

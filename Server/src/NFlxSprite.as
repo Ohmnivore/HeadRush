@@ -6,47 +6,150 @@ package
 	
 	public class NFlxSprite extends FlxSprite
 	{
-		public static var initMsg:Message;
-		public static var setMsg:Message;
-		public static var setImg:Message;
-		public static var updateMsg:Message;
+		public var templ:uint = 0;
+		public var upd:Array = [];
+		public var init:Array = [];
+		public var ID2:uint = 0;
 		
-		public static var i:uint = 0;
-		
-		public function NFlxSprite()
+		public function NFlxSprite(template:uint, x:Number = 0, y:Number = 0, localset = false, peer:ServerPeer = null)
 		{
+			templ = template;
 			
+			upd = NFlxSpritePreset.templ[templ].update;
+			
+			ID2 = NFlxSpritePreset.i;
+			NFlxSpritePreset.items.push(this);
+			NFlxSpritePreset.i++;
+			
+			var t:NFlxSpriteTemplate = NFlxSpritePreset.templ[template] as NFlxSpriteTemplate;
+			if (localset)
+			{
+				super(x, y, Assets[t.img]);
+				Registry.playstate.entities.add(this);
+				
+				t.exportTemplate();
+				
+				var props:Object = t.data;
+				
+				for (var prop:String in props)
+				{
+					switch (prop)
+					{
+						case "dragx":
+							drag.x = props[prop];
+							break;
+						case "accy":
+							acceleration.y = props[prop];
+							break;
+						case "scrollFactor":
+							scrollFactor.x = scrollFactor.y = props[prop];
+							break;
+						case "img":
+							loadGraphic(Assets[props[prop]], false, true);
+							break;
+						case "update":
+							upd = props[prop] as Array;
+							break;
+						case "init":
+							init = props[prop] as Array;
+							break;
+						default:
+							this[prop] = props[prop];
+							break;
+					}
+				}
+			}
 		}
 		
-		public static function initMsg(net:*):void
+		public function declare(peer:ServerPeer = null)
 		{
-			setMsg = new Message(25, net);
-			setMsg.SetFields("prop", "json");
-			setMsg.SetTypes("String", "String");
+			var data:Array = [];
 			
-			setImg = new Message(26, net);
-			setImg.SetFields("json");
-			setMsg.SetTypes("String");
+			for each (var prop:String in upd)
+			{
+				data.push(getProp(prop));
+			}
+			
+			NFlxSpritePreset.createMsg.msg["json"] = JSON.stringify([[templ, ID2, x, y], data]);
+			
+			if (peer == null) NFlxSpritePreset.createMsg.SendReliableToAll();
+			else NFlxSpritePreset.createMsg.SendReliable(peer);
 		}
 		
-		public function setImg(img:String, anim:Boolean = false, reverse:Boolean = false, 
-			width:uint = 0, height:uint = 0, localset:Boolean = true, peer:ServerPeer = null):void
+		public function killdelete(peer:ServerPeer = null, localset:Boolean = true)
 		{
-			if (localset) loadGraphic(Assets[img], anim, reverse, width, height);
+			NFlxSpritePreset.deleteMsg.msg["ID"] = ID2;
 			
-			var arr:Array = [img, anim, reverse, width, height];
-			setImg.msg["json"] = JSON.stringify(arr);
+			if (peer == null) NFlxSpritePreset.deleteMsg.SendReliableToAll();
+			else NFlxSpritePreset.deleteMsg.SendReliable(peer);
 			
-			if (peer == null) setImg.SendReliableToAll();
-			else setImg.SendReliable(peer);
+			if (localset)
+			{
+				Registry.playstate.entities.remove(this, true);
+				kill();
+				destroy();
+			}
 		}
 		
-		public function setProp(prop:String, value:*, localset:Boolean = true, peer:ServerPeer = null):void
+		public function setImg(img:String, localset:Boolean = true, peer:ServerPeer = null):void
 		{
-			if (prop.search(".") != -1)
+			if (localset) loadGraphic(Assets[img]);
+			
+			NFlxSpritePreset.setImg.msg["name"] = img;
+			
+			if (peer == null) NFlxSpritePreset.setImg.SendReliableToAll();
+			else NFlxSpritePreset.setImg.SendReliable(peer);
+		}
+		
+		public function broadcastupdate(peer:ServerPeer = null, useTCP:Boolean = false):void
+		{
+			var msg:Array = [];
+			msg.push(ID2);
+			
+			var data:Array = [];
+			
+			for each (var prop:String in upd)
+			{
+				data.push(getProp(prop));
+			}
+			
+			msg.push(data);
+			
+			NFlxSpritePreset.updateMsg.msg["json"] = JSON.stringify(msg);
+			
+			if (useTCP)
+			{
+				if (peer == null) NFlxSpritePreset.updateMsg.SendReliableToAll();
+				else NFlxSpritePreset.updateMsg.SendReliable(peer);
+			}
+			
+			else
+			{
+				if (peer == null) NFlxSpritePreset.updateMsg.SendUnreliableToAll();
+				else NFlxSpritePreset.updateMsg.SendUnreliable(peer);
+			}
+		}
+		
+		public function getProp(prop:String):*
+		{
+			if (prop.indexOf(".") > 0)
 			{
 				var subprops:Array = prop.split(".", 2);
-				if (localset) this[subprops[1]][subprops[2]] = value;
+				return this[subprops[0]][subprops[1]];
+			}
+			
+			else
+			{
+				return this[prop];
+			}
+		}
+		
+		public function setProp(prop:String, value:*, localset:Boolean = true, peer:ServerPeer = null, useTCP:Boolean = false):void
+		{
+			if (prop.indexOf(".") > 0)
+			{
+				var subprops:Array = prop.split(".", 2);
+				if (localset) this[subprops[0]][subprops[1]] = value;
 			}
 			
 			else
@@ -54,17 +157,34 @@ package
 				if (localset) this[prop] = value;
 			}
 			
-			setMsg.msg["prop"] = prop;
-			setMsg.msg["json"] = JSON.stringify(value);
+			NFlxSpritePreset.setMsg.msg["prop"] = prop;
+			NFlxSpritePreset.setMsg.msg["json"] = JSON.stringify([ID2, value]);
 			
-			if (peer == null)
+			if (useTCP)
 			{
-				setMsg.SendReliableToAll();
+				if (peer == null)
+				{
+					NFlxSpritePreset.setMsg.SendReliableToAll();
+				}
+				
+				else
+				{
+					NFlxSpritePreset.setMsg.SendReliable(peer);
+				}
 			}
 			
 			else
 			{
-				setMsg.SendReliable(peer);
+				if (peer == null)
+				{
+					NFlxSpritePreset.setMsg.SendUnreliableToAll();
+				}
+				
+				else
+				{
+					NFlxSpritePreset.setMsg.SendUnreliable(peer);
+				}
+
 			}
 		}
 	}

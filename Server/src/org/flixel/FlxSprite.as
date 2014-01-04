@@ -965,6 +965,25 @@ package org.flixel
 			return ((_point.x + radius > 0) && (_point.x - radius < Camera.width) && (_point.y + radius > 0) && (_point.y - radius < Camera.height));
 		}
 		
+		public function onScreenRect(Camera:FlxRect=null):Boolean
+		{
+			getScreenXY(_point);
+			_point.x = _point.x - offset.x;
+			_point.y = _point.y - offset.y;
+
+			if(((angle == 0) || (_bakedRotation > 0)) && (scale.x == 1) && (scale.y == 1))
+				return ((_point.x + frameWidth > 0) && (_point.x < Camera.width) && (_point.y + frameHeight > 0) && (_point.y < Camera.height));
+			
+			var halfWidth:Number = frameWidth/2;
+			var halfHeight:Number = frameHeight/2;
+			var absScaleX:Number = (scale.x>0)?scale.x:-scale.x;
+			var absScaleY:Number = (scale.y>0)?scale.y:-scale.y;
+			var radius:Number = Math.sqrt(halfWidth*halfWidth+halfHeight*halfHeight)*((absScaleX >= absScaleY)?absScaleX:absScaleY);
+			_point.x += halfWidth;
+			_point.y += halfHeight;
+			return ((_point.x + radius > 0) && (_point.x - radius < Camera.width) && (_point.y + radius > 0) && (_point.y - radius < Camera.height));
+		}
+		
 		/**
 		 * Checks to see if a point in 2D world space overlaps this <code>FlxSprite</code> object's current displayed pixels.
 		 * This check is ALWAYS made in screen space, and always takes scroll factors into account.

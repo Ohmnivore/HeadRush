@@ -5,7 +5,7 @@ package
 	
 	public class PlayState extends FlxState
 	{
-		public var map:BTNTilemap;
+		public var map:BTNTilemap = new BTNTilemap();
 		public var string:String;
 		public var player:Player;
 		public var players:FlxGroup = new FlxGroup();
@@ -19,6 +19,8 @@ package
 		public var bullets:FlxGroup = new FlxGroup();
 		public var charoverlay:FlxGroup = new FlxGroup();
 		public var scores:FlxGroup = new FlxGroup();
+		public var entities:FlxGroup = new FlxGroup();
+		public var emitters:FlxGroup = new FlxGroup();
 		public static var maps:Array = new Array();
 		public static var mapz:Array = new Array();
 		public var announcer:Announcer = new Announcer();
@@ -42,10 +44,7 @@ package
 			Registry.playstate = this;
 			Registry.client = new RushClient("127.0.0.1", "127.0.0.1");
 			Msg.init();
-			
-			Msg.newclient.msg["id"] = 0;
-			Msg.newclient.msg["json"] = JSON.stringify([Registry.name, Registry.color]);
-			Msg.newclient.SendReliable();
+			NFlxSpritePreset.initMsg(Registry.client);
 			
 			player = new Player(70, 70);
 			players.add(player);
@@ -75,18 +74,8 @@ package
 			FlxG.bgColor = 0xff7A7A7A;
 			FlxG.mouse.show();
 			
-			map = new BTNTilemap();
 			Registry.loadedmap = false;
-			//string = convertMatrixToStr(Registry.mapray);
-			//map.loadMap(string, FlxTilemap.ImgAuto, 8, 8, FlxTilemap.AUTO);
-			//add(map);
 			
-			//add(players);
-			
-			//var spect:Spectator = new Spectator(0, 0);
-			//add(spect);
-			
-			//FlxG.camera.setBounds(0, 0, map.width, map.height);
 			FlxG.camera.follow(player);
 			
 			chathist = new ChatHist();
@@ -101,6 +90,20 @@ package
 		
 		public function loadmap(mapstring:String):void
 		{
+			if (Registry.loadedmap)
+			{
+				Registry.makeSkeleton(lasers);
+				Registry.makeSkeleton(platforms);
+				//Registry.makeSkeleton(charunderlay);
+				//Registry.makeSkeleton(charoverlay);
+				Registry.makeSkeleton(emitters);
+				//Registry.makeSkeleton(bullets);
+				Registry.makeSkeleton(entities);
+				Registry.makeSkeleton(hud);
+				Registry.makeSkeleton(chats);
+				Registry.makeSkeleton(scores);
+			}
+			
 			var damap = JSON.parse(mapstring);
 			var materialmap:FlxTilemap = new FlxTilemap();
 			var lavamap:FlxTilemap = new FlxTilemap();
@@ -162,20 +165,25 @@ package
 				}
 			}
 			
-			add(backmap);
-			add(lasers);
-			add(lavamap);
-			add(frontmap);
-			add(materialmap);
-			add(platforms);
-			add(players);
-			add(charoverlay);
-			add(bullets);
-			add(Registry.chatrect);
-			add(hud);
-			add(huds);
-			add(chats);
-			add(scores);
+			if (!Registry.loadedmap)
+			{
+				add(backmap);
+				add(lasers);
+				add(lavamap);
+				add(frontmap);
+				add(materialmap);
+				add(platforms);
+				add(emitters);
+				add(players);
+				add(charoverlay);
+				add(bullets);
+				add(entities);
+				add(Registry.chatrect);
+				add(hud);
+				add(huds);
+				add(chats);
+				add(scores);
+			}
 			
 			//Load platforms
 			for (var platf:int = 0; platf < damap[PLATFORMS].length; platf++)
@@ -254,6 +262,9 @@ package
 				}
 				
 				FlxG.collide(players, map);
+				FlxG.collide(entities, map);
+				FlxG.collide(entities, entities);
+				FlxG.collide(players, entities);
 				
 				var deltay:Number = (player.y + player.height / 2) - FlxG.mouse.y;
 				var deltax:Number = (player.x + player.width / 2) - FlxG.mouse.x;

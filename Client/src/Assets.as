@@ -1,7 +1,10 @@
 package  
 {
+	import flash.utils.Dictionary;
+	
 	public class Assets 
 	{
+		//public static var assets:Dictionary = new Dictionary();
 		public static const maxtracks:uint = 2;
 		
 		[Embed(source = "art/tilemaps/snow.png")]
@@ -33,6 +36,9 @@ package
 		
 		[Embed(source = "art/setupback.png")]
 		public static const SETUPBACK:Class;
+		
+		//[Embed(source = "art/flag.png")]
+		//public static const FLAG:Class;
 		
 		public function Assets() 
 		{

@@ -1,5 +1,6 @@
 package org.flixel
 {
+	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Graphics;
 	import flash.geom.ColorTransform;
@@ -258,10 +259,11 @@ package org.flixel
 		 * 
 		 * @return	This FlxSprite instance (nice for chaining stuff together, if you're into that).
 		 */
-		public function loadGraphic(Graphic:Class,Animated:Boolean=false,Reverse:Boolean=false,Width:uint=0,Height:uint=0,Unique:Boolean=false):FlxSprite
+		public function loadGraphic(Graphic:*,Animated:Boolean=false,Reverse:Boolean=false,Width:uint=0,Height:uint=0,Unique:Boolean=false):FlxSprite
 		{
 			_bakedRotation = 0;
-			_pixels = FlxG.addBitmap(Graphic,Reverse,Unique);
+			if (Graphic is Bitmap) _pixels = FlxG.addLoadedBitmap(Graphic, Reverse, Unique);
+			else _pixels = FlxG.addBitmap(Graphic, Reverse, Unique);
 			if(Reverse)
 				_flipped = _pixels.width>>1;
 			else

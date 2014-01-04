@@ -34,6 +34,9 @@ package
 		[Embed(source = "art/setupback.png")]
 		public static const SETUPBACK:Class;
 		
+		[Embed(source = "art/flag.png")]
+		public static const FLAG:Class;
+		
 		public static const LVLS = JSON.parse(String(new embedded_text()));
 		
 		public function Assets() 

@@ -25,7 +25,6 @@ package
 		public var dead:Boolean = false;
 		public var respawntimer:FlxDelay;
 		public var shootimer:FlxDelay;
-		public var coinEmitter:FlxEmitter = new FlxEmitter();
 		
 		public var wallshade:FlxSprite;
 		public var wallshade2:FlxSprite;
@@ -46,6 +45,9 @@ package
 		public var ceilingwalk:Boolean = true;
 		
 		public var header:MarkupText = new MarkupText(0, 0, 500, "Unnamed_player", true, true);
+		
+		public var scrwidth:uint = FlxG.width;
+		public var scrheight:uint = FlxG.height;
 
 		public function Player(_x:int, _y:int):void 
 		{		
@@ -123,8 +125,6 @@ package
 			
 			shootimer = new FlxDelay(2000);
 			shootimer.start();
-			
-			Registry.playstate.heademitters.add(coinEmitter);
 			
 			wallshade = new FlxSprite(x - 2, y + 2);
 			wallshade.width = width/2;
@@ -217,8 +217,6 @@ package
 				}
 			}
 			
-			FlxG.collide(coinEmitter, Registry.playstate.map);
-			
 			gun.x = x;
 			gun.y = y + 2;
 			
@@ -292,7 +290,6 @@ package
 				
 				respawntimer.duration = timer;
 				respawntimer.start();
-				ExplodeHeads();
 			}
 			
 			else
@@ -325,30 +322,6 @@ package
 			}
 		}
 		
-		public function ExplodeHeads():void
-		{
-			coinEmitter = new FlxEmitter(0, 0, 50);
-			coinEmitter.x = x + width/2;
-			coinEmitter.y = y + height / 2;
-			coinEmitter.gravity = 350;
-			coinEmitter.setRotation(0, 0);
-			coinEmitter.setXSpeed( -16, 16);
-			coinEmitter.setYSpeed( -20, -30);
-			
-			var i:int = 0
-			for (i; i < heads/2; i++)
-			{
-				coinEmitter.add(new Head);
-				//trace("emit");
-			}
-			
-			if (i == 0) coinEmitter.add(new Head);
-			
-			heads -= i;
-			
-			coinEmitter.start(true, 10, 0, 0);
-		}
-		
 		public function shoot():void
 		{
 			//if (true)
@@ -362,6 +335,7 @@ package
 		
 		override public function destroy():void
 		{
+			super.destroy();
 			gun.kill();
 			gun.destroy();
 			gun2.kill();
@@ -372,7 +346,10 @@ package
 			cannon.group.destroy();
 			header.kill();
 			header.destroy();
-			super.destroy();
+			wallshade.kill();
+			wallshade.destroy();
+			wallshade2.kill();
+			wallshade2.destroy();
 		}
 	}
 }

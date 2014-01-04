@@ -140,7 +140,7 @@ package com.bit101.utils
 					// if id exists on parent as a public property, assign this component to it.
 					if(flixelparent.hasOwnProperty(id))
 					{
-						//flixelparent[id] = compInst;
+						flixelparent[id] = compInst;
 					}
 				}
 				

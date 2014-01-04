@@ -12,6 +12,7 @@ package gamemode
 	import org.flixel.*;
 	import org.flixel.plugin.photonstorm.*;
 	import org.flixel.plugin.photonstorm.BaseTypes.Bullet;
+	import entity.Flag;
 	
 	public class DefaultHooks 
 	{
@@ -22,6 +23,12 @@ package gamemode
 			collideWorld();
 			checkWorldBounds();
 			checkLasers();
+		}
+		
+		public static function initTemplates():void
+		{
+			NFlxSpritePreset.initMsg(Registry.server);
+			BaseTemplates.initTemplates();
 		}
 		
 		public static function hookEvents(gm:BaseGamemode):void
@@ -43,6 +50,14 @@ package gamemode
 			FlxG.collide(p.bullets, p.players, explobullet);
 			FlxG.collide(p.players, p.platforms);
 			FlxG.collide(p.players, p.players, jumpkill);
+			
+			FlxG.collide(p.entities, p.materialmap);
+			FlxG.collide(p.entities, p.lavamap);
+			FlxG.collide(p.entities, p.map);
+			FlxG.collide(p.bullets, p.entities, explobullet);
+			FlxG.collide(p.entities, p.platforms);
+			FlxG.collide(p.entities, p.entities);
+			FlxG.collide(p.entities, p.players);
 		}
 		
 		public static function checkWorldBounds():void
@@ -260,25 +275,16 @@ package gamemode
 			var s:RushServer = Registry.server;
 			var event:ServerSocketConnectEvent = e.joininfo;
 			
-			//ServerInfo.currentp = ServerInfo.currentp + 1;
-			
 			FlxG.log("[Server]newplayer from: ".concat(event.socket.remoteAddress));
 			
 			Msg.dl.msg["dlurl"] = ServerInfo.dlurl;
 			Msg.dl.msg["jsonmanifests"] = JSON.stringify(ServerInfo.dlmanifests);
 			Msg.dl.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
 			
-			//var newplayer:Player = new Player(0, 0);
-			//
-			//Equivalent to clients[peer.id], but we don't have a reference
-			//to the peer object.
-			//s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)].identifier = s.id;
-			//s.clients[s.id] = newplayer;
-			//newplayer.ID = s.id;
+			NFlxSpritePreset.exportMsg.msg["json"] = NFlxSpritePreset.exportPresets();
+			NFlxSpritePreset.exportMsg.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
+			
 			Msg.mapstring.SendReliable(s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)]);
-			//s.id++;
-			//Registry.playstate.players.add(newplayer);
-			//newplayer.peer = s.peers[event.socket.remoteAddress.concat(event.socket.remotePort)];
 			
 			//var testhud:HUDLabel = new HUDLabel(1, 0, "TestHUD");
 			//testhud.pos = new FlxPoint(100, 0);
@@ -299,6 +305,12 @@ package gamemode
 			var p:Player = new Player(0, 0);
 			
 			ServerInfo.currentp = ServerInfo.currentp + 1;
+			
+			//new Flag(300, 0);
+			for each (var spr:NFlxSprite in NFlxSpritePreset.items)
+			{
+				spr.declare(event.peer);
+			}
 			
 			event.peer.identifier = s.id;
 			s.clients[s.id] = p;
@@ -387,6 +399,13 @@ package gamemode
 		
 		public static function handleKeys(event:MsgHandler):void
 		{
+			//for each (var spr:NFlxSprite in NFlxSpritePreset.items)
+			//{
+				//if (spr.templ == BaseTemplates.flag.id)
+				//{
+					//spr.broadcastupdate();
+				//}
+			//}
 			//if (Registry.server.clients[event.peer.identifier] !== undefined)
 			//{
 			//trace(event.peer.identifier);
@@ -451,6 +470,16 @@ package gamemode
 			if (Msg.keystatus.msg["shooting"])
 			{
 				Registry.server.clients[event.peer.identifier].shoot();
+				//var sp:Flag = new Flag(300, 0);
+				//sp.declare();
+				//for each (var spr:NFlxSprite in NFlxSpritePreset.items)
+				//{
+					//if (spr.templ == BaseTemplates.flag.id)
+					//{
+						//trace("k");
+						//spr.broadcastupdate();
+					//}
+				//}
 				//trace("shot");
 			}
 			
@@ -472,7 +501,7 @@ package gamemode
 			lead.header = new MarkupText(0, 0, 500, "Leaderboard", true, true, 
 				[new Markup(0, 11, 11, FlxG.RED)]);
 			lead.titles = [
-				new MarkupText(0, 0, 500, "|Player      |", true, true, [new Markup(0, 14, 9, FlxG.RED)]),
+				new MarkupText(0, 0, 500, "|Player                      |", true, true, [new Markup(0, 14, 9, FlxG.RED)]),
 				new MarkupText(0, 0, 500, "Kills |", true, true, [new Markup(0, 7, 9, FlxG.RED)]),
 				new MarkupText(0, 0, 500, "Deaths", true, true, [new Markup(0, 6, 9, FlxG.RED)])
 			];

@@ -1,6 +1,8 @@
 package  
 {
 	import Assets;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.utils.Dictionary;
 	import org.flixel.FlxG;
 	import com.stimuli.loading.BulkLoader;
@@ -90,13 +92,20 @@ package
 			{
 				for (var key in manifest)
 				{
-					Assets[key] = loader.getContent(dlurl.concat(manifest[key]));
+					//var d:Bitmap = loader.getBitmap(dlurl.concat(manifest[key]));
+					Assets[key] = loader.getBitmap(dlurl.concat(manifest[key]));
+					//FlxG.stage.addChild(d);
+					//FlxG.log(key);
 				}
 			}
 			
 			loader.removeAll();
 			loader.removeEventListener(BulkLoader.COMPLETE, onFilesLoaded);
 			FlxG.log("[DL]Got files.");
+			
+			Msg.newclient.msg["id"] = 0;
+			Msg.newclient.msg["json"] = JSON.stringify([Registry.name, Registry.color]);
+			Msg.newclient.SendReliable();
 		}
 	}
 }

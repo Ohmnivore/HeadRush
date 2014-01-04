@@ -33,7 +33,7 @@ package plugin
 							<Window id="GWind" x={initx} y="0" title={pname} event="close:onClose" hasCloseButton="true" height={FlxG.height*2} width={FlxG.width*3/2 - 20}>
 								<VBox x="0" y="0">
 									<Label id="namelabel" x="10" y="0" text="Name"/>
-									<InputText id="name" x="10" y="20" event="change:setName"/>
+									<InputText id="sname" x="10" y="20" event="change:setName"/>
 									<Label id="passlabel" x="10" y="40" text="Password"/>
 									<InputText id="pass" x="10" y="60" event="change:setPass"/>
 									<VIntSlider id="maxp" x="10" y="80" label="Max players" event="change:setMaxP" minimum="6" maximum="32" value={12}/>
@@ -45,10 +45,10 @@ package plugin
 			
 			config.parseXML(xml);
 			
-			runtimeunsafe = ["name"];
+			runtimeunsafe = ["sname"];
 			applyRuntimes(runtimeunsafe);
 			
-			savecomps = ["name", "pass", "maxp", "pubbox"];
+			savecomps = ["sname", "pass", "maxp", "pubbox"];
 			savecompsdefault = ["New_Server", "", 12, true];
 			
 			LoadFromSave();
@@ -69,7 +69,7 @@ package plugin
 		
 		public function setName(e:Event):void
 		{
-			ServerInfo.name = config.getCompById("name")["text"];
+			ServerInfo.name = config.getCompById("sname")["text"];
 		}
 		
 		public function setPass(e:Event):void

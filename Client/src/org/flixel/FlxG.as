@@ -768,6 +768,41 @@ package org.flixel
 			return _cache[Key];
 		}
 		
+		static public function addLoadedBitmap(Graphic:Bitmap, Reverse:Boolean=false, Unique:Boolean=false):BitmapData
+		{
+			var needReverse:Boolean = false;
+			var key:String = String(Graphic);
+			if (Unique && (_cache[key] != undefined) && (_cache[key] != null))
+			{
+				var inc:uint = 0;
+				var uKey:String;
+				do { uKey = key + inc++;
+				} while ((_cache[uKey] != undefined) && (_cache[uKey] != null));
+				key = uKey;
+			}
+			if ((_cache[key] == undefined) || (_cache[key] == null))
+			{
+				_cache[key] = Graphic.bitmapData;
+				if (Reverse) { needReverse = true; }
+			}
+			var pixels:BitmapData = _cache[key];
+			if (!needReverse && Reverse && (pixels.width == Graphic.bitmapData.width))
+			{
+				needReverse = true;
+			}
+			if (needReverse)
+			{
+				var newPixels:BitmapData = new BitmapData(pixels.width << 1, pixels.height, true, 0x00000000);
+				newPixels.draw(pixels);
+				var mtx:Matrix = new Matrix();
+				mtx.scale(-1, 1);
+				mtx.translate(newPixels.width, 0);
+				newPixels.draw(pixels, mtx);
+				pixels = newPixels;
+			}
+			return pixels;
+		}
+		
 		/**
 		 * Dumps the cache's image references.
 		 */

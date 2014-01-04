@@ -108,7 +108,7 @@ public class CLI extends Sprite
 				_view.y = _height - 20 - _view.height;
 				_cmd.text = "";
 				if (_commands[func[0]]) {
-					var command:Function = _parent[_commands[func[0]]] as Function;
+					var command:Function = Registry[_commands[func[0]]] as Function;
 					switch (func.length) {
 						case 1:
 							command();

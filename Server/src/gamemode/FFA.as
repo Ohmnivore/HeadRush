@@ -1,5 +1,7 @@
 package gamemode 
 {
+	import com.jmx2.delayedFunctionCall;
+	import entity.Flag;
 	import gevent.DeathEvent;
 	import gevent.HurtEvent;
 	import gevent.JoinEvent;
@@ -13,6 +15,23 @@ package gamemode
 		{
 			super();
 			DefaultHooks.hookEvents(this);
+			DefaultHooks.initTemplates();
+		}
+		
+		override public function update(elapsed:Number):void
+		{
+			super.update(elapsed);
+			for each (var p:Player in Registry.playstate.players)
+			{
+				if (p.kills >= 25)
+				{
+				var announce:String = p.name.concat(" won the game!");
+				var pmarkup:Markup = new Markup(0, p.name.length, 11, p.teamcolor);
+				PlayState.announcer.add(new MarkupText(0, 0, 500, announce, true, true, [pmarkup]));
+				
+				new delayedFunctionCall(Registry.nextmap, 3000);
+				}
+			}
 		}
 		
 		override public function onHurt(e:HurtEvent):void

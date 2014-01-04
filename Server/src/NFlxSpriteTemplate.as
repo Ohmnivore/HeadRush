@@ -5,6 +5,8 @@ package
 	
 	public class NFlxSpriteTemplate 
 	{
+		public var id:uint = 0;
+		
 		public var img:String; //
 		public var active:Boolean = true;
 		public var visible:Boolean = true;
@@ -16,36 +18,43 @@ package
 		public var immovable:Boolean = false;
 		public var elasticity:Number = 0;
 		public var dragx:int = 0;
-		public var dragy:int = 0;
-		public var scrollFactor:FlxPoint = new FlxPoint(0, 0);
+		public var accy:int = 0;
+		public var scrollFactor:Number = 1; //same for x and y
 		public var moves:Boolean = true;
 		
-		public var data:Dictionary = new Dictionary();
+		public var update:Array = [];
+		public var init:Array = [];
+		
+		public var data:Object = new Object();
 		
 		public function exportTemplate():String 
 		{
-			data= new Dictionary();
+			data= new Object();
 			
-			data[img] = img;
-			data[width] = width;
-			data[height] = height;
+			data["img"] = img;
+			data["width"] = width;
+			data["height"] = height;
+			data["update"] = update;
+			data["init"] = init;
 			
-			checkDefault(active, true);
-			checkDefault(visible, true);
-			checkDefault(exists, true);
-			checkDefault(x, 0);
-			checkDefault(y, 0);
-			checkDefault(immovable, false);
-			checkDefault(elasticity, 0);
-			checkDefault(moves, true);
-			checkDefault(active, true);
-			checkDefault(active, true);
-			checkDefault(active, true);
+			checkDefault("active", true);
+			checkDefault("visible", true);
+			checkDefault("exists", true);
+			checkDefault("x", 0);
+			checkDefault("y", 0);
+			checkDefault("immovable", false);
+			checkDefault("elasticity", 0);
+			checkDefault("moves", true);
+			checkDefault("dragx", 0);
+			checkDefault("accy", 0);
+			checkDefault("scrollFactor", 1);
+			
+			return JSON.stringify(data);
 		}
 		
-		public function checkDefault(variable:*, def:*):void
+		public function checkDefault(variable:String, def:*):void
 		{
-			if (variable != def) data[variable] = variable;
+			if (this[variable] != def) data[variable] = this[variable];
 		}
 	}
 

@@ -4,7 +4,7 @@ package
 	public class NFlxSpritePreset 
 	{
 		public static var templ:Array = [];
-		public static var items:Array = [];
+		public static var items:Object = new Object;
 		public static var t:uint = 0;
 		public static var i:uint = 0;
 		
@@ -42,24 +42,21 @@ package
 			deleteMsg.SetTypes("Int");
 		}
 		
-		public static function register(template:NFlxSpriteTemplate):void
+		public static function register(template:Object):void
 		{
 			templ.push(template);
-			template.id = t;
+			//template.id = t;
 			t++;
 		}
 		
-		public static function exportPresets():String
+		public static function importPresets(json:String):void
 		{
-			var data:Array = new Array();
+			var data:Array = JSON.parse(json) as Array;
 			
-			for each (var template:NFlxSpriteTemplate in templ)
+			for each (var template:Object in data)
 			{
-				template.exportTemplate();
-				data.push(template.data);
+				register(template);
 			}
-			
-			return JSON.stringify(data);
 		}
 	}
 }

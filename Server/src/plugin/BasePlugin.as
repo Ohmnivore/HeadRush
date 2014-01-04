@@ -49,11 +49,19 @@ package plugin
 				
 				for (var data:String in save)
 				{
-					var comp:Component = config.getCompById(data) as Component;
+					try
+					{
+						var comp:Component = config.getCompById(data) as Component;
+						
+						setCompValue(save[data], comp);
+						
+						comp.dispatchEvent(new Event(Event.CHANGE));
+					}
 					
-					setCompValue(save[data], comp);
-					
-					comp.dispatchEvent(new Event(Event.CHANGE));
+					catch (e:Error)
+					{
+						
+					}
 				}
 			}
 			
@@ -96,6 +104,11 @@ package plugin
 			{
 				comp["selected"] = value;
 			}
+			
+			if (comp is List)
+			{
+				comp["items"] = value;
+			}
 		}
 		
 		public function getCompValue(comp:Component):*
@@ -123,6 +136,11 @@ package plugin
 			if (comp is RadioButton)
 			{
 				return comp["selected"];
+			}
+			
+			if (comp is List)
+			{
+				return comp["items"];
 			}
 		}
 		

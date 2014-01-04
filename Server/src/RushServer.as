@@ -40,6 +40,10 @@ package
 						  </cross-domain-policy>;
 						  
 			Security.loadPolicyFile("src/secure.txt");
+			var dataset:Object = new Object();
+			dataset[id] = id;
+			dataset["lol"] = id;
+			trace("JSON", JSON.stringify(dataset as Object));
 		}
 		
 		public function onLAN(event:DatagramSocketDataEvent):void

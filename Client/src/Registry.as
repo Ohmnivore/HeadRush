@@ -48,5 +48,15 @@ package
 		{
 			s.scrollFactor.x = s.scrollFactor.y = 0;
 		}
+		
+		public static function makeSkeleton(g:FlxGroup):void
+		{
+			if (g.length > 0)
+			{
+				g.callAll("kill", true);
+				g.callAll("destroy", true);
+				g.clear();
+			}
+		}
 	}
 }

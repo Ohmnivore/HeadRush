@@ -259,6 +259,57 @@ package
 					Registry.playstate.chathist.add(core);
 				}
 			}
+			
+			if (event.id == NFlxSpritePreset.exportMsg.ID)
+			{
+				NFlxSpritePreset.importPresets(NFlxSpritePreset.exportMsg.msg["json"]);
+			}
+			
+			if (event.id == NFlxSpritePreset.createMsg.ID)
+			{
+				var data:Array = JSON.parse(NFlxSpritePreset.createMsg.msg["json"]) as Array;
+				//FlxG.log(data[1]);
+				if (NFlxSpritePreset.items.hasOwnProperty(data[0][1]))
+				{
+					//FlxG.log("k");
+					var sp:NFlxSprite = NFlxSpritePreset.items[data[0][1]] as NFlxSprite;
+					Registry.playstate.entities.remove(sp, true);
+					sp.kill();
+					sp.destroy();
+					var spr:NFlxSprite = new NFlxSprite(data[0][2], data[0][3], NFlxSpritePreset.templ[data[0][0]], data[0][1], data[1]);
+				}
+				
+				else
+				{
+					var spr:NFlxSprite = new NFlxSprite(data[0][2], data[0][3], NFlxSpritePreset.templ[data[0][0]], data[0][1], data[1]);
+				}
+			}
+			
+			if (event.id == NFlxSpritePreset.updateMsg.ID)
+			{
+				var msg:Array = JSON.parse(NFlxSpritePreset.updateMsg.msg["json"]) as Array;
+				
+				if (NFlxSpritePreset.items.hasOwnProperty(msg[0]))
+				{
+					var spr:NFlxSprite = NFlxSpritePreset.items[msg[0]] as NFlxSprite;
+					spr.applyupdate(msg[1]);
+				}
+			}
+			
+			if (event.id == NFlxSpritePreset.deleteMsg.ID)
+			{
+				var ID:uint = NFlxSpritePreset.deleteMsg.msg["ID"];
+				var spr:NFlxSprite = NFlxSpritePreset.items[ID] as NFlxSprite;
+				Registry.playstate.entities.remove(spr, true);
+				spr.kill();
+				spr.destroy();
+				delete NFlxSpritePreset.items[ID];
+			}
+			
+			if (event.id == NFlxSpritePreset.setImg.ID)
+			{
+				
+			}
 		}
 		
 		public static function decode(str:String):ByteArray 
