@@ -193,7 +193,7 @@ package gamemode
 			
 			var iskill:Boolean = false;
 			
-			if (player.touching & FlxObject.DOWN)
+			if (player.touching & FlxObject.DOWN && player.x >= player2.x && player.x <= player2.x + player2.width)
 			{
 				if (player.y <= player2.y + 1)
 				{
@@ -203,7 +203,7 @@ package gamemode
 				}
 			}
 			
-			if (player2.touching & FlxObject.DOWN)
+			if (player2.touching & FlxObject.DOWN && player2.x >= player.x && player2.x <= player.x + player.width)
 			{
 				if (player2.y <= player.y + 1)
 				{
@@ -218,7 +218,7 @@ package gamemode
 				var info:HurtInfo = new HurtInfo;
 				info.attacker = winner.ID;
 				info.victim = loser.ID;
-				info.dmg = 100;
+				info.dmg = Math.abs(winner.velocity.y - loser.velocity.y) * 3;
 				info.type = BaseGamemode.JUMPKILL;
 				info.dmgsource = winner.getMidpoint();
 				
