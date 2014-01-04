@@ -42,7 +42,6 @@ official menus and gamemodes are being written as
 plugins and mods as well.
 
 TODO
-0)-Seamless map rotation/changing
 1)-Custom networked objects protocol *(1)
 2)-Add flow control to Streamy *(2)
 3)-I forgot about audio. Must think about audio. *(3)
