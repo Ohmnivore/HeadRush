@@ -10,6 +10,7 @@ package
 		public var upd:Array = [];
 		public var init:Array = [];
 		public var ID2:uint = 0;
+		public var priority = 0;
 		
 		public function NFlxSprite(template:uint, x:Number = 0, y:Number = 0, localset = false, peer:ServerPeer = null)
 		{
@@ -20,6 +21,8 @@ package
 			ID2 = NFlxSpritePreset.i;
 			NFlxSpritePreset.items.push(this);
 			NFlxSpritePreset.i++;
+			
+			priority = NFlxSpritePreset.templ[templ].priority;
 			
 			var t:NFlxSpriteTemplate = NFlxSpritePreset.templ[template] as NFlxSpriteTemplate;
 			if (localset)

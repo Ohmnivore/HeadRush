@@ -182,56 +182,105 @@ package Streamy
 			{
 				var peersocket:Socket = event.target as Socket;
 				
-				//FlxG.log("gottcp");
-				
 				var buffer:ByteArray = new ByteArray();
 				peersocket.readBytes(buffer, 0, peersocket.bytesAvailable);
 				
-				while (buffer.bytesAvailable)
-					ProcessTCP(buffer);
+				var contents:Array = JSON.parse(buffer.readUTF()) as Array;
+				
+				var currentmsg:uint = 0;
+				
+				for (var currentmsg:uint = 0; currentmsg < contents.length; currentmsg++)
+				{
+					if (currentmsg == contents.length - 1)
+					{
+						var buffer2:ByteArray = new ByteArray();
+						buffer.readBytes(buffer2, contents[currentmsg], 0);
+						
+						ProcessTCP(buffer2);
+					}
+					
+					else
+					{
+						var buffer2:ByteArray = new ByteArray();
+						buffer.readBytes(buffer2, contents[currentmsg], 
+							contents[currentmsg] - contents[currentmsg + 1]);
+						
+						ProcessTCP(buffer2);
+					}
+				}
+				
+				//while (buffer.bytesAvailable)
+					//ProcessTCP(buffer);
 			}
 			
 			catch (e)
 			{
-				trace("Client: ", "TCP", e);
+				FlxG.log("Client: " + "TCP" + e);
 			}
+		}
+		
+		private function ParseFromBytes(d:ByteArray):void
+		{
+			var inputarray:Array = new Array();
+			
+			var x:uint = 0;
+			while (d.bytesAvailable)
+			{
+				if (x == 0)
+				{
+					inputarray.push(d.readInt());
+				}
+				
+				else
+				{
+					var types:Array = messages[inputarray[0]].types;
+					
+					if (types[x-1] == "String") inputarray.push(d.readUTF());
+					if (types[x-1] == "Int") inputarray.push(d.readInt());
+					if (types[x-1] == "Float") inputarray.push(d.readFloat());
+					if (types[x-1] == "Boolean") inputarray.push(d.readBoolean());
+				}
+				x++;
+			}
+			var unreliableevent:UnreliableEvent = new UnreliableEvent(inputarray);
+			udpsocket.dispatchEvent(unreliableevent);
+			
+			var msgevent:MsgHandler = new MsgHandler(null, inputarray[0], false);
+			udpsocket.dispatchEvent(msgevent);
 		}
 		
 		private function ReceivedUDP(event:DatagramSocketDataEvent):void
         {
 			try
 			{
-				var inputarray:Array = new Array();
+				var contents:Array = JSON.parse(event.data.readUTF()) as Array;
 				
-				var x:uint = 0;
-				while (event.data.bytesAvailable)
+				var currentmsg:uint = 0;
+				
+				for (var currentmsg:uint = 0; currentmsg < contents.length; currentmsg++)
 				{
-					if (x == 0)
+					if (currentmsg == contents.length - 1)
 					{
-						inputarray.push(event.data.readInt());
+						var buffer:ByteArray = new ByteArray();
+						event.data.readBytes(buffer, contents[currentmsg], 0);
+						
+						ParseFromBytes(buffer);
 					}
 					
 					else
 					{
-						var types:Array = messages[inputarray[0]].types;
+						var buffer:ByteArray = new ByteArray();
+						event.data.readBytes(buffer, contents[currentmsg], 
+							contents[currentmsg] - contents[currentmsg + 1]);
 						
-						if (types[x-1] == "String") inputarray.push(event.data.readUTF());
-						if (types[x-1] == "Int") inputarray.push(event.data.readInt());
-						if (types[x-1] == "Float") inputarray.push(event.data.readFloat());
-						if (types[x-1] == "Boolean") inputarray.push(event.data.readBoolean());
+						ParseFromBytes(buffer);
 					}
-					x++;
 				}
-				var unreliableevent:UnreliableEvent = new UnreliableEvent(inputarray);
-				udpsocket.dispatchEvent(unreliableevent);
-				
-				var msgevent:MsgHandler = new MsgHandler(null, inputarray[0], false);
-				udpsocket.dispatchEvent(msgevent);
 			}
 			
 			catch(e)
 			{
-				trace("Client: ", "UDP", e);
+				FlxG.log("Client: " + "UDP" + e);
 			}
         }
 		

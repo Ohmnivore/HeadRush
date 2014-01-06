@@ -13,7 +13,7 @@ package
 	import entity.*;
 	import gamemode.*;
 	import plugin.BasePlugin;
-	import Spawn;
+	import entity.Spawn;
 	import com.jmx2.delayedFunctionCall;
 	import Streamy.ServerPeer;
 	
@@ -40,10 +40,6 @@ package
 		public static var mapz:Array = new Array();
 		public static var announcer:Announcer = new Announcer();
 		
-		internal var elapsed:Number;
-		internal var messagespersecond:uint;
-		internal var rate:Number;
-		
 		public var chatbox:ChatBox;
 		public var chathist:ChatHist;
 		
@@ -52,9 +48,6 @@ package
 		override public function create():void 
 		{
 			super.create();
-			
-			elapsed = 0;
-			rate = 1.0 / messagespersecond;
 			
 			Registry.playstate = this;
 			Registry.spawntimer = 3000;
@@ -66,7 +59,7 @@ package
 			FlxG.bgColor = 0xff7A7A7A;
 			FlxG.mouse.show();
 			
-			spawns.push(new Spawn(30, 0, 0));
+			//spawns.push(new Spawn(30, 0, 0));
 			
 			LoadMap();
 			
@@ -269,6 +262,8 @@ package
 		{
 			super.update();
 			
+			Registry.server.update(FlxG.elapsed);
+			
 			Registry.ms.update(FlxG.elapsed);
 			
 			Registry.gm.update(FlxG.elapsed);
@@ -293,28 +288,22 @@ package
 			if (FlxG.keys.justReleased("T")) chatbox.toggle();
 			if (FlxG.keys.justReleased("TAB")) Registry.leadset.toggle();
 			
-			elapsed += FlxG.elapsed;
-			if (elapsed >= messagespersecond)
+			var peerstates:Array = new Array;
+			for each (var peer:Player in players.members)
 			{
-				elapsed = 0;
-				
-				var peerstates:Array = new Array;
-				for each (var peer:Player in players.members)
-				{
-					//FlxG.log(peer.ID);
-					var peerstate:Array = new Array();
-					peerstate.push(peer.ID);
-					peerstate.push(peer.x);
-					peerstate.push(peer.y);
-					if (!peer.dead) peerstate.push(peer.health);
-					else peerstate.push( -100);
-					if (peer.ceilingwalk) peerstate.push(true);
-					peerstates.push(peerstate);
-				}
-				
-				Msg.clientpositions.msg["json"] = JSON.stringify(peerstates);
-				Msg.clientpositions.SendUnreliableToAll();
+				//FlxG.log(peer.ID);
+				var peerstate:Array = new Array();
+				peerstate.push(peer.ID);
+				peerstate.push(peer.x);
+				peerstate.push(peer.y);
+				if (!peer.dead) peerstate.push(peer.health);
+				else peerstate.push( -100);
+				if (peer.ceilingwalk) peerstate.push(true);
+				peerstates.push(peerstate);
 			}
+			
+			Msg.clientpositions.msg["json"] = JSON.stringify(peerstates);
+			Msg.clientpositions.SendUnreliableToAll();
 		}
 		
 		public function CeilingWalk(tile:FlxTile, player:Player):void

@@ -20,6 +20,8 @@ package Streamy
 	
 	public class Message 
 	{
+		public var helpermsg:MsgObject = new MsgObject(new ByteArray(), 1);
+		
 		/**
 		 * A unique identifier for this message. Must be the same on both the client and the server.
 		 */
@@ -110,79 +112,83 @@ package Streamy
 		 */
 		public function SendReliable(peer:ServerPeer = null):void
 		{
-			try
-			{
-				if (isClient)
-				{
-					_tosend.splice(0);
-					_tosend.push(ID);
-					bytedata.clear();
-					
-					for (var x:uint; x < fields.length; x++)
-					{
-						_tosend.push(msg[fields[x]]);
-					}
-					
-					for (var y:uint; y < _tosend.length; y++)
-					{
-						if (y == 0)
-						{
-							bytedata.writeInt(_tosend[y]);
-						}
-						
-						else
-						{
-							if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
-							if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
-							if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
-							if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
-						}
-					}
-					
-					if (compress) bytedata.compress();
-					network.tcpsocket.writeBytes(bytedata);
-					network.tcpsocket.flush();
-				}
-				
-				else
-				{
-					_tosend.splice(0);
-					_tosend.push(ID);
-					bytedata.clear();
-					
-					for (var x:uint; x < fields.length; x++)
-					{
-						_tosend.push(msg[fields[x]]);
-					}
-					
-					for (var y:uint; y < _tosend.length; y++)
-					{
-						if (y == 0)
-						{
-							bytedata.writeInt(_tosend[y]);
-						}
-						
-						else
-						{
-							if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
-							if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
-							if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
-							if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
-						}
-					}
-					
+			//try
+			//{
+				//if (isClient)
+				//{
+					//_tosend.splice(0);
+					//_tosend.push(ID);
+					//bytedata.clear();
+					//
+					//for (var x:uint; x < fields.length; x++)
+					//{
+						//_tosend.push(msg[fields[x]]);
+					//}
+					//
+					//for (var y:uint; y < _tosend.length; y++)
+					//{
+						//if (y == 0)
+						//{
+							//bytedata.writeInt(_tosend[y]);
+						//}
+						//
+						//else
+						//{
+							//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
+							//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
+							//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
+							//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
+						//}
+					//}
+					//
+					//if (compress) bytedata.compress();
+					//network.tcpsocket.writeBytes(bytedata);
+					//network.tcpsocket.flush();
+				//}
+				//
+				//else
+				//{
+					//_tosend.splice(0);
+					//_tosend.push(ID);
+					//bytedata.clear();
+					//
+					//for (var x:uint; x < fields.length; x++)
+					//{
+						//_tosend.push(msg[fields[x]]);
+					//}
+					//
+					//for (var y:uint; y < _tosend.length; y++)
+					//{
+						//if (y == 0)
+						//{
+							//bytedata.writeInt(_tosend[y]);
+						//}
+						//
+						//else
+						//{
+							//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
+							//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
+							//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
+							//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
+						//}
+					//}
+					//
 					//trace(peer.tcpsocket.remotePort);
-					if (compress) bytedata.compress();
-					peer.tcpsocket.writeBytes(bytedata);
-					peer.tcpsocket.flush();
-				}
-			}
-			
-			catch (e:IOError)
-			{
-				if (isClient) trace("Client: ", "TCP", e);
-				else trace("Server: ", "TCP", e);
-			}
+					//if (compress) bytedata.compress();
+					//peer.tcpsocket.writeBytes(bytedata);
+					//peer.tcpsocket.flush();
+				//}
+			//}
+			//
+			//catch (e:IOError)
+			//{
+				//if (isClient) trace("Client: ", "TCP", e);
+				//else trace("Server: ", "TCP", e);
+			//}
+			helpermsg.data = getByteArray();
+			helpermsg.msgID = ID;
+			helpermsg.isTCP = true;
+			peer.dispatcher.add(helpermsg);
 		}
 		
 		/**
@@ -190,9 +196,13 @@ package Streamy
 		 */
 		public function SendReliableToAll():void
 		{
+			helpermsg.data = getByteArray();
+			helpermsg.msgID = ID;
+			helpermsg.isTCP = true;
+			
 			for each (var peer:ServerPeer in network.peers)
 			{
-				SendReliable(peer);
+				peer.dispatcher.add(helpermsg);
 			}
 		}
 		
@@ -201,18 +211,17 @@ package Streamy
 		 */
 		public function SendUnreliableToAll():void
 		{
+			helpermsg.data = getByteArray();
+			helpermsg.msgID = ID;
+			helpermsg.isTCP = false;
+			
 			for each (var peer:ServerPeer in network.peers)
 			{
-				SendUnreliable(peer);
+				peer.dispatcher.add(helpermsg);
 			}
 		}
 		
-		/**
-		 * Sends an unreliable but fast message via UDP.
-		 * 
-		 * @param peer		If network parent is a server, specify a peer to whom you want to send the message. Otherwise leave it null.
-		 */
-		public function SendUnreliable(peer:ServerPeer = null):void
+		public function getByteArray():ByteArray
 		{
 			bytedata.clear();
 			_tosend.splice(0);
@@ -239,8 +248,83 @@ package Streamy
 				}
 			}
 			
-			if (isClient) network.SendUnreliable(bytedata);
-			else network.SendUnreliable(bytedata, peer);
+			return bytedata;
+		}
+		
+		public function sendUnrB(b:ByteArray, peer:ServerPeer = null):void
+		{
+			if (isClient) network.SendUnreliable(b);
+			else network.SendUnreliable(b, peer);
+		}
+		
+		public function sendUnrBAll(b:ByteArray):void
+		{
+			for each (var peer:ServerPeer in network.peers)
+			{
+				sendUnrB(b, peer);
+			}
+		}
+		
+		public function sendReB(b:ByteArray, peer:ServerPeer = null):void
+		{
+			if (isClient)
+			{
+				network.tcpsocket.writeBytes(b);
+				network.tcpsocket.flush();
+			}
+			else
+			{
+				peer.tcpsocket.writeBytes(bytedata);
+				peer.tcpsocket.flush();
+			}
+		}
+		
+		public function sendReBAll(b:ByteArray):void
+		{
+			for each (var peer:ServerPeer in network.peers)
+			{
+				sendReB(b, peer);
+			}
+		}
+		
+		/**
+		 * Sends an unreliable but fast message via UDP.
+		 * 
+		 * @param peer		If network parent is a server, specify a peer to whom you want to send the message. Otherwise leave it null.
+		 */
+		public function SendUnreliable(peer:ServerPeer = null):void
+		{
+			//bytedata.clear();
+			//_tosend.splice(0);
+			//_tosend.push(ID);
+			//
+			//for (var x:uint; x < fields.length; x++)
+			//{
+				//_tosend.push(msg[fields[x]]);
+			//}
+			//
+			//for (var y:uint; y < _tosend.length; y++)
+			//{
+				//if (y == 0)
+				//{
+					//bytedata.writeInt(_tosend[y]);
+				//}
+				//
+				//else
+				//{
+					//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
+					//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
+					//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
+					//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
+				//}
+			//}
+			//
+			//if (isClient) network.SendUnreliable(bytedata);
+			//else network.SendUnreliable(bytedata, peer);
+			helpermsg.data = getByteArray();
+			helpermsg.msgID = ID;
+			helpermsg.isTCP = false;
+			peer.dispatcher.add(helpermsg);
 		}
 		
 		/**

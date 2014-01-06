@@ -8,7 +8,7 @@ package
 	    {
 	        className = "Main";
 	        super();
-			trace("PATH: ", root.loaderInfo.loaderURL);
+			//trace("PATH: ", root.loaderInfo.loaderURL);
         }
     }
 }

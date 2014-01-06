@@ -36,10 +36,7 @@ package Streamy
 		public var peers:Dictionary = new Dictionary();
 		internal var portmappings:Dictionary = new Dictionary();
 		
-		//internal var elapsed:Number;
-		//internal const messagespersecond:uint;
-		//internal const rate:Number;
-		//internal var tosend:Array = new Array();
+		public var buffer:ByteArray = new ByteArray;
 		
 		public function Server(Ip:String = null, Udpport:uint = 0, Tcpport:uint = 0) 
 		{	
@@ -112,9 +109,17 @@ package Streamy
 			//}
 		//}
 		
+		public function update(elapsed:Number):void
+		{
+			for each (var p:ServerPeer in peers)
+			{
+				p.dispatcher.update(elapsed);
+			}
+		}
+		
 		public function NewClient(event:ServerSocketConnectEvent):void
 		{
-			var peer:ServerPeer = new ServerPeer(event.socket.remoteAddress, event.socket.remotePort, event.socket);
+			var peer:ServerPeer = new ServerPeer(event.socket.remoteAddress, event.socket.remotePort, event.socket, this);
 			peers[peer.id] = peer;
 			//peer.address = event.re
 			event.socket.addEventListener(ProgressEvent.SOCKET_DATA, ReceivedTCP);
@@ -196,8 +201,6 @@ package Streamy
 		
 		private function ReceivedUDP(event:DatagramSocketDataEvent):void
         {
-			//trace(event.srcAddress);
-			
 			try
 			{
 				var inputarray:Array = new Array();
@@ -225,8 +228,6 @@ package Streamy
 				udpsocket.dispatchEvent(unreliableevent);
 				
 				var peer:ServerPeer = peers[event.srcAddress.concat(portmappings[event.srcAddress+event.srcPort])];
-				
-				//trace(peer.id);
 				
 				var msgevent:MsgHandler = new MsgHandler(peer, inputarray[0], false);
 				udpsocket.dispatchEvent(msgevent);

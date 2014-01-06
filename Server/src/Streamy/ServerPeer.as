@@ -10,13 +10,17 @@ package Streamy
 		public var tcpsocket:Socket;
 		public var id:String;
 		public var identifier:uint;
+		public var dispatcher:MsgDispatcher;
+		public var net:*;
 		
-		public function ServerPeer(Ip:String, Port:uint, TCPSocket:Socket) 
+		public function ServerPeer(Ip:String, Port:uint, TCPSocket:Socket, Net:*) 
 		{
 			ip = Ip;
 			tcpsocket = TCPSocket;
 			tcpport = tcpsocket.remotePort;
 			udpport = 0;
+			net = Net;
+			dispatcher = new MsgDispatcher(net, this);
 			Create();
 		}
 		

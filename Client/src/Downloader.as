@@ -30,7 +30,7 @@ package
 		{
 			if (dlmanifests.length > 0)
 			{
-				FlxG.fade(FlxG.BLACK, 1000, null, true);
+				FlxG.fade(FlxG.BLACK, 1, null, true);
 				
 				loader = new BulkLoader("hashloader");
 				
@@ -44,6 +44,7 @@ package
 			
 			else
 			{
+				FlxG.camera.stopFX();
 				FlxG.flash(FlxG.BLACK, 1, null, true);
 				
 				Msg.newclient.msg["id"] = 0;
@@ -102,6 +103,7 @@ package
 		
 		public static function onFilesLoaded(event:Event):void 
 		{
+			FlxG.camera.stopFX();
 			FlxG.flash(FlxG.BLACK, 1, null, true);
 			
 			for each (var manifest in manifests)

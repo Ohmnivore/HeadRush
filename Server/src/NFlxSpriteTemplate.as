@@ -6,6 +6,7 @@ package
 	public class NFlxSpriteTemplate 
 	{
 		public var id:uint = 0;
+		public var priority = 0;
 		
 		public var img:String; //
 		public var active:Boolean = true;

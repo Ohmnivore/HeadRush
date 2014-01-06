@@ -1,5 +1,6 @@
 package  
 {
+	import entity.Spawn;
 	import gevent.DeathEvent;
 	import gevent.HurtInfo;
 	import mx.core.FlexSprite;
