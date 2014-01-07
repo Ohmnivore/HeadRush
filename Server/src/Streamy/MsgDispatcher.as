@@ -22,16 +22,42 @@ package Streamy
 		
 		public var msg:Array = new Array;
 		
+		//Network performance stats
 		public var seq:uint = 10;
 		internal var _ack:uint;
-		public var times:Array = [75, 75, 75, 75, 75, 75, 75, 75, 75, 75];
+		public var times:Array = [true, true, true, true, true, true, true, true, true, true];
 		public var ping:Number = 75.0;
-		public var lostpacks:uint = 0;
+		public var lostpacks:uint = 0; //Doesn't work yet
+		
+		//Network congestion handling variables
+		public const UDPDOWN:uint = 2;
+		public const TCPDOWN:uint = 3;
+		public const UDPUP:Number = 0.005;
+		public const TCPUP:Number = 0.004;
 		
 		public function MsgDispatcher(Network:*, Peer:ServerPeer)
 		{
 			peer = Peer;
 			network = Network;
+		}
+		
+		public function regulate(Congested:Boolean):void
+		{
+			if (Congested)
+			{
+				udpdelay *= UDPDOWN;
+				tcpdelay *= TCPDOWN;
+				if (udpdelay > 0.5) udpdelay = 0.5;
+				if (tcpdelay > 0.5) tcpdelay = 0.5;
+			}
+			
+			else
+			{
+				udpdelay -= UDPUP;
+				tcpdelay -= TCPUP;
+				if (udpdelay < 0) udpdelay = 0;
+				if (tcpdelay < 0) tcpdelay = 0;
+			}
 		}
 		
 		public function set ack(v:uint):void
@@ -41,21 +67,22 @@ package Streamy
 			var diff:uint;
 			diff = seq - _ack;
 			
-			if (diff < 10)
+			if (diff < 11)
 			{
-				if (times[10 - diff] != true)
+				if (times[10 - diff] != -1)
 				{
 					var rtt:Number;
 					rtt = times[10 - diff];
-					times[10 - diff] = true;
-					if (rtt > ping) ping += rtt / 10;
-					else ping -= rtt / 10;
+					times[10 - diff] = -1;
+					//if (rtt > ping) ping += rtt / 10;
+					//else ping -= rtt / 10;
+					ping = rtt/2;
 				}
 			}
 			
 			else
 			{
-				ping += 300 / 10;
+				ping += 30;
 			}
 		}
 		
@@ -110,19 +137,14 @@ package Streamy
 				msg.push(seq);
 				seq++;
 				
-				if (times[0] != true)
+				if (times[0] != -1)
 				{
 					lostpacks++;
 				}
 				
 				else 
 				{
-					lostpacks--;
-				}
-				
-				if (lostpacks < 0) 
-				{
-					lostpacks = 0;
+					if (lostpacks > 0) lostpacks--;
 				}
 				
 				times.splice(0, 1);
@@ -146,7 +168,7 @@ package Streamy
 		{
 			for each (var t in times)
 			{
-				if (t != true) t += e * 1000;
+				if (t != -1) t += e * 1000;
 			}
 			
 			udpelapsed += e;
@@ -189,6 +211,29 @@ package Streamy
 					tcpelapsed = 0;
 				}
 			}
+			
+			//Send rate throttle
+			//if (lostpacks > 0)
+			//{
+				//regulate(true);
+				//if (lostpacks > 0) lostpacks--;
+			//}
+			//
+			//else
+			//{
+				//regulate(false);
+			//}
+			
+			var tot:Number = 0;
+			for (var x:int = 5; x < 10; x++)
+			{
+				tot += times[x];
+			}
+			
+			if (tot / 5 > ping) regulate(true);
+			else regulate(false);
+			
+			//trace(ping, udpdelay);
 		}
 		
 		public function add(m:MsgObject):void
