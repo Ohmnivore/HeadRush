@@ -20,12 +20,48 @@ package Streamy
 		public var tcpdelay:Number = 0.033;
 		public var tcpelapsed:Number = 0;
 		
-		public var header:Array = new Array;
+		public var msg:Array = new Array;
+		
+		public var seq:uint = 10;
+		internal var _ack:uint;
+		public var times:Array = [75, 75, 75, 75, 75, 75, 75, 75, 75, 75];
+		public var ping:Number = 75.0;
+		public var lostpacks:uint = 0;
 		
 		public function MsgDispatcher(Network:*, Peer:ServerPeer)
 		{
 			peer = Peer;
 			network = Network;
+		}
+		
+		public function set ack(v:uint):void
+		{
+			_ack = v;
+			
+			var diff:uint;
+			diff = seq - _ack;
+			
+			if (diff < 10)
+			{
+				if (times[10 - diff] != true)
+				{
+					var rtt:Number;
+					rtt = times[10 - diff];
+					times[10 - diff] = true;
+					if (rtt > ping) ping += rtt / 10;
+					else ping -= rtt / 10;
+				}
+			}
+			
+			else
+			{
+				ping += 300 / 10;
+			}
+		}
+		
+		public function get ack():uint
+		{
+			return _ack;
 		}
 		
 		public function check(isTCP:Boolean = false):Boolean
@@ -44,7 +80,14 @@ package Streamy
 			
 			if (queue.length > 0)
 			{
-				if (network.buffer.length + queue[0].data.length < 1000)
+				var tot:uint = 0;
+				
+				for each (var m:ByteArray in msg)
+				{
+					tot += m.length;
+				}
+				
+				if (tot + queue[0].data.length < 900)
 				{
 					return true;
 				}
@@ -55,17 +98,38 @@ package Streamy
 		
 		public function addto(m:MsgObject):void
 		{
-			header.push(network.buffer.length);
-			network.buffer.writeBytes(m.data);
+			msg.push(m.data);
 		}
 		
 		public function finalize(isTCP:Boolean = false):void
 		{
-			var str:String = JSON.stringify(header);
-			
 			var b:ByteArray = new ByteArray();
-			b.writeUTF(str);
-			b.writeBytes(network.buffer);
+			
+			if (!isTCP)
+			{
+				msg.push(seq);
+				seq++;
+				
+				if (times[0] != true)
+				{
+					lostpacks++;
+				}
+				
+				else 
+				{
+					lostpacks--;
+				}
+				
+				if (lostpacks < 0) 
+				{
+					lostpacks = 0;
+				}
+				
+				times.splice(0, 1);
+				times.push(0.0);
+			}
+			
+			b.writeObject(msg);
 			
 			if (isTCP)
 			{
@@ -75,11 +139,16 @@ package Streamy
 			
 			else network.SendUnreliable(b, peer);
 			
-			network.buffer.clear();
+			msg = [];
 		}
 		
 		public function update(e:Number):void
 		{
+			for each (var t in times)
+			{
+				if (t != true) t += e * 1000;
+			}
+			
 			udpelapsed += e;
 			tcpelapsed += e;
 			
@@ -104,14 +173,6 @@ package Streamy
 			
 			if (tcpelapsed > tcpdelay)
 			{
-				//var toSend:MsgObject = fetchTCP(true);
-				//
-				//if (toSend != null)
-				//{
-					//var m:Message = network.messages[toSend.msgID];
-					//m.sendReB(toSend.data, peer);
-					//tcpelapsed = 0;
-				//}
 				var toSend:MsgObject = fetchTCP(true);
 				
 				if (toSend != null)
@@ -133,7 +194,7 @@ package Streamy
 		public function add(m:MsgObject):void
 		{
 			var replaced:Boolean = false;
-			
+			//trace(ping);
 			if (!m.isTCP)
 			{
 				for (var i:uint = 0; i < q.length; i++)

@@ -208,6 +208,8 @@ package Streamy
 				_tosend.push(msg[fields[x]]);
 			}
 			
+			bytedata.writeUnsignedInt(network.seq);
+			
 			for (var y:uint; y < _tosend.length; y++)
 			{
 				if (y == 0)

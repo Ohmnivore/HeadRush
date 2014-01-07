@@ -87,28 +87,6 @@ package Streamy
 			udpportdeclare.msg["udpport"] = 0;
 		}
 		
-		//public function flush(timeelapsed):void
-		//{
-			//elapsed += timeelapsed;
-			//
-			//if (elapsed >= messagespersecond)
-			//{
-				//elapsed = 0;
-				//
-				//var alreadysent:Array = new Array();
-				//for (var x:uint; x < tosend.length; x++)
-				//{
-					//var found:Boolean = false;
-					//for (var y:uint; y < alreadysent.length; y++)
-					//{
-						//if (tosend[x].id == alreadysent[y]) found = true;
-					//}
-					//
-					//if (!found) tosend[x].SendReliable();
-				//}
-			//}
-		//}
-		
 		public function update(elapsed:Number):void
 		{
 			for each (var p:ServerPeer in peers)
@@ -203,6 +181,8 @@ package Streamy
         {
 			try
 			{
+				var ack:uint = event.data.readUnsignedInt();
+				
 				var inputarray:Array = new Array();
 				
 				var x:uint = 0;
@@ -228,6 +208,8 @@ package Streamy
 				udpsocket.dispatchEvent(unreliableevent);
 				
 				var peer:ServerPeer = peers[event.srcAddress.concat(portmappings[event.srcAddress+event.srcPort])];
+				
+				peer.dispatcher.ack = ack;
 				
 				var msgevent:MsgHandler = new MsgHandler(peer, inputarray[0], false);
 				udpsocket.dispatchEvent(msgevent);

@@ -40,10 +40,8 @@ package Streamy
 		public var messages:Dictionary = new Dictionary();
 		public var udpportdeclare:Message;
 		
-		//internal var elapsed:Number;
-		//internal const messagespersecond:uint;
-		//internal const rate:Number;
-		//internal var tosendudp:Array = new Array();
+		public var seq:uint;
+		public var stillprocessing:Boolean = false;
 		
 		public function Client(Ip:String = null, Udpport:uint = 0, Tcpport:uint = 0):void
 		{
@@ -132,90 +130,28 @@ package Streamy
 			{
 				udpsocket.send(bytes, 0, 0);
 			}
-			catch (e)
+			catch (e:Error)
 			{
 				trace("Client: ", "UDP", e);
 			}
-		}
-		
-		private function ProcessTCP(buffer:ByteArray):Array
-		{
-			var inputarray:Array = new Array();
-			
-			var x:uint = 0;
-			var y:uint = 100;
-			while (buffer.bytesAvailable && x <= y)
-			{
-				if (x == 0)
-				{
-					var k = buffer.readInt();
-					inputarray.push(k);
-					y = messages[k].fields.length;
-					x++;
-				}
-				
-				else
-				{
-					var types:Array = messages[inputarray[0]].types;
-					
-					if (types[x-1] == "String") inputarray.push(buffer.readUTF());
-					if (types[x-1] == "Int") inputarray.push(buffer.readInt());
-					if (types[x-1] == "Float") inputarray.push(buffer.readFloat());
-					if (types[x - 1] == "Boolean") inputarray.push(buffer.readBoolean());
-					x++;
-					if (x-1 == types.length) break;
-				}
-			}
-			
-			var unreliableevent:UnreliableEvent = new UnreliableEvent(inputarray);
-			udpsocket.dispatchEvent(unreliableevent);
-			
-			var msgevent:MsgHandler = new MsgHandler(null, inputarray[0], true);
-			udpsocket.dispatchEvent(msgevent);
-			
-			return inputarray;
 		}
 		
 		private function ReceivedTCP(event:ProgressEvent):void
 		{
 			try
 			{
-				var peersocket:Socket = event.target as Socket;
+				var sock:Socket = event.target as Socket;
+				var msg:Array = sock.readObject() as Array;
 				
-				var buffer:ByteArray = new ByteArray();
-				peersocket.readBytes(buffer, 0, peersocket.bytesAvailable);
-				
-				var contents:Array = JSON.parse(buffer.readUTF()) as Array;
-				
-				var currentmsg:uint = 0;
-				
-				for (var currentmsg:uint = 0; currentmsg < contents.length; currentmsg++)
+				for each (var x:ByteArray in msg)
 				{
-					if (currentmsg == contents.length - 1)
-					{
-						var buffer2:ByteArray = new ByteArray();
-						buffer.readBytes(buffer2, contents[currentmsg], 0);
-						
-						ProcessTCP(buffer2);
-					}
-					
-					else
-					{
-						var buffer2:ByteArray = new ByteArray();
-						buffer.readBytes(buffer2, contents[currentmsg], 
-							contents[currentmsg] - contents[currentmsg + 1]);
-						
-						ProcessTCP(buffer2);
-					}
+					ParseFromBytes(x);
 				}
-				
-				//while (buffer.bytesAvailable)
-					//ProcessTCP(buffer);
 			}
 			
-			catch (e)
+			catch (e:Error)
 			{
-				FlxG.log("Client: " + "TCP" + e);
+				FlxG.log(e);
 			}
 		}
 		
@@ -253,32 +189,23 @@ package Streamy
         {
 			try
 			{
-				var contents:Array = JSON.parse(event.data.readUTF()) as Array;
+				var msg:Array = event.data.readObject() as Array;
 				
-				var currentmsg:uint = 0;
-				
-				for (var currentmsg:uint = 0; currentmsg < contents.length; currentmsg++)
+				for (var x:uint = 0; x < msg.length; x++)
 				{
-					if (currentmsg == contents.length - 1)
+					if (x == msg.length - 1)
 					{
-						var buffer:ByteArray = new ByteArray();
-						event.data.readBytes(buffer, contents[currentmsg], 0);
-						
-						ParseFromBytes(buffer);
+						seq = msg[x];
 					}
 					
 					else
 					{
-						var buffer:ByteArray = new ByteArray();
-						event.data.readBytes(buffer, contents[currentmsg], 
-							contents[currentmsg] - contents[currentmsg + 1]);
-						
-						ParseFromBytes(buffer);
+						ParseFromBytes(msg[x]);
 					}
 				}
 			}
 			
-			catch(e)
+			catch(e:Error)
 			{
 				FlxG.log("Client: " + "UDP" + e);
 			}

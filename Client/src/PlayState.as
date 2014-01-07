@@ -317,7 +317,7 @@ package
 					}
 					if ((FlxG.keys.W || FlxG.keys.UP))
 					{
-						player.velocity.y = -player.maxVelocity.y / 2;
+						if (player.isTouching(FlxObject.ANY)) player.velocity.y = -player.maxVelocity.y / 2;
 						Msg.keystatus.msg["up"] = true;
 					}
 					if (FlxG.keys.justReleased("TAB"))
