@@ -76,7 +76,9 @@ package Streamy
 					times[10 - diff] = -1;
 					//if (rtt > ping) ping += rtt / 10;
 					//else ping -= rtt / 10;
-					ping = rtt/2;
+					//ping = rtt / 2;
+					ping = (0.2 * rtt / 2.0) + ((1.0 - 0.2) * ping);
+					if (ping < 0.01) ping = 0.01;
 				}
 			}
 			
@@ -212,18 +214,7 @@ package Streamy
 				}
 			}
 			
-			//Send rate throttle
-			//if (lostpacks > 0)
-			//{
-				//regulate(true);
-				//if (lostpacks > 0) lostpacks--;
-			//}
-			//
-			//else
-			//{
-				//regulate(false);
-			//}
-			
+			//Flow control
 			var tot:Number = 0;
 			for (var x:int = 5; x < 10; x++)
 			{
@@ -233,7 +224,7 @@ package Streamy
 			if (tot / 5 > ping) regulate(true);
 			else regulate(false);
 			
-			//trace(ping, udpdelay);
+			trace(ping, udpdelay);
 		}
 		
 		public function add(m:MsgObject):void
