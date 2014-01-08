@@ -224,7 +224,7 @@ package Streamy
 			if (tot / 5 > ping) regulate(true);
 			else regulate(false);
 			
-			trace(ping, udpdelay);
+			//trace(ping, udpdelay);
 		}
 		
 		public function add(m:MsgObject):void

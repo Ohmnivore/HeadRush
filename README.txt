@@ -29,10 +29,10 @@ LAN server discovery
 Auto-saved settings (client and server)
 Custom entities supported for mapping
 Reliable and unreliable networking channels
-Networked sprites *
+Networked sprites
 Networked sound *
 Networked particle system *
-Networking flow control for optimal packet delivery *
+Networking flow control for optimal packet delivery (+packet aggregation and fragmentation)
 
 All in all I tried to give the server the power
 to change nearly every aspect of the game without 
@@ -42,25 +42,19 @@ official menus and gamemodes are being written as
 plugins and mods as well.
 
 TODO
-1)-Custom networked objects protocol *(1)
-2)-Add flow control to Streamy *(2)
-3)-I forgot about audio. Must think about audio. *(3)
-4)-Networked particle emitters? Why not?
+1)-Message priority for Streamy (smarter queue handling)
+2)-I forgot about audio. Must think about audio. *(3)
+3)-Networked particle emitters? Why not?
 
 TOFIX
 -Better knock back
 -Rewrite custom HUDs classes to use MarkupText
 
-*(1)This will be heavy-duty. Really. In short, it will
-allow the remote creation+handling of FlxSprites on
-a target client while keeping bandwidth usage to a minimum.
-Similar concept to Source engine entities, I guess,
-but I don't know how these work under the hood.
 
-*(2)As of now, there is no flow control and that's very bad.
-I'll implement a basic ACK system for UDP to monitor not only
-RTT, but also lost packets to better manage the
-reliable and unreliable queues.
+*(1)It's the only thing keeping me from finally
+fully implementing the networked sprite protocol.
+Once that's done, things like bullets will finally
+be added to the game.
 
-*(3)Pretty much the same as the networked FlxSprite
+*(2)Pretty much the same as the networked FlxSprite
 protocol but for FlxSound, I guess.

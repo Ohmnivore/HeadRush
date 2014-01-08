@@ -49,7 +49,7 @@ package plugin
 			config.parseXML(xml);
 			
 			savecomps = ["addr"];
-			savecompsdefault = ["127.0.0.1"];
+			savecompsdefault = ["0.0.0.0"];
 			
 			LoadFromSave();
 		}
@@ -77,6 +77,10 @@ package plugin
 			
 			var help:TextArea = new TextArea(showwindow, 0, 0, "Here's all the available addresses:");
 			
+			help.text += '\n';
+			
+			help.text += '\n';
+			help.text += "0.0.0.0 will listen on all available interfaces. It's preferable to use that address.";
 			help.text += '\n';
 			
 			var net:Vector.<NetworkInterface> = NetworkInfo.networkInfo.findInterfaces();
