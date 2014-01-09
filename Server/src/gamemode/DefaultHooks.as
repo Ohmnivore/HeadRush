@@ -17,6 +17,7 @@ package gamemode
 	public class DefaultHooks 
 	{
 		public static var p:PlayState = Registry.playstate;
+		public static var entities:Array = [];
 		
 		public static function update():void 
 		{			
@@ -178,6 +179,7 @@ package gamemode
 				}
 				
 				bullet.kill();
+				bullet["nsprite"].killdelete(null, false);
 			}
 		}
 		
@@ -399,16 +401,14 @@ package gamemode
 		
 		public static function handleKeys(event:MsgHandler):void
 		{
-			//for each (var spr:NFlxSprite in NFlxSpritePreset.items)
-			//{
-				//if (spr.templ == BaseTemplates.flag.id)
-				//{
+			for each (var spr:NFlxSprite in entities)
+			{
+				if (spr.templ == BaseTemplates.bullet.id)
+				{
 					//spr.broadcastupdate();
-				//}
-			//}
-			//if (Registry.server.clients[event.peer.identifier] !== undefined)
-			//{
-			//trace(event.peer.identifier);
+				}
+			}
+			
 			var p:Player = Registry.server.clients[event.peer.identifier];
 			
 			if (!Msg.keystatus.msg["left"] && !Msg.keystatus.msg["right"])

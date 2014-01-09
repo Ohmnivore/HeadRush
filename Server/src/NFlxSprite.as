@@ -26,41 +26,45 @@ package
 			priority = NFlxSpritePreset.templ[templ].priority;
 			
 			var t:NFlxSpriteTemplate = NFlxSpritePreset.templ[template] as NFlxSpriteTemplate;
+			
 			if (localset)
 			{
-				super(x, y, Assets[t.img]);
 				Registry.playstate.entities.add(this);
+			}
+			
+			super(x, y, Assets[t.img]);
 				
-				t.exportTemplate();
-				
-				var props:Object = t.data;
-				
-				for (var prop:String in props)
+			t.exportTemplate();
+			
+			var props:Object = t.data;
+			
+			for (var prop:String in props)
+			{
+				trace(prop, props[prop]);
+				switch (prop)
 				{
-					switch (prop)
-					{
-						case "dragx":
-							drag.x = props[prop];
-							break;
-						case "accy":
-							acceleration.y = props[prop];
-							break;
-						case "scrollFactor":
-							scrollFactor.x = scrollFactor.y = props[prop];
-							break;
-						case "img":
-							loadGraphic(Assets[props[prop]], false, true);
-							break;
-						case "update":
-							upd = props[prop] as Array;
-							break;
-						case "init":
-							init = props[prop] as Array;
-							break;
-						default:
-							this[prop] = props[prop];
-							break;
-					}
+					case "dragx":
+						drag.x = props[prop];
+						break;
+					case "accy":
+						acceleration.y = props[prop];
+						break;
+					case "scrollFactor":
+						scrollFactor.x = scrollFactor.y = props[prop];
+						break;
+					case "img":
+						if (localset) loadGraphic(Assets[props[prop]], false, true);
+						break;
+					case "update":
+						upd = props[prop] as Array;
+						break;
+					case "init":
+						init = props[prop] as Array;
+						break;
+					default:
+						//trace(prop, props[prop]);
+						this[prop] = props[prop];
+						break;
 				}
 			}
 		}
@@ -69,11 +73,11 @@ package
 		{
 			var data:Array = [];
 			
-			for each (var prop:String in upd)
+			for each (var prop:String in init)
 			{
 				data.push(getProp(prop));
 			}
-			
+			trace(x, y);
 			NFlxSpritePreset.createMsg.msg["json"] = JSON.stringify([[templ, ID2, x, y], data]);
 			
 			if (peer == null) NFlxSpritePreset.createMsg.SendReliableToAll(priority, ID2);
@@ -90,9 +94,10 @@ package
 			if (localset)
 			{
 				Registry.playstate.entities.remove(this, true);
-				kill();
-				destroy();
 			}
+			
+			kill();
+			destroy();
 		}
 		
 		public function setImg(img:String, localset:Boolean = true, peer:ServerPeer = null):void

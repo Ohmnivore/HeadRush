@@ -267,6 +267,7 @@ package
 			
 			if (event.id == NFlxSpritePreset.createMsg.ID)
 			{
+				FlxG.log(NFlxSpritePreset.createMsg.msg["json"]);
 				var data:Array = JSON.parse(NFlxSpritePreset.createMsg.msg["json"]) as Array;
 				//FlxG.log(data[1]);
 				if (NFlxSpritePreset.items.hasOwnProperty(data[0][1]))

@@ -75,7 +75,8 @@ package
 			
 			cannon = new FlxWeapon("blaster", this, "x", "y");
 			cannon.player = this;
-			cannon.makePixelBullet(5, 6, 6, 0xff000000);
+			//cannon.makePixelBullet(5, 6, 6, 0xff000000);
+			cannon.makeImageBullet(5, Assets.BULLET);
 			cannon.setBulletSpeed(160);
 			cannon.setFireRate(2000);
 			cannon.setBulletOffset(10, 10);

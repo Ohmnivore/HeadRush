@@ -33,6 +33,7 @@ Networked sprites
 Networked sound *
 Networked particle system *
 Networking flow control for optimal packet delivery (+packet aggregation and fragmentation)
+Networking message priority (smart queue handling)
 
 All in all I tried to give the server the power
 to change nearly every aspect of the game without 
@@ -42,19 +43,16 @@ official menus and gamemodes are being written as
 plugins and mods as well.
 
 TODO
-1)-Message priority for Streamy (smarter queue handling)
-2)-I forgot about audio. Must think about audio. *(3)
-3)-Networked particle emitters? Why not?
+1)-I forgot about audio. Must think about audio. *(3)
+2)-Networked particle emitters? Why not?
 
 TOFIX
 -Better knock back
 -Rewrite custom HUDs classes to use MarkupText
 
 
-*(1)It's the only thing keeping me from finally
-fully implementing the networked sprite protocol.
-Once that's done, things like bullets will finally
-be added to the game.
-
-*(2)Pretty much the same as the networked FlxSprite
-protocol but for FlxSound, I guess.
+*(1)Pretty much the same as the networked FlxSprite
+protocol but for FlxSound, I guess. Also I plan to
+use FkxFlod for background music (tracker music is
+awesome and also takes up waaaay less space - a 
+common issue in games.)

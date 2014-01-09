@@ -13,6 +13,7 @@
 
 package org.flixel.plugin.photonstorm.BaseTypes 
 {
+	import gamemode.BaseTemplates;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxSprite;
 	import org.flixel.plugin.photonstorm.FlxMath;
@@ -22,6 +23,8 @@ package org.flixel.plugin.photonstorm.BaseTypes
 
 	public class Bullet extends FlxSprite
 	{
+		public var nsprite:NFlxSprite;
+		
 		public var weapon:FlxWeapon;
 		
 		protected var bulletSpeed:int;
@@ -157,6 +160,13 @@ package org.flixel.plugin.photonstorm.BaseTypes
 				velocity.x = newVelocity.x;
 				velocity.y = newVelocity.y;
 			}
+			nsprite = new NFlxSprite(BaseTemplates.bullet.id, x, y);
+			//nsprite.update();
+			//nsprite.x = x;
+			//nsprite.y = y;
+			nsprite.velocity.x = velocity.x;
+			nsprite.velocity.y = velocity.y;
+			nsprite.declare();
 			
 			postFire();
 		}

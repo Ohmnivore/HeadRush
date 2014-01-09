@@ -40,6 +40,9 @@ package
 		//[Embed(source = "art/flag.png")]
 		//public static const FLAG:Class;
 		
+		[Embed(source = "art/bullet.png")]
+		public static const BULLET:Class;
+		
 		public function Assets() 
 		{
 			

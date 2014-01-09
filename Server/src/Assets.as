@@ -37,6 +37,9 @@ package
 		[Embed(source = "art/flag.png")]
 		public static const FLAG:Class;
 		
+		[Embed(source = "art/bullet.png")]
+		public static const BULLET:Class;
+		
 		public static const LVLS = JSON.parse(String(new embedded_text()));
 		
 		public function Assets() 
