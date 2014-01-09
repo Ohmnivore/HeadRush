@@ -230,14 +230,14 @@ package Streamy
 		public function add(m:MsgObject):void
 		{
 			var replaced:Boolean = false;
-			//trace(ping);
+			
 			if (!m.isTCP)
 			{
 				for (var i:uint = 0; i < q.length; i++)
 				{
 					var m2:MsgObject = q[i];
 					
-					if (m2.msgID == m.msgID && !m2.isTCP)
+					if (m2.msgID == m.msgID && m2.entity == m.entity)
 					{
 						m2.data = m.data;
 						replaced = true;
@@ -255,6 +255,8 @@ package Streamy
 		
 		public function fetchUDP(Splice:Boolean = false):MsgObject
 		{
+			q.sortOn("priority", Array.NUMERIC | Array.DESCENDING);
+			
 			var found:MsgObject = null;
 			
 			if (q.length > 0)
@@ -263,17 +265,29 @@ package Streamy
 				if (Splice) q.splice(0, 1);
 			}
 			
+			for (var x:uint = 0; x < q.length; x++)
+			{
+				q[x].priority++;
+			}
+			
 			return found;
 		}
 		
 		public function fetchTCP(Splice:Boolean = false):MsgObject
 		{
+			tcpq.sortOn("priority", Array.NUMERIC | Array.DESCENDING);
+			
 			var found:MsgObject = null;
 			
 			if (tcpq.length > 0)
 			{
 				found = tcpq[0];
 				if (Splice) tcpq.splice(0, 1);
+			}
+			
+			for (var x:uint = 0; x < tcpq.length; x++)
+			{
+				tcpq[x].priority++;
 			}
 			
 			return found;
