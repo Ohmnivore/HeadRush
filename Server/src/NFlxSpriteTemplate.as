@@ -2,11 +2,12 @@ package
 {
 	import flash.utils.Dictionary;
 	import org.flixel.FlxPoint;
+	import Streamy.MsgObject;
 	
 	public class NFlxSpriteTemplate 
 	{
 		public var id:uint = 0;
-		public var priority = 0;
+		public var priority = MsgObject.STREAMY_PRT - 2;
 		
 		public var img:String; //
 		public var active:Boolean = true;

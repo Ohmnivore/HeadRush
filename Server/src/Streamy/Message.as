@@ -59,7 +59,7 @@ package Streamy
 		/**
 		 * DO NOT USE. NOT IMPLEMENTED.
 		 */
-		public var compress:Boolean;
+		public var compress:Boolean = false;
 		
 		/**
 		 * A buffer used when sending.
@@ -80,14 +80,14 @@ package Streamy
 		 * @param Network	The parent network. You should pass an instance of a client or that of a server.
 		 * @param Compress 	Whether to use zlib compression. Only compresses when message is sent through TCP (reliable).
 		 */
-		public function Message(id:uint, Network, Compress:Boolean = false) 
+		public function Message(id:uint, Network) 
 		{
 			fields = new Array();
 			msg = new Array();
 			_tosend = new Array();
 			bytedata = new ByteArray();
 			ID = id;
-			compress = Compress;
+			//compress = Compress;
 			
 			network = Network;
 			network.add(this);
@@ -97,108 +97,33 @@ package Streamy
 			else isClient = false;
 		}
 		
-		public function Updatemsg(event:UnreliableEvent):void
-		{
-			for (var x:uint = 1; x < event.data.length; x++)
-			{
-				msg[fields[x-1]] = event.data[x];
-			}
-		}
-		
 		/**
 		 * Sends a reliable message via TCP.
 		 * 
 		 * @param peer		If network parent is a server, specify a peer to whom you want to send the message. Otherwise leave it null.
 		 */
-		public function SendReliable(peer:ServerPeer = null):void
+		public function SendReliable(peer:ServerPeer = null,
+			Priority:uint = MsgObject.STREAMY_PRT, EntID:int = MsgObject.STREAMY_ENT):void
 		{
-			//try
-			//{
-				//if (isClient)
-				//{
-					//_tosend.splice(0);
-					//_tosend.push(ID);
-					//bytedata.clear();
-					//
-					//for (var x:uint; x < fields.length; x++)
-					//{
-						//_tosend.push(msg[fields[x]]);
-					//}
-					//
-					//for (var y:uint; y < _tosend.length; y++)
-					//{
-						//if (y == 0)
-						//{
-							//bytedata.writeInt(_tosend[y]);
-						//}
-						//
-						//else
-						//{
-							//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
-							//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
-							//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
-							//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
-						//}
-					//}
-					//
-					//if (compress) bytedata.compress();
-					//network.tcpsocket.writeBytes(bytedata);
-					//network.tcpsocket.flush();
-				//}
-				//
-				//else
-				//{
-					//_tosend.splice(0);
-					//_tosend.push(ID);
-					//bytedata.clear();
-					//
-					//for (var x:uint; x < fields.length; x++)
-					//{
-						//_tosend.push(msg[fields[x]]);
-					//}
-					//
-					//for (var y:uint; y < _tosend.length; y++)
-					//{
-						//if (y == 0)
-						//{
-							//bytedata.writeInt(_tosend[y]);
-						//}
-						//
-						//else
-						//{
-							//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
-							//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
-							//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
-							//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
-						//}
-					//}
-					//
-					//trace(peer.tcpsocket.remotePort);
-					//if (compress) bytedata.compress();
-					//peer.tcpsocket.writeBytes(bytedata);
-					//peer.tcpsocket.flush();
-				//}
-			//}
-			//
-			//catch (e:IOError)
-			//{
-				//if (isClient) trace("Client: ", "TCP", e);
-				//else trace("Server: ", "TCP", e);
-			//}
 			helpermsg.data = getByteArray();
 			helpermsg.msgID = ID;
 			helpermsg.isTCP = true;
+			helpermsg.priority = Priority;
+			helpermsg.entity = EntID;
+			
 			peer.dispatcher.add(helpermsg);
 		}
 		
 		/**
 		 * Sends a reliable message via TCP to ALL connected peers.
 		 */
-		public function SendReliableToAll():void
+		public function SendReliableToAll(Priority:uint = MsgObject.STREAMY_PRT, EntID:int = MsgObject.STREAMY_ENT):void
 		{
 			helpermsg.data = getByteArray();
 			helpermsg.msgID = ID;
 			helpermsg.isTCP = true;
+			helpermsg.priority = Priority;
+			helpermsg.entity = EntID;
 			
 			for each (var peer:ServerPeer in network.peers)
 			{
@@ -207,13 +132,32 @@ package Streamy
 		}
 		
 		/**
-		 * Sends an unreliable but fast message via UDP to ALL connected peers.
+		 * Sends an unreliable but fast message via UDP.
+		 * 
+		 * @param peer		If network parent is a server, specify a peer to whom you want to send the message. Otherwise leave it null.
 		 */
-		public function SendUnreliableToAll():void
+		public function SendUnreliable(peer:ServerPeer = null,
+			Priority:uint = MsgObject.STREAMY_PRT, EntID:int = MsgObject.STREAMY_ENT):void
 		{
 			helpermsg.data = getByteArray();
 			helpermsg.msgID = ID;
 			helpermsg.isTCP = false;
+			helpermsg.priority = Priority;
+			helpermsg.entity = EntID;
+			
+			peer.dispatcher.add(helpermsg);
+		}
+		
+		/**
+		 * Sends an unreliable but fast message via UDP to ALL connected peers.
+		 */
+		public function SendUnreliableToAll(Priority:uint = MsgObject.STREAMY_PRT, EntID:int = MsgObject.STREAMY_ENT):void
+		{
+			helpermsg.data = getByteArray();
+			helpermsg.msgID = ID;
+			helpermsg.isTCP = false;
+			helpermsg.priority = Priority;
+			helpermsg.entity = EntID;
 			
 			for each (var peer:ServerPeer in network.peers)
 			{
@@ -288,46 +232,6 @@ package Streamy
 		}
 		
 		/**
-		 * Sends an unreliable but fast message via UDP.
-		 * 
-		 * @param peer		If network parent is a server, specify a peer to whom you want to send the message. Otherwise leave it null.
-		 */
-		public function SendUnreliable(peer:ServerPeer = null):void
-		{
-			//bytedata.clear();
-			//_tosend.splice(0);
-			//_tosend.push(ID);
-			//
-			//for (var x:uint; x < fields.length; x++)
-			//{
-				//_tosend.push(msg[fields[x]]);
-			//}
-			//
-			//for (var y:uint; y < _tosend.length; y++)
-			//{
-				//if (y == 0)
-				//{
-					//bytedata.writeInt(_tosend[y]);
-				//}
-				//
-				//else
-				//{
-					//if (types[y-1] == "String") bytedata.writeUTF(_tosend[y]);
-					//if (types[y-1] == "Int") bytedata.writeInt(_tosend[y]);
-					//if (types[y-1] == "Float") bytedata.writeFloat(_tosend[y]);
-					//if (types[y-1] == "Boolean") bytedata.writeBoolean(_tosend[y]);
-				//}
-			//}
-			//
-			//if (isClient) network.SendUnreliable(bytedata);
-			//else network.SendUnreliable(bytedata, peer);
-			helpermsg.data = getByteArray();
-			helpermsg.msgID = ID;
-			helpermsg.isTCP = false;
-			peer.dispatcher.add(helpermsg);
-		}
-		
-		/**
 		 * Sets fields for this message. Call this method right after creation of the message instance.
 		 * 
 		 * @param fieldarray	Ex: SetFields("id", "xpos", "ypos") will create those 3 fields.
@@ -353,6 +257,14 @@ package Streamy
 		public function SetTypes(... fieldarray):void
 		{
 			types = fieldarray;
+		}
+		
+		public function Updatemsg(event:UnreliableEvent):void
+		{
+			for (var x:uint = 1; x < event.data.length; x++)
+			{
+				msg[fields[x-1]] = event.data[x];
+			}
 		}
 	}
 

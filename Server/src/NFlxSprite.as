@@ -2,6 +2,7 @@ package
 {
 	import org.flixel.FlxSprite;
 	import Streamy.Message;
+	import Streamy.MsgObject;
 	import Streamy.ServerPeer;
 	
 	public class NFlxSprite extends FlxSprite
@@ -10,7 +11,7 @@ package
 		public var upd:Array = [];
 		public var init:Array = [];
 		public var ID2:uint = 0;
-		public var priority = 0;
+		public var priority = MsgObject.STREAMY_PRT - 2;
 		
 		public function NFlxSprite(template:uint, x:Number = 0, y:Number = 0, localset = false, peer:ServerPeer = null)
 		{
@@ -75,16 +76,16 @@ package
 			
 			NFlxSpritePreset.createMsg.msg["json"] = JSON.stringify([[templ, ID2, x, y], data]);
 			
-			if (peer == null) NFlxSpritePreset.createMsg.SendReliableToAll();
-			else NFlxSpritePreset.createMsg.SendReliable(peer);
+			if (peer == null) NFlxSpritePreset.createMsg.SendReliableToAll(priority, ID2);
+			else NFlxSpritePreset.createMsg.SendReliable(peer, priority, ID2);
 		}
 		
 		public function killdelete(peer:ServerPeer = null, localset:Boolean = true)
 		{
 			NFlxSpritePreset.deleteMsg.msg["ID"] = ID2;
 			
-			if (peer == null) NFlxSpritePreset.deleteMsg.SendReliableToAll();
-			else NFlxSpritePreset.deleteMsg.SendReliable(peer);
+			if (peer == null) NFlxSpritePreset.deleteMsg.SendReliableToAll(priority, ID2);
+			else NFlxSpritePreset.deleteMsg.SendReliable(peer, priority, ID2);
 			
 			if (localset)
 			{
@@ -100,8 +101,8 @@ package
 			
 			NFlxSpritePreset.setImg.msg["name"] = img;
 			
-			if (peer == null) NFlxSpritePreset.setImg.SendReliableToAll();
-			else NFlxSpritePreset.setImg.SendReliable(peer);
+			if (peer == null) NFlxSpritePreset.setImg.SendReliableToAll(priority, ID2);
+			else NFlxSpritePreset.setImg.SendReliable(peer, priority, ID2);
 		}
 		
 		public function broadcastupdate(peer:ServerPeer = null, useTCP:Boolean = false):void
@@ -122,14 +123,14 @@ package
 			
 			if (useTCP)
 			{
-				if (peer == null) NFlxSpritePreset.updateMsg.SendReliableToAll();
-				else NFlxSpritePreset.updateMsg.SendReliable(peer);
+				if (peer == null) NFlxSpritePreset.updateMsg.SendReliableToAll(priority, ID2);
+				else NFlxSpritePreset.updateMsg.SendReliable(peer, priority, ID2);
 			}
 			
 			else
 			{
-				if (peer == null) NFlxSpritePreset.updateMsg.SendUnreliableToAll();
-				else NFlxSpritePreset.updateMsg.SendUnreliable(peer);
+				if (peer == null) NFlxSpritePreset.updateMsg.SendUnreliableToAll(priority, ID2);
+				else NFlxSpritePreset.updateMsg.SendUnreliable(peer, priority, ID2);
 			}
 		}
 		
@@ -167,12 +168,12 @@ package
 			{
 				if (peer == null)
 				{
-					NFlxSpritePreset.setMsg.SendReliableToAll();
+					NFlxSpritePreset.setMsg.SendReliableToAll(priority, ID2);
 				}
 				
 				else
 				{
-					NFlxSpritePreset.setMsg.SendReliable(peer);
+					NFlxSpritePreset.setMsg.SendReliable(peer, priority, ID2);
 				}
 			}
 			
@@ -180,12 +181,12 @@ package
 			{
 				if (peer == null)
 				{
-					NFlxSpritePreset.setMsg.SendUnreliableToAll();
+					NFlxSpritePreset.setMsg.SendUnreliableToAll(priority, ID2);
 				}
 				
 				else
 				{
-					NFlxSpritePreset.setMsg.SendUnreliable(peer);
+					NFlxSpritePreset.setMsg.SendUnreliable(peer, priority, ID2);
 				}
 
 			}

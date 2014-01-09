@@ -14,8 +14,8 @@ package Streamy
 		
 		public var entity:int;
 		
-		public const STREAMY_ENT:int = -1;
-		public const STREAMY_PRT:uint = 5;
+		public static const STREAMY_ENT:int = -1;
+		public static const STREAMY_PRT:uint = 5;
 		
 		public function MsgObject(Data:ByteArray, MsgID:uint, IsTCP:Boolean = false, 
 			Priority:uint = STREAMY_PRT, Entity:int = STREAMY_ENT) 
