@@ -10,7 +10,7 @@
 	<copyright></copyright> 
 	
 	<initialWindow> 
-		<title>Test</title> 
+		<title>HeadRush Server</title> 
 		<content>Test.swf</content> 
 		<systemChrome>standard</systemChrome> 
 		<transparent>false</transparent> 

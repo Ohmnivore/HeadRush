@@ -4,12 +4,12 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\Test.swf" />
+    <movie path="bin\Server.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
     <movie version="3" />
-    <movie minorVersion="7" />
+    <movie minorVersion="9" />
     <movie platform="AIR" />
     <movie background="#FFFFFF" />
   </output>
