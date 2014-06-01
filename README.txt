@@ -1,8 +1,8 @@
 UPDATE
 
-I have abandoned this project. I decided to move on to
+I have abandoned this version, but made a better one. I decided to move on to
 Haxe and HaxeFlixel because I just hate Adobe AIR.
-So here's the newer version: http://skullrush.elementfx.com/smf/
+So here's the newer version: https://github.com/Ohmnivore/SkullRush
 
 
 Sup. This is Head Rush. It's an online
