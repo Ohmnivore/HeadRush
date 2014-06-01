@@ -1,3 +1,10 @@
+UPDATE
+
+I have abandoned this project. I decided to move on to
+Haxe and HaxeFlixel because I just hate Adobe AIR.
+So here's the newer version: http://skullrush.elementfx.com/smf/
+
+
 Sup. This is Head Rush. It's an online
 multiplayer 2D platformer shooter.
 
